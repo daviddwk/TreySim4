@@ -1,0 +1,3 @@
+[submodule "lib/Eendgine"]
+	path = lib/Eendgine
+	url = https://github.com/daviddwk/Eendgine
