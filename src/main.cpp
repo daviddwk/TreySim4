@@ -20,25 +20,16 @@
 #include <numbers>
 #include <vector>
 
+#include "terrain.hpp"
+
 namespace Eend = Eendgine;
 
 const unsigned int screenHeight = 750;
 const unsigned int screenWidth = 1000;
 
 int main() {
-    // DEBUG
-    Eend::Info::registerTime("frame time", INFO_OPTION_AVERAGE);
-    Eend::Info::registerTime("frame time", 0);
-    Eend::Info::registerTime("strike time", 0);
-    Eend::Info::registerTime("player time", 0);
-    Eend::Info::registerTime("court time", 0);
-    Eend::Info::registerTime("ball time", 0);
-    Eend::Info::registerTime("draw time", 0);
-    Eend::Info::registerTime("render time", 0);
-    Eend::Info::registerInt("test id", 0);
-    //
 
-    Eend::Window::init(screenWidth, screenHeight, "Quack");
+    Eend::Window::init(screenWidth, screenHeight, "Neigh");
     Eend::Screen::init(screenWidth, screenHeight);
     Eend::InputManager::init();
     Eend::Info::init();
@@ -58,65 +49,24 @@ int main() {
 
     std::vector<Eend::CollisionModel *> myColModels;
 
-    // Ball ball("resources/ost/diffuse_noeyes.png", glm::vec3(0.0f, 10.0f,
-    // 0.0f), 10.0f);
-    /*
-    auto testPanelId =
-    Eend::Entities::PanelBatch::insert({"resources/ost/diffuse_noeyes.png"});
-    auto testPanelIdd =
-    Eend::Entities::PanelBatch::insert({"resources/ost/diffuse_noeyes.png"});
-    Eend::Info::updateInt("test id", testPanelId);
-    Eend::Sprite& testPanelRef =
-    Eend::Entities::PanelBatch::getRef(testPanelId); Eend::Sprite&
-    testPanelReff = Eend::Entities::PanelBatch::getRef(testPanelIdd);
-    testPanelRef.setScale(100, 100); testPanelReff.setScale(100, 100);
-    testPanelReff.setPosition(glm::vec3(20.0f));
-    */
-    Eend::Text text("test", 100, "aABC");
+    Terrain testTerrain;
+    testTerrain.generate_terrain("resources/new.png");
+
+    Eend::Entities::ModelBatch::insert("resources/new.obj");
 
     while (!Eend::InputManager::shouldClose) {
         Eend::FrameLimiter::startInterval();
-        Eend::Info::startTime("frame time");
         Eend::Screen::bind();
 
-        shaders.setPixelSize(5);
-
-        float dt = Eend::FrameLimiter::deltaTime;
-        if (dt > 1.0f / 30.0f)
-            dt = 1.0f / 30.0f;
-
-        Eend::Info::startTime("strike time");
-        /*
-        if (player.getStrike() &&
-        Eend::colliding(player.getStrikeCollision(), ball.getCollision(),
-        nullptr)) { ball.hit();
-        }
-        */
-        Eend::Info::stopTime("strike time");
-
-        Eend::Info::startTime("player time");
-        Eend::Info::stopTime("player time");
-
-        Eend::Info::startTime("ball time");
-        // ball.update(dt);
-        Eend::Info::stopTime("ball time");
-
-        Eend::Info::startTime("court time");
-        Eend::Info::stopTime("court time");
-
-        Eend::Info::startTime("draw time");
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
-        Eend::Info::stopTime("draw time");
-
-        Eend::Info::startTime("player time");
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
-        Eend::Info::stopTime("player time");
 
         Eend::InputManager::processInput();
 
         Eend::Window::swapBuffers();
+
         Eend::Info::print();
-        Eend::Info::stopTime("frame time");
+
         Eend::FrameLimiter::stopInterval();
     }
     Eend::Screen::close();
