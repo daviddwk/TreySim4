@@ -1,16 +1,18 @@
 #pragma once
+#include <Eendgine/entityBatches.hpp>
 #include <filesystem>
 #include <optional>
 #include <vector>
+namespace Eend = Eendgine;
 
 class Terrain {
   public:
-    Terrain();
+    Terrain(std::filesystem::path pngHeightMap, glm::vec3 scale);
     ~Terrain();
-    std::optional<std::filesystem::path> generate_terrain(std::filesystem::path png_height_map);
 
   private:
     int _height;
     int _width;
     std::vector<std::vector<int>> _heightMap;
+    Eend::ModelId _modelId;
 };

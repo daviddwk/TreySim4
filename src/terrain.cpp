@@ -10,10 +10,13 @@
 
 namespace Eend = Eendgine;
 
-Terrain::Terrain() : _height(0), _width(0) {}
-Terrain::~Terrain() {}
+Terrain::Terrain(std::filesystem::path path, glm::vec3 scale) : _height(0), _width(0), _modelId(0) {
 
-std::optional<std::filesystem::path> Terrain::generate_terrain(std::filesystem::path pngHeightMap) {
+    if (!std::filesystem::is_directory(path)) {
+        Eend::fatalError("loading terrain " + path.string() + " is not a directory");
+    }
+
+    std::filesystem::path pngHeightMap = path / (path.filename().string() + ".png");
 
     int channels = 0;
     unsigned char *imageData = stbi_load(pngHeightMap.c_str(), &_width, &_height, &channels, 0);
@@ -25,15 +28,17 @@ std::optional<std::filesystem::path> Terrain::generate_terrain(std::filesystem::
     for (int h = 0; h < (_height - 1); ++h) {
         _heightMap.emplace_back();
         for (int w = 0; w < (_width - 1); ++w) {
-            const unsigned int currentIdx = w + (h * w);
-            const unsigned int rightIdx = (w + 1) + (h * w);
-            const unsigned int downIdx = w + ((h + 1) * w);
+            const unsigned int currentIdx = w + (h * _width);
+            const unsigned int rightIdx = (w + 1) + (h * _width);
+            const unsigned int downIdx = w + ((h + 1) * _width);
             const unsigned int avg = ((imageData[currentIdx] + imageData[rightIdx] +
                                           imageData[downIdx] + imageData[currentIdx]) /
                                       4);
-            _heightMap[h].push_back(avg);
+            _heightMap[h].push_back((float)avg * scale.y);
         }
     }
+
+    stbi_image_free(imageData);
 
     if (_heightMap.size() == 0) {
         Eend::fatalError("height map is empty");
@@ -50,37 +55,31 @@ std::optional<std::filesystem::path> Terrain::generate_terrain(std::filesystem::
     // make obj
     std::string fileName = pngHeightMap.stem().string();
 
-    std::ofstream objFile("resources/" + fileName + ".obj");
+    std::ofstream objFile(path / (path.filename().string() + ".obj"));
 
     objFile << "# TreySim4" << std::endl;
     objFile << "mtllib " << fileName << ".mtl" << std::endl;
     objFile << "o " << fileName << std::endl;
 
-    float scale = 1;
-    float xPos, yPos = 0;
+    float xPos = 0.0f;
+    float yPos = 0.0f;
     // vert positions
     for (auto &line : _heightMap) {
         for (int &height : line) {
-            xPos += 1.0f * scale;
             // x and y Pos also UV map?
-            objFile << "v " << xPos << " " << yPos << " " << height << std::endl;
+            objFile << "v " << xPos * scale.x << " " << height << " " << yPos * scale.z
+                    << std::endl; // height << std::endl;
+            xPos += 1.0f;
         }
         xPos = 0.0f;
-        yPos += 1.0f * scale;
-    }
-    // vert normals
-    for (auto &line : _heightMap) {
-        for (int &height : line) {
-            // temp vertex normals
-            objFile << "vn " << 0.000f << " " << 0.000f << " " << 1.000f << std::endl;
-        }
+        yPos += 1.0f;
     }
     // uv mapping
     for (unsigned int lineIdx = 0; lineIdx < _heightMap.size(); ++lineIdx) {
-        float heightRatio = (float)lineIdx / (float)(_heightMap.size() - 1);
+        float heightRatio = 1.0f - ((float)lineIdx / (float)(_heightMap.size() - 1.0f));
         for (unsigned int eleIdx = 0; eleIdx < _heightMap[lineIdx].size(); ++eleIdx) {
-            float widthRatio = (float)eleIdx / (float)(_heightMap[lineIdx].size() - 1);
-            objFile << "vt " << widthRatio << " " << 0.000f << heightRatio << std::endl;
+            float widthRatio = (float)eleIdx / (float)(_heightMap[lineIdx].size() - 1.0f);
+            objFile << "vt " << widthRatio << " " << heightRatio << std::endl;
         }
     }
 
@@ -107,7 +106,7 @@ std::optional<std::filesystem::path> Terrain::generate_terrain(std::filesystem::
         }
     }
 
-    std::ofstream mtlFile("resources/" + fileName + ".mtl");
+    std::ofstream mtlFile(path / (path.filename().string() + ".mtl"));
     mtlFile << "#TreySim4" << std::endl;
     mtlFile << "newmtl Material" << std::endl;
     mtlFile << "Ns 0.000000" << std::endl;
@@ -118,7 +117,14 @@ std::optional<std::filesystem::path> Terrain::generate_terrain(std::filesystem::
     mtlFile << "Ni 1.000000" << std::endl;
     mtlFile << "d 1.000000" << std::endl;
     mtlFile << "illum 2" << std::endl;
-    mtlFile << "map_Kd " << fileName << ".png" << std::endl;
+    mtlFile << "map_Kd diffuse.png" << std::endl;
 
-    return std::nullopt;
+    objFile.close();
+    mtlFile.close();
+
+    _modelId = Eend::Entities::ModelBatch::insert(path / (path.filename().string() + ".obj"));
+    auto modelRef = Eend::Entities::ModelBatch::getRef(_modelId);
+    modelRef.setScale(scale);
 }
+
+Terrain::~Terrain() { Eend::Entities::ModelBatch::erase(_modelId); }

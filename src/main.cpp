@@ -45,18 +45,18 @@ int main() {
 
     Eend::Camera2D hudCamera(screenWidth, screenHeight);
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
-        glm::vec3(20.0f, 15.0f, 20.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        glm::vec3(-25.0f, 55.0f, 65.0f), glm::vec3(35.0f, 0.0f, 55.0f));
 
     std::vector<Eend::CollisionModel *> myColModels;
 
-    Terrain testTerrain;
-    testTerrain.generate_terrain("resources/new.png");
+    Terrain testTerrain("resources/terrain/test", glm::vec3(2.0f, 0.05f, 2.0f));
 
-    Eend::Entities::ModelBatch::insert("resources/new.obj");
+    float look_height = 0.0f;
 
     while (!Eend::InputManager::shouldClose) {
         Eend::FrameLimiter::startInterval();
         Eend::Screen::bind();
+        shaders.setPixelSize(5);
 
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
