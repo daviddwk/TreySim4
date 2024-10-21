@@ -1,16 +1,24 @@
 #include "terrain.hpp"
 
+#include <Eendgine/collisionGeometry.hpp>
 #include <Eendgine/fatalError.hpp>
+#include <Eendgine/info.hpp>
 
 #include <stb/stb_image.h>
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <string>
 
 namespace Eend = Eendgine;
 
-Terrain::Terrain(std::filesystem::path path, glm::vec3 scale) : _height(0), _width(0), _modelId(0) {
+float pointHeightOnTri(
+    const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, float x, float z);
+float pythagorean(float a, float b);
+
+Terrain::Terrain(std::filesystem::path path, glm::vec3 scale)
+    : _height(0), _width(0), _modelId(0), _scale(scale) {
 
     if (!std::filesystem::is_directory(path)) {
         Eend::fatalError("loading terrain " + path.string() + " is not a directory");
@@ -19,7 +27,7 @@ Terrain::Terrain(std::filesystem::path path, glm::vec3 scale) : _height(0), _wid
     std::filesystem::path pngHeightMap = path / (path.filename().string() + ".png");
 
     int channels = 0;
-    unsigned char *imageData = stbi_load(pngHeightMap.c_str(), &_width, &_height, &channels, 0);
+    unsigned char* imageData = stbi_load(pngHeightMap.c_str(), &_width, &_height, &channels, 0);
     if (imageData == NULL) {
         Eend::fatalError(
             "unable to load image " + pngHeightMap.generic_string() + " for terrain generation");
@@ -34,7 +42,7 @@ Terrain::Terrain(std::filesystem::path path, glm::vec3 scale) : _height(0), _wid
             const unsigned int avg = ((imageData[currentIdx] + imageData[rightIdx] +
                                           imageData[downIdx] + imageData[currentIdx]) /
                                       4);
-            _heightMap[h].push_back((float)avg * scale.y);
+            _heightMap[h].push_back(((float)avg / 256.0f) * _scale.y);
         }
     }
 
@@ -46,7 +54,7 @@ Terrain::Terrain(std::filesystem::path path, glm::vec3 scale) : _height(0), _wid
     if (_heightMap.size() != (_height - 1)) {
         Eend::fatalError("height map unexpected height");
     }
-    for (auto &line : _heightMap) {
+    for (auto& line : _heightMap) {
         if (line.size() != (_width - 1)) {
             Eend::fatalError("height map unexpected line width");
         }
@@ -64,10 +72,10 @@ Terrain::Terrain(std::filesystem::path path, glm::vec3 scale) : _height(0), _wid
     float xPos = 0.0f;
     float yPos = 0.0f;
     // vert positions
-    for (auto &line : _heightMap) {
-        for (int &height : line) {
+    for (auto& line : _heightMap) {
+        for (float& height : line) {
             // x and y Pos also UV map?
-            objFile << "v " << xPos * scale.x << " " << height << " " << yPos * scale.z
+            objFile << "v " << xPos * _scale.x << " " << height << " " << yPos * _scale.z
                     << std::endl; // height << std::endl;
             xPos += 1.0f;
         }
@@ -123,8 +131,98 @@ Terrain::Terrain(std::filesystem::path path, glm::vec3 scale) : _height(0), _wid
     mtlFile.close();
 
     _modelId = Eend::Entities::ModelBatch::insert(path / (path.filename().string() + ".obj"));
-    auto modelRef = Eend::Entities::ModelBatch::getRef(_modelId);
-    modelRef.setScale(scale);
+    Eend::Model& modelRef = Eend::Entities::ModelBatch::getRef(_modelId);
+    Eend::Model* pointer;
 }
 
 Terrain::~Terrain() { Eend::Entities::ModelBatch::erase(_modelId); }
+
+//    top left +-------+ top right
+//             |\      |
+//             | \upper|
+//             |  \    |
+//             |   \   |
+//             |    \  |
+//             |lower\ |
+//             |      \|
+// bottom left +-------+ bottom right
+
+float Terrain::heightAtPoint(const float x, const float z) {
+
+    Eend::Info::registerInt("heightAtPoint", 0);
+    Eend::Info::registerFloat("x", 0);
+    Eend::Info::registerFloat("z", 0);
+    Eend::Info::updateFloat("x", x);
+    Eend::Info::updateFloat("z", z);
+    Eend::Info::registerInt("hm[z]", 0);
+    Eend::Info::registerInt("hm[x]", 0);
+    Eend::Info::registerInt("hm[0].size()", 0);
+    Eend::Info::registerInt("hm.size()", 0);
+    Eend::Info::updateInt("hm[0].size()", _heightMap[0].size());
+    Eend::Info::updateInt("hm.size()", _heightMap.size());
+
+    const float scaledX = x / _scale.x;
+    const float scaledZ = z / _scale.z;
+    Eend::Info::registerFloat("scaledX", 0);
+    Eend::Info::registerFloat("scaledZ", 0);
+    Eend::Info::updateFloat("scaledX", scaledX);
+    Eend::Info::updateFloat("scaledZ", scaledZ);
+    Eend::Info::print();
+    // IDK WHERE
+    // BUT I AM HANDLING THE SCALING WRONG
+
+    if (x < 0 || z < 0 || scaledX >= (_heightMap[0].size() - 1) ||
+        scaledZ >= (_heightMap.size() - 1)) {
+        // outside of the terrain area
+        return 0.0f;
+    }
+
+    const float relativeX = scaledX - floor(scaledX);
+    const float relativeZ = scaledZ - floor(scaledZ);
+
+    const float topLeftX = floor(scaledX) * _scale.x;
+    const float topRightX = (floor(scaledX) + 1) * _scale.x;
+    const float bottomRightX = (floor(scaledX) + 1) * _scale.x;
+    const float bottomLeftX = floor(scaledX) * _scale.x;
+
+    const float topLeftY = _heightMap[(int)floor(scaledZ) + 1][(int)floor(scaledX)];
+    const float topRightY = _heightMap[(int)floor(scaledZ) + 1][(int)floor(scaledX) + 1];
+    const float bottomRightY = _heightMap[(int)floor(scaledZ)][(int)floor(scaledX) + 1];
+    const float bottomLeftY = _heightMap[(int)floor(scaledZ)][(int)floor(scaledX)];
+
+    const float topLeftZ = (floor(scaledZ) + 1) * _scale.z;
+    const float topRightZ = (floor(scaledZ) + 1) * _scale.z;
+    const float bottomRightZ = floor(scaledZ) * _scale.z;
+    const float bottomLeftZ = floor(scaledZ) * _scale.z;
+
+    const glm::vec3 topLeftPoint = glm::vec3(topLeftX, topLeftY, topLeftZ);
+    const glm::vec3 topRightPoint = glm::vec3(topRightX, topRightY, topRightZ);
+    const glm::vec3 bottomRightPoint = glm::vec3(bottomRightX, bottomRightY, bottomRightZ);
+    const glm::vec3 bottomLeftPoint = glm::vec3(bottomLeftX, bottomLeftY, bottomLeftZ);
+
+    if (relativeZ < relativeX) {
+        // lower tri
+        // return topLeftHeight;
+        return pointHeightOnTri(topLeftPoint, topRightPoint, bottomRightPoint, x, z);
+    } else {
+        // upper tri
+        // return topLeftHeight;
+        return pointHeightOnTri(topLeftPoint, bottomLeftPoint, bottomRightPoint, x, z);
+    }
+}
+
+float pythagorean(const float a, const float b) {
+    return std::sqrt(std::pow(a, 2.0f) + std::pow(b, 2.0f));
+}
+
+float pointHeightOnTri(
+    const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, float x, float z) {
+    // undefined behavior if plane is parallel
+    // WHAT?
+    // https://math.stackexchange.com/questions/1154340/how-to-find-the-height-of-a-2d-coordinate-on-a-3d-triangle
+    float a = -(p3.z * p2.y - p1.z * p2.y - p3.z * p1.y + p1.y * p2.z + p3.y * p1.z - p2.z * p3.y);
+    float b = (p1.z * p3.x + p2.z * p1.x + p3.z * p2.x - p2.z * p3.x - p1.z * p2.x - p3.z * p1.x);
+    float c = (p2.y * p3.x + p1.y * p2.x + p3.y * p1.x - p1.y * p3.x - p2.y * p1.x - p2.x * p3.y);
+    float d = -a * p1.x - b * p1.y - c * p1.z;
+    return -(a * x + c * z + d) / b;
+}

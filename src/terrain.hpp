@@ -6,13 +6,16 @@
 namespace Eend = Eendgine;
 
 class Terrain {
-  public:
-    Terrain(std::filesystem::path pngHeightMap, glm::vec3 scale);
-    ~Terrain();
+    public:
+        Terrain(std::filesystem::path pngHeightMap, glm::vec3 scale);
+        ~Terrain();
 
-  private:
-    int _height;
-    int _width;
-    std::vector<std::vector<int>> _heightMap;
-    Eend::ModelId _modelId;
+        float heightAtPoint(float x, float y);
+
+    private:
+        int _height;
+        int _width;
+        std::vector<std::vector<float>> _heightMap;
+        Eend::ModelId _modelId;
+        glm::vec3 _scale;
 };
