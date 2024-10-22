@@ -10,6 +10,9 @@ class Terrain {
         Terrain(std::filesystem::path pngHeightMap, glm::vec3 scale);
         ~Terrain();
 
+        int getHeight() { return _height; };
+        int getWidth() { return _width; };
+
         float heightAtPoint(float x, float y);
 
     private:

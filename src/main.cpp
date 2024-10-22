@@ -50,17 +50,20 @@ int main() {
 
     Eend::Info::registerInt("main", 0);
 
-    Terrain flatTerrain("resources/terrain/grad", glm::vec3(2.0f, 0.0f, 2.0f));
-    Terrain testTerrain("resources/terrain/grad", glm::vec3(2.0f, 2.0f, 2.0f));
+    Terrain testTerrain("resources/terrain/test", glm::vec3(7.0f, 10.0f, 7.0f));
 
     Eend::BillboardId bill = Eend::Entities::BillboardBatch::insert({"resources/duck2.png"});
     float billHeight = testTerrain.heightAtPoint(0.0f, 0.0f);
     glm::vec3 billPos = glm::vec3(0.0f, billHeight, 0.0f);
+    glm::vec3 cameraPos = glm::vec3(billPos.x + 15.0f, billPos.y + 10.0f, billPos.x);
     Eend::Sprite& billRef = Eend::Entities::BillboardBatch::getRef(bill);
     billRef.setScale(2.0f, 2.0f);
     billRef.setPosition(billPos);
+    sceneCamera.setPosition(cameraPos);
+    sceneCamera.setTarget(billPos);
 
     while (!Eend::InputManager::shouldClose) {
+        float dt = Eend::FrameLimiter::deltaTime;
         Eend::FrameLimiter::startInterval();
         Eend::Screen::bind();
         shaders.setPixelSize(5);
@@ -70,12 +73,26 @@ int main() {
 
         Eend::InputManager::processInput();
 
-        billHeight = testTerrain.heightAtPoint(billPos.x + 0.004, billPos.z + 0.0044);
-        Eend::Info::updateFloat("billHeight", billHeight);
-        billPos = glm::vec3(billPos.x + 0.004, billHeight, billPos.z + 0.0044);
+        if (Eend::InputManager::upPress) {
+            billPos.x -= 0.03f * dt;
+        }
+        if (Eend::InputManager::downPress) {
+            billPos.x += 0.03f * dt;
+        }
+        if (Eend::InputManager::leftPress) {
+            billPos.z += 0.03f * dt;
+        }
+        if (Eend::InputManager::rightPress) {
+            billPos.z -= 0.03f * dt;
+        }
+        billPos.y = testTerrain.heightAtPoint(billPos.x, billPos.z) + 1.0f;
+
+        glm::vec3 cameraPos = glm::vec3(billPos.x + 15.0f, billPos.y + 10.0f, billPos.z);
         Eend::Sprite& billRef = Eend::Entities::BillboardBatch::getRef(bill);
         billRef.setScale(2.0f, 2.0f);
         billRef.setPosition(billPos);
+        sceneCamera.setPosition(cameraPos);
+        sceneCamera.setTarget(billPos);
 
         Eend::Window::swapBuffers();
 
