@@ -19,12 +19,13 @@
 #include <numbers>
 #include <vector>
 
+#include "duck.hpp"
 #include "terrain.hpp"
 
 namespace Eend = Eendgine;
 
-const unsigned int screenHeight = 750;
-const unsigned int screenWidth = 1000;
+const unsigned int screenHeight = 1080;
+const unsigned int screenWidth = 1920;
 
 int main() {
 
@@ -35,6 +36,7 @@ int main() {
     Eend::FrameLimiter::init(30.0f);
 
     Eend::Info::registerFloat("billHeight", 0);
+    Eend::Info::registerFloat("duck rotation", 0);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -52,15 +54,15 @@ int main() {
 
     Terrain testTerrain("resources/terrain/test", glm::vec3(7.0f, 10.0f, 7.0f));
 
-    Eend::BillboardId bill = Eend::Entities::BillboardBatch::insert({"resources/duck2.png"});
-    float billHeight = testTerrain.heightAtPoint(0.0f, 0.0f);
-    glm::vec3 billPos = glm::vec3(0.0f, billHeight, 0.0f);
-    glm::vec3 cameraPos = glm::vec3(billPos.x + 15.0f, billPos.y + 10.0f, billPos.x);
-    Eend::Sprite& billRef = Eend::Entities::BillboardBatch::getRef(bill);
-    billRef.setScale(2.0f, 2.0f);
-    billRef.setPosition(billPos);
-    sceneCamera.setPosition(cameraPos);
-    sceneCamera.setTarget(billPos);
+    Duck duck = Duck();
+
+    float duckHeight = testTerrain.heightAtPoint(0.0f, 0.0f);
+
+    glm::vec3 duckPosition = duck.getPosition();
+    sceneCamera.setPosition(
+        glm::vec3(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
+    sceneCamera.setTarget(duckPosition);
+    float duckRotation = 0.0f;
 
     while (!Eend::InputManager::shouldClose) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -71,28 +73,51 @@ int main() {
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
 
+        duckPosition = duck.getPosition();
+
         Eend::InputManager::processInput();
 
+        float duckRotationOffset = 0.0f;
+        unsigned int numPressed = 0;
         if (Eend::InputManager::upPress) {
-            billPos.x -= 0.03f * dt;
+            duckPosition.x -= 0.03f * dt;
+            duckRotationOffset += 90.0f;
+            numPressed++;
         }
         if (Eend::InputManager::downPress) {
-            billPos.x += 0.03f * dt;
+            duckPosition.x += 0.03f * dt;
+            duckRotationOffset -= 90.0f;
+            numPressed++;
         }
         if (Eend::InputManager::leftPress) {
-            billPos.z += 0.03f * dt;
+            duckPosition.z += 0.03f * dt;
+            duckRotationOffset += 0.0f;
+            numPressed++;
         }
         if (Eend::InputManager::rightPress) {
-            billPos.z -= 0.03f * dt;
+            duckPosition.z -= 0.03f * dt;
+            // stupid hack because my trig is mid
+            if (duckRotationOffset < 0.0f) {
+                duckRotationOffset = -270.0f;
+            } else {
+                duckRotationOffset += 180.0f;
+            }
+            numPressed++;
         }
-        billPos.y = testTerrain.heightAtPoint(billPos.x, billPos.z) + 1.0f;
+        if (numPressed) {
+            duckRotation = (duckRotationOffset / (float)numPressed);
+        } else {
+            duckRotation += 0.1f * dt;
+        }
+        Eend::Info::updateFloat("duck rotation", duckRotation);
 
-        glm::vec3 cameraPos = glm::vec3(billPos.x + 15.0f, billPos.y + 10.0f, billPos.z);
-        Eend::Sprite& billRef = Eend::Entities::BillboardBatch::getRef(bill);
-        billRef.setScale(2.0f, 2.0f);
-        billRef.setPosition(billPos);
-        sceneCamera.setPosition(cameraPos);
-        sceneCamera.setTarget(billPos);
+        duckPosition.y = testTerrain.heightAtPoint(duckPosition.x, duckPosition.z);
+
+        duck.setPosition(duckPosition);
+        duck.setRotation(duckRotation, 0.0f);
+        sceneCamera.setPosition(
+            glm::vec3(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
+        sceneCamera.setTarget(duckPosition);
 
         Eend::Window::swapBuffers();
 
