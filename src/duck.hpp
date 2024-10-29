@@ -1,4 +1,5 @@
 #include <Eendgine/entityBatches.hpp>
+#include <Eendgine/types.hpp>
 
 namespace Eend = Eendgine;
 
@@ -9,13 +10,13 @@ class Duck {
         Duck();
         ~Duck();
 
-        void setPosition(glm::vec3 position);
+        void setPosition(Eend::Point position);
         void setRotation(float x, float y);
 
-        glm::vec3 getPosition() { return _position; };
+        Eend::Point getPosition() { return _position; };
 
     private:
-        glm::vec3 _position;
+        Eend::Point _position;
         float _rotX;
         float _rotY;
         Eend::ModelId _bodyId;

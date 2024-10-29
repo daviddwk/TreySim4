@@ -3,6 +3,7 @@
 #include <Eendgine/collisionGeometry.hpp>
 #include <Eendgine/fatalError.hpp>
 #include <Eendgine/info.hpp>
+#include <Eendgine/types.hpp>
 
 #include <stb/stb_image.h>
 
@@ -14,10 +15,10 @@
 namespace Eend = Eendgine;
 
 float pointHeightOnTri(
-    const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, float x, float z);
+    const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3, float x, float z);
 float pythagorean(float a, float b);
 
-Terrain::Terrain(std::filesystem::path path, glm::vec3 scale)
+Terrain::Terrain(std::filesystem::path path, Eend::Scale scale)
     : _height(0), _width(0), _modelId(0), _scale(scale) {
 
     if (!std::filesystem::is_directory(path)) {
@@ -195,10 +196,10 @@ float Terrain::heightAtPoint(const float x, const float z) {
     const float bottomRightZ = floor(scaledZ) * _scale.z;
     const float bottomLeftZ = floor(scaledZ) * _scale.z;
 
-    const glm::vec3 topLeftPoint = glm::vec3(topLeftX, topLeftY, topLeftZ);
-    const glm::vec3 topRightPoint = glm::vec3(topRightX, topRightY, topRightZ);
-    const glm::vec3 bottomRightPoint = glm::vec3(bottomRightX, bottomRightY, bottomRightZ);
-    const glm::vec3 bottomLeftPoint = glm::vec3(bottomLeftX, bottomLeftY, bottomLeftZ);
+    const Eend::Point topLeftPoint = Eend::Point(topLeftX, topLeftY, topLeftZ);
+    const Eend::Point topRightPoint = Eend::Point(topRightX, topRightY, topRightZ);
+    const Eend::Point bottomRightPoint = Eend::Point(bottomRightX, bottomRightY, bottomRightZ);
+    const Eend::Point bottomLeftPoint = Eend::Point(bottomLeftX, bottomLeftY, bottomLeftZ);
 
     if (relativeZ < relativeX) {
         // lower tri
@@ -216,7 +217,7 @@ float pythagorean(const float a, const float b) {
 }
 
 float pointHeightOnTri(
-    const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3, float x, float z) {
+    const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3, float x, float z) {
     // undefined behavior if plane is parallel
     // WHAT?
     // https://math.stackexchange.com/questions/1154340/how-to-find-the-height-of-a-2d-coordinate-on-a-3d-triangle

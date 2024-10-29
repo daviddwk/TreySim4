@@ -11,6 +11,7 @@
 #include <Eendgine/sprite.hpp>
 #include <Eendgine/text.hpp>
 #include <Eendgine/textureCache.hpp>
+#include <Eendgine/types.hpp>
 #include <Eendgine/window.hpp>
 
 #include <stb/stb_image.h>
@@ -37,6 +38,7 @@ int main() {
 
     Eend::Info::registerFloat("billHeight", 0);
     Eend::Info::registerFloat("duck rotation", 0);
+    Eend::Info::registerInt("textNum", 0);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -48,19 +50,21 @@ int main() {
 
     Eend::Camera2D hudCamera(screenWidth, screenHeight);
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
-        glm::vec3(-20.0f, 5.0f, 0.0f), glm::vec3(3.0f, 0.0f, 3.0f));
+        Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
 
     Eend::Info::registerInt("main", 0);
 
-    Terrain testTerrain("resources/terrain/test", glm::vec3(7.0f, 10.0f, 7.0f));
+    Terrain testTerrain("resources/terrain/test", Eend::Scale(7.0f, 10.0f, 7.0f));
+    unsigned int textNum = 1234;
+    Eend::Text testText("test", std::to_string(textNum), Eend::Point(0.0f), 100.0f);
 
     Duck duck = Duck();
 
     float duckHeight = testTerrain.heightAtPoint(0.0f, 0.0f);
 
-    glm::vec3 duckPosition = duck.getPosition();
+    Eend::Point duckPosition = duck.getPosition();
     sceneCamera.setPosition(
-        glm::vec3(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
+        Eend::Point(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
     sceneCamera.setTarget(duckPosition);
     float duckRotation = 0.0f;
 
@@ -80,6 +84,9 @@ int main() {
         float duckRotationOffset = 0.0f;
         unsigned int numPressed = 0;
         if (Eend::InputManager::upPress) {
+            textNum += 1;
+            // testText.setText(std::to_string(textNum));
+            testText.clearText();
             duckPosition.x -= 0.03f * dt;
             duckRotationOffset += 90.0f;
             numPressed++;
@@ -110,13 +117,14 @@ int main() {
             duckRotation += 0.1f * dt;
         }
         Eend::Info::updateFloat("duck rotation", duckRotation);
+        Eend::Info::updateInt("textNum", textNum);
 
         duckPosition.y = testTerrain.heightAtPoint(duckPosition.x, duckPosition.z);
 
         duck.setPosition(duckPosition);
         duck.setRotation(duckRotation, 0.0f);
         sceneCamera.setPosition(
-            glm::vec3(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
+            Eend::Point(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
         sceneCamera.setTarget(duckPosition);
 
         Eend::Window::swapBuffers();

@@ -1,13 +1,13 @@
 #pragma once
 #include <Eendgine/entityBatches.hpp>
+#include <Eendgine/types.hpp>
 #include <filesystem>
-#include <optional>
 #include <vector>
 namespace Eend = Eendgine;
 
 class Terrain {
     public:
-        Terrain(std::filesystem::path pngHeightMap, glm::vec3 scale);
+        Terrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
         ~Terrain();
 
         int getHeight() { return _height; };
