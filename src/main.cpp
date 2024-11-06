@@ -60,8 +60,6 @@ int main() {
 
     Duck duck = Duck();
 
-    float duckHeight = testTerrain.heightAtPoint(0.0f, 0.0f);
-
     Eend::Point duckPosition = duck.getPosition();
     sceneCamera.setPosition(
         Eend::Point(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));

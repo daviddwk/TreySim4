@@ -16,9 +16,9 @@ class Duck {
         Eend::Point getPosition() { return _position; };
 
     private:
+        Eend::ModelId _bodyId;
+        Eend::BillboardId _headId;
         Eend::Point _position;
         float _rotX;
         float _rotY;
-        Eend::ModelId _bodyId;
-        Eend::BillboardId _headId;
 };

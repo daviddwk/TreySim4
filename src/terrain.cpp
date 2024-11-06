@@ -49,14 +49,14 @@ Terrain::Terrain(std::filesystem::path path, Eend::Scale scale)
 
     stbi_image_free(imageData);
 
-    if (_heightMap.size() == 0) {
+    if ((int)_heightMap.size() == 0) {
         Eend::fatalError("height map is empty");
     }
-    if (_heightMap.size() != (_height - 1)) {
+    if ((int)_heightMap.size() != (_height - 1)) {
         Eend::fatalError("height map unexpected height");
     }
     for (auto& line : _heightMap) {
-        if (line.size() != (_width - 1)) {
+        if ((int)line.size() != (_width - 1)) {
             Eend::fatalError("height map unexpected line width");
         }
     }
@@ -132,8 +132,6 @@ Terrain::Terrain(std::filesystem::path path, Eend::Scale scale)
     mtlFile.close();
 
     _modelId = Eend::Entities::ModelBatch::insert(path / (path.filename().string() + ".obj"));
-    Eend::Model& modelRef = Eend::Entities::ModelBatch::getRef(_modelId);
-    Eend::Model* pointer;
 }
 
 Terrain::~Terrain() { Eend::Entities::ModelBatch::erase(_modelId); }
