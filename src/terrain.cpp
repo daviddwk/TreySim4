@@ -19,7 +19,7 @@ float pointHeightOnTri(
 float pythagorean(float a, float b);
 
 Terrain::Terrain(std::filesystem::path path, Eend::Scale scale)
-    : _height(0), _width(0), _modelId(0), _scale(scale) {
+    : _height(0), _width(0), _statueId(0), _scale(scale) {
 
     if (!std::filesystem::is_directory(path)) {
         Eend::fatalError("loading terrain " + path.string() + " is not a directory");
@@ -131,10 +131,10 @@ Terrain::Terrain(std::filesystem::path path, Eend::Scale scale)
     objFile.close();
     mtlFile.close();
 
-    _modelId = Eend::Entities::ModelBatch::insert(path / (path.filename().string() + ".obj"));
+    _statueId = Eend::Entities::StatueBatch::insert(path / (path.filename().string() + ".obj"));
 }
 
-Terrain::~Terrain() { Eend::Entities::ModelBatch::erase(_modelId); }
+Terrain::~Terrain() { Eend::Entities::StatueBatch::erase(_statueId); }
 
 //    top left +-------+ top right
 //             |\      |

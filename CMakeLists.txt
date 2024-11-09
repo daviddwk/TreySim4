@@ -17,5 +17,5 @@ set_target_properties(
         SUFFIX ".out"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
-target_link_libraries(game Eendgine)
+target_link_libraries(game Eendgine stb)
 target_compile_options(game PRIVATE -Wall)

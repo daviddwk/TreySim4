@@ -4,7 +4,6 @@
 #include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/info.hpp>
 #include <Eendgine/inputManager.hpp>
-#include <Eendgine/model.hpp>
 #include <Eendgine/screen.hpp>
 #include <Eendgine/shader.hpp>
 #include <Eendgine/shaders.hpp>

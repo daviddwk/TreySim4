@@ -19,6 +19,6 @@ class Terrain {
         int _height;
         int _width;
         std::vector<std::vector<float>> _heightMap;
-        Eend::ModelId _modelId;
+        Eend::StatueId _statueId;
         glm::vec3 _scale;
 };
