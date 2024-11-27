@@ -16,8 +16,6 @@
 #include <stb/stb_image.h>
 
 #include <filesystem>
-#include <numbers>
-#include <vector>
 
 #include "duck.hpp"
 #include "terrain.hpp"
@@ -35,9 +33,11 @@ int main() {
     Eend::Info::init();
     Eend::FrameLimiter::init(30.0f);
 
-    Eend::Info::registerFloat("billHeight", 0);
-    Eend::Info::registerFloat("duck rotation", 0);
-    Eend::Info::registerInt("textNum", 0);
+    Eend::Info::registerFloat("billHeight", INFO_OPTION_NONE);
+    Eend::Info::registerFloat("duck rotation", INFO_OPTION_NONE);
+    Eend::Info::registerInt("textNum", INFO_OPTION_NONE);
+    Eend::Info::registerFloat("_animScale", INFO_OPTION_NONE);
+    Eend::Info::registerFloat("readScale", INFO_OPTION_NONE);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -51,7 +51,7 @@ int main() {
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
         Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
 
-    Eend::Info::registerInt("main", 0);
+    Eend::Info::registerInt("main", INFO_OPTION_NONE);
 
     Terrain testTerrain("resources/terrain/test", Eend::Scale(7.0f, 10.0f, 7.0f));
     unsigned int textNum = 1234;
@@ -64,6 +64,11 @@ int main() {
         Eend::Point(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
     sceneCamera.setTarget(duckPosition);
     float duckRotation = 0.0f;
+
+    float testAnimScale = 0.0f;
+    Eend::DollId testDollId = Eend::Entities::DollBatch::insert("resources/testCube");
+
+    Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("resources/duck/duck.obj");
 
     while (!Eend::InputManager::shouldClose) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -81,6 +86,7 @@ int main() {
         float duckRotationOffset = 0.0f;
         unsigned int numPressed = 0;
         if (Eend::InputManager::upPress) {
+            Eend::Entities::DollBatch::getRef(testDollId).setAnimation("one");
             textNum += 1;
             // testText.setText(std::to_string(textNum));
             testText.clearText();
@@ -89,6 +95,7 @@ int main() {
             numPressed++;
         }
         if (Eend::InputManager::downPress) {
+            Eend::Entities::DollBatch::getRef(testDollId).setAnimation("two");
             duckPosition.x += 0.03f * dt;
             duckRotationOffset -= 90.0f;
             numPressed++;
@@ -99,6 +106,7 @@ int main() {
             numPressed++;
         }
         if (Eend::InputManager::rightPress) {
+
             duckPosition.z -= 0.03f * dt;
             // stupid hack because my trig is mid
             if (duckRotationOffset < 0.0f) {
@@ -123,6 +131,12 @@ int main() {
         sceneCamera.setPosition(
             Eend::Point(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
         sceneCamera.setTarget(duckPosition);
+
+        testAnimScale += 0.001f * dt;
+        Eend::Info::updateFloat("_animScale", testAnimScale);
+        Eend::Info::updateFloat(
+            "readScale", Eend::Entities::DollBatch::getRef(testDollId).getAnim());
+        Eend::Entities::DollBatch::getRef(testDollId).setAnim(testAnimScale);
 
         Eend::Window::swapBuffers();
 
