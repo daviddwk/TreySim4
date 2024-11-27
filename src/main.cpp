@@ -66,7 +66,7 @@ int main() {
     float duckRotation = 0.0f;
 
     float testAnimScale = 0.0f;
-    Eend::DollId testDollId = Eend::Entities::DollBatch::insert("resources/testCube");
+    Eend::DollId testDollId = Eend::Entities::DollBatch::insert("resources/testCube", false);
 
     Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("resources/duck/duck.obj");
 
