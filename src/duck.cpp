@@ -1,10 +1,11 @@
 #include "duck.hpp"
 
 Duck::Duck()
-    : _bodyId(Eend::Entities::StatueBatch::insert("resources/duck/duck.obj")),
-      _headId(Eend::Entities::BoardBatch::insert({"resources/duck/duckHead.png"})),
+    : _bodyId(
+          Eend::Entities::StatueBatch::insert(std::filesystem::path("resources/duck/duck.obj"))),
+      _headId(Eend::Entities::BoardBatch::insert(std::filesystem::path("duck/sprites/duckHead"))),
       _position(Eend::Point(0.0f)), _rotX(0.0f), _rotY(0.0f) {
-    Eend::Entities::BoardBatch::getRef(_headId).setScale(3.5f, 3.5f);
+    Eend::Entities::BoardBatch::getRef(_headId).setScale(Eend::Scale2D(3.5f, 3.5f));
 }
 
 Duck::~Duck() {
@@ -13,6 +14,11 @@ Duck::~Duck() {
 }
 
 void Duck::setPosition(Eend::Point position) {
+    if (position.x > _position.x) {
+        Eend::Entities::BoardBatch::getRef(_headId).setTexture("eyesOpen");
+    } else if (position.x < _position.x) {
+        Eend::Entities::BoardBatch::getRef(_headId).setTexture("eyesClose");
+    }
     _position = position;
     Eend::Statue& bodyRef = Eend::Entities::StatueBatch::getRef(_bodyId);
     Eend::Board& headRef = Eend::Entities::BoardBatch::getRef(_headId);

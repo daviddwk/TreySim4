@@ -26,7 +26,6 @@ const unsigned int screenHeight = 1080;
 const unsigned int screenWidth = 1920;
 
 int main() {
-
     Eend::Window::init(screenWidth, screenHeight, "Neigh");
     Eend::Screen::init(screenWidth, screenHeight);
     Eend::InputManager::init();
@@ -54,8 +53,8 @@ int main() {
     Eend::Info::registerInt("main", INFO_OPTION_NONE);
 
     Terrain testTerrain("resources/terrain/test", Eend::Scale(7.0f, 10.0f, 7.0f));
-    unsigned int textNum = 1234;
-    Eend::Text testText("test", std::to_string(textNum), Eend::Point(0.0f), 100.0f);
+    // unsigned int textNum = 1234;
+    // Eend::Text testText("test", std::to_string(textNum), Eend::Point(0.0f), 100.0f);
 
     Duck duck = Duck();
 
@@ -87,9 +86,9 @@ int main() {
         unsigned int numPressed = 0;
         if (Eend::InputManager::upPress) {
             Eend::Entities::DollBatch::getRef(testDollId).setAnimation("one");
-            textNum += 1;
-            // testText.setText(std::to_string(textNum));
-            testText.clearText();
+            // textNum += 1;
+            //  testText.setText(std::to_string(textNum));
+            // testText.clearText();
             duckPosition.x -= 0.03f * dt;
             duckRotationOffset += 90.0f;
             numPressed++;
@@ -122,7 +121,7 @@ int main() {
             duckRotation += 0.1f * dt;
         }
         Eend::Info::updateFloat("duck rotation", duckRotation);
-        Eend::Info::updateInt("textNum", textNum);
+        // Eend::Info::updateInt("textNum", textNum);
 
         duckPosition.y = testTerrain.heightAtPoint(duckPosition.x, duckPosition.z);
 
