@@ -18,14 +18,16 @@ float pointHeightOnTri(
     const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3, float x, float z);
 float pythagorean(float a, float b);
 
-Terrain::Terrain(std::filesystem::path path, Eend::Scale scale)
+Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : _height(0), _width(0), _statueId(0), _scale(scale) {
 
-    if (!std::filesystem::is_directory(path)) {
-        Eend::fatalError("loading terrain " + path.string() + " is not a directory");
-    }
+    // this should be checked by Statue initializer
 
-    std::filesystem::path pngHeightMap = path / (path.filename().string() + ".png");
+    // if (!std::filesystem::is_directory(path)) {
+    //     Eend::fatalError("loading terrain " + path.string() + " is not a directory");
+    // }
+
+    std::filesystem::path pngHeightMap = "resources" / path / (path.filename().string() + ".png");
 
     int channels = 0;
     unsigned char* imageData = stbi_load(pngHeightMap.c_str(), &_width, &_height, &channels, 0);
@@ -60,7 +62,6 @@ Terrain::Terrain(std::filesystem::path path, Eend::Scale scale)
             Eend::fatalError("height map unexpected line width");
         }
     }
-
     // make obj
     std::string fileName = pngHeightMap.stem().string();
 
@@ -131,7 +132,7 @@ Terrain::Terrain(std::filesystem::path path, Eend::Scale scale)
     objFile.close();
     mtlFile.close();
 
-    _statueId = Eend::Entities::StatueBatch::insert(path / (path.filename().string() + ".obj"));
+    _statueId = Eend::Entities::StatueBatch::insert(path);
 }
 
 Terrain::~Terrain() { Eend::Entities::StatueBatch::erase(_statueId); }

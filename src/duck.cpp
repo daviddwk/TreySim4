@@ -1,9 +1,8 @@
 #include "duck.hpp"
 
 Duck::Duck()
-    : _bodyId(
-          Eend::Entities::StatueBatch::insert(std::filesystem::path("resources/duck/duck.obj"))),
-      _headId(Eend::Entities::BoardBatch::insert(std::filesystem::path("duck/sprites/duckHead"))),
+    : _bodyId(Eend::Entities::StatueBatch::insert(std::filesystem::path("duck/statues/body"))),
+      _headId(Eend::Entities::BoardBatch::insert(std::filesystem::path("duck/boards/head"))),
       _position(Eend::Point(0.0f)), _rotX(0.0f), _rotY(0.0f) {
     Eend::Entities::BoardBatch::getRef(_headId).setScale(Eend::Scale2D(3.5f, 3.5f));
 }
