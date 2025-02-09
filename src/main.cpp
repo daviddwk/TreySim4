@@ -26,6 +26,7 @@ const unsigned int screenHeight = 1080;
 const unsigned int screenWidth = 1920;
 
 int main() {
+
     Eend::Window::init(screenWidth, screenHeight, "Neigh");
     Eend::Screen::init(screenWidth, screenHeight);
     Eend::InputManager::init();
@@ -54,7 +55,6 @@ int main() {
 
     Terrain testTerrain("terrain/test", Eend::Scale(7.0f, 10.0f, 7.0f));
     unsigned int textNum = 1234;
-    // Eend::Text testText("test", std::to_string(textNum), Eend::Point(0.0f), 100.0f);
 
     Duck duck = Duck();
 
@@ -68,6 +68,11 @@ int main() {
     Eend::DollId testDollId = Eend::Entities::DollBatch::insert("testCube");
 
     Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
+
+    Eend::PanelId testPanel = Eend::Entities::PanelBatch::insert("duck/boards/head");
+    Eend::Entities::PanelBatch::getRef(testPanel).setTexture("eyesOpen");
+    Eend::Entities::PanelBatch::getRef(testPanel).setPosition(Eend::Point(0.0f));
+    Eend::Entities::PanelBatch::getRef(testPanel).setScale(Eend::Scale2D(300.0f, 300.0f));
 
     while (!Eend::InputManager::shouldClose) {
         float dt = Eend::FrameLimiter::deltaTime;
