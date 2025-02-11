@@ -50,10 +50,10 @@ Stage::Stage(std::string stagePath) {
             const Eend::BoardId id =
                 Eend::Entities::BoardBatch::insert(std::filesystem::path("resources/" + name));
             _boardIds.push_back(id);
-            Eend::Sprite& ref = Eend::Entities::BoardBatch::getRef(id);
+            Eend::Board& boardRef = Eend::Entities::BoardBatch::getRef(id);
             // we need to set this at the height of the terrain here actuallieeee
-            ref.setPosition(Eend::Point(position.x, position.y, 0.0f));
-            ref.setScale(scale);
+            boardRef.setPosition(Eend::Point(position.x, position.y, 0.0f));
+            boardRef.setScale(scale);
         }
     }
 }

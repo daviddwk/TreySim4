@@ -69,10 +69,12 @@ int main() {
 
     Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
 
-    Eend::PanelId testPanel = Eend::Entities::PanelBatch::insert("duck/boards/head");
-    Eend::Entities::PanelBatch::getRef(testPanel).setTexture("eyesOpen");
-    Eend::Entities::PanelBatch::getRef(testPanel).setPosition(Eend::Point(0.0f));
+    Eend::PanelId testPanel = Eend::Entities::PanelBatch::insert("testTexture");
+    // Eend::Entities::PanelBatch::getRef(testPanel).setTexture("eyesOpen");
+    Eend::Entities::PanelBatch::getRef(testPanel).setPosition(Eend::Point(10.0f, 100.0f, 0.0f));
     Eend::Entities::PanelBatch::getRef(testPanel).setScale(Eend::Scale2D(300.0f, 300.0f));
+    Eend::Entities::PanelBatch::getRef(testPanel).cropTexture(
+        Eend::Scale2D(1.0f), Eend::Scale2D(1.0f));
 
     while (!Eend::InputManager::shouldClose) {
         float dt = Eend::FrameLimiter::deltaTime;
