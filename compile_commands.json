@@ -1,0 +1,17 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-std=gnu++23",
+      "-Wall",
+      "-c",
+      "-o",
+      "CMakeFiles/game.dir/src/main.cpp.o",
+      "/home/david/Code/TreySim4/src/main.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build",
+    "file": "/home/david/Code/TreySim4/src/main.cpp",
+    "output": "/home/david/Code/TreySim4/build/CMakeFiles/game.dir/src/main.cpp.o"
+  }
+]

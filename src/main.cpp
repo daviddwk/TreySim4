@@ -58,13 +58,7 @@ int main() {
 
     Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
 
-    Eend::PanelId testPanel = Eend::Entities::PanelBatch::insert("testTexture");
-    // Eend::Entities::PanelBatch::getRef(testPanel).setTexture("eyesOpen");
-    Eend::Entities::PanelBatch::getRef(testPanel).setPosition(Eend::Point(10.0f, 100.0f, 0.0f));
-    Eend::Entities::PanelBatch::getRef(testPanel).setScale(Eend::Scale2D(300.0f, 300.0f));
-    Eend::Entities::PanelBatch::getRef(testPanel).cropTexture(
-        Eend::Scale2D(1.0f), Eend::Scale2D(1.0f));
-    Eend::Text testText("daniel", "", Eend::Point(0.0f), 50.0f);
+    Eend::Text testText("daniel", "", Eend::Point(20.0f), 50.0f);
 
     while (!Eend::InputManager::shouldClose) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -72,7 +66,8 @@ int main() {
         Eend::Screen::bind();
         shaders.setPixelSize(5);
 
-        testText.setText(std::format("{:.4f} {:.4f}", duck.getPosition().x, duck.getPosition().z));
+        testText.setText(std::format("X:{:.4f} Y:{:.4f} Z:{:.4f}", duck.getPosition().x,
+            duck.getPosition().y, duck.getPosition().z));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
 
