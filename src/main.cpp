@@ -2,12 +2,10 @@
 #include <Eendgine/collisionGeometry.hpp>
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/frameLimiter.hpp>
-#include <Eendgine/info.hpp>
 #include <Eendgine/inputManager.hpp>
 #include <Eendgine/screen.hpp>
 #include <Eendgine/shader.hpp>
 #include <Eendgine/shaders.hpp>
-#include <Eendgine/sprite.hpp>
 #include <Eendgine/text.hpp>
 #include <Eendgine/textureCache.hpp>
 #include <Eendgine/types.hpp>
@@ -30,14 +28,7 @@ int main() {
     Eend::Window::init(screenWidth, screenHeight, "Neigh");
     Eend::Screen::init(screenWidth, screenHeight);
     Eend::InputManager::init();
-    Eend::Info::init();
     Eend::FrameLimiter::init(30.0f);
-
-    Eend::Info::registerFloat("billHeight", INFO_OPTION_NONE);
-    Eend::Info::registerFloat("duck rotation", INFO_OPTION_NONE);
-    Eend::Info::registerInt("textNum", INFO_OPTION_NONE);
-    Eend::Info::registerFloat("_animScale", INFO_OPTION_NONE);
-    Eend::Info::registerFloat("readScale", INFO_OPTION_NONE);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -50,8 +41,6 @@ int main() {
     Eend::Camera2D hudCamera(screenWidth, screenHeight);
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
         Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
-
-    Eend::Info::registerInt("main", INFO_OPTION_NONE);
 
     Terrain testTerrain("terrain/test", Eend::Scale(7.0f, 10.0f, 7.0f));
     unsigned int textNum = 1234;
@@ -75,6 +64,7 @@ int main() {
     Eend::Entities::PanelBatch::getRef(testPanel).setScale(Eend::Scale2D(300.0f, 300.0f));
     Eend::Entities::PanelBatch::getRef(testPanel).cropTexture(
         Eend::Scale2D(1.0f), Eend::Scale2D(1.0f));
+    Eend::Text testText("daniel", "", Eend::Point(0.0f), 50.0f);
 
     while (!Eend::InputManager::shouldClose) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -82,6 +72,7 @@ int main() {
         Eend::Screen::bind();
         shaders.setPixelSize(5);
 
+        testText.setText(std::format("{:.4f} {:.4f}", duck.getPosition().x, duck.getPosition().z));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
 
@@ -127,8 +118,6 @@ int main() {
         } else {
             duckRotation += 0.1f * dt;
         }
-        Eend::Info::updateFloat("duck rotation", duckRotation);
-        Eend::Info::updateInt("textNum", textNum);
 
         duckPosition.y = testTerrain.heightAtPoint(duckPosition.x, duckPosition.z);
 
@@ -138,20 +127,13 @@ int main() {
             Eend::Point(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
         sceneCamera.setTarget(duckPosition);
 
-        testAnimScale += 0.001f * dt;
-        Eend::Info::updateFloat("_animScale", testAnimScale);
-        Eend::Info::updateFloat(
-            "readScale", Eend::Entities::DollBatch::getRef(testDollId).getAnim());
         Eend::Entities::DollBatch::getRef(testDollId).setAnim(testAnimScale);
 
         Eend::Window::swapBuffers();
 
-        Eend::Info::print();
-
         Eend::FrameLimiter::stopInterval();
     }
     Eend::Screen::close();
-    Eend::Info::close();
     Eend::FrameLimiter::close();
     return 0;
 }

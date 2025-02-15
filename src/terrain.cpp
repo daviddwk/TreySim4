@@ -2,7 +2,6 @@
 
 #include <Eendgine/collisionGeometry.hpp>
 #include <Eendgine/fatalError.hpp>
-#include <Eendgine/info.hpp>
 #include <Eendgine/types.hpp>
 
 #include <stb/stb_image.h>
@@ -149,25 +148,8 @@ Terrain::~Terrain() { Eend::Entities::StatueBatch::erase(_statueId); }
 
 float Terrain::heightAtPoint(const float x, const float z) {
 
-    Eend::Info::registerInt("heightAtPoint", 0);
-    Eend::Info::registerFloat("x", 0);
-    Eend::Info::registerFloat("z", 0);
-    Eend::Info::updateFloat("x", x);
-    Eend::Info::updateFloat("z", z);
-    Eend::Info::registerInt("hm[z]", 0);
-    Eend::Info::registerInt("hm[x]", 0);
-    Eend::Info::registerInt("hm[0].size()", 0);
-    Eend::Info::registerInt("hm.size()", 0);
-    Eend::Info::updateInt("hm[0].size()", _heightMap[0].size());
-    Eend::Info::updateInt("hm.size()", _heightMap.size());
-
     const float scaledX = x / _scale.x;
     const float scaledZ = z / _scale.z;
-    Eend::Info::registerFloat("scaledX", 0);
-    Eend::Info::registerFloat("scaledZ", 0);
-    Eend::Info::updateFloat("scaledX", scaledX);
-    Eend::Info::updateFloat("scaledZ", scaledZ);
-    Eend::Info::print();
     // IDK WHERE
     // BUT I AM HANDLING THE SCALING WRONG
 
