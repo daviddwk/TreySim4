@@ -1,14 +1,17 @@
+#include "Eendgine/entityBatches.hpp"
 #include "terrain.hpp"
 
 #include <Eendgine/collisionGeometry.hpp>
 #include <Eendgine/fatalError.hpp>
 #include <Eendgine/types.hpp>
 
+#include <json/json.h>
 #include <stb/stb_image.h>
 
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <print>
 #include <stdio.h>
 #include <string>
 
@@ -20,13 +23,37 @@ float pythagorean(float a, float b);
 
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : _height(0), _width(0), _statueId(0), _scale(scale) {
+    /*
+    Json::Value root;
+    std::filesystem::path metadataPath = "resources" / path / "metadata.json";
+    std::ifstream metadata(metadataPath);
+    if (!metadata.is_open()) {
+        Eend::fatalError("could not open: " + metadataPath.string());
+    }
+    try {
+        metadata >> root;
+    } catch (...) {
+        Eend::fatalError("improper json: " + metadataPath.string());
+    }
 
-    // this should be checked by Statue initializer
+    if (root["Boards"].isArray()) {
+        unsigned int idx = 0;
+        Json::Value boards = root["Boards"][idx];
+        while (boards[idx].isObject()) {
+            Eend::BoardId id = Eend::Entities::BoardBatch::insert(boards["path"].asString());
+            auto& boardRef = Eend::Entities::BoardBatch::getRef(id);
+            _boards.push_back(id);
 
-    // if (!std::filesystem::is_directory(path)) {
-    //     Eend::fatalError("loading terrain " + path.string() + " is not a directory");
-    // }
+            boardRef.setPosition(Eend::Point(boards["scale"][0].asFloat(),
+                boards["scale"][1].asFloat(), boards["scale"][2].asFloat()));
+            // boardRef.setRotation();
+            boardRef.setScale(
+                Eend::Scale2D(boards["scale"][0].asFloat(), boards["scale"][1].asFloat()));
 
+            boards = root["Boards"][++idx];
+        }
+    }
+    */
     std::filesystem::path pngHeightMap = "resources" / path / (path.filename().string() + ".png");
 
     int channels = 0;
@@ -65,7 +92,12 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     // make obj
     std::string fileName = pngHeightMap.stem().string();
 
-    std::ofstream objFile(path / (path.filename().string() + ".obj"));
+    std::filesystem::path objPath = "resources" / path / path.filename().string().append(".obj");
+    std::print("opening {}\n", objPath.generic_string());
+    std::ofstream objFile;
+    objFile.open(objPath);
+    if (!objFile.is_open())
+        Eend::fatalError(std::format("unable to open file {}\n", objPath.generic_string()));
 
     objFile << "# TreySim4" << std::endl;
     objFile << "mtllib " << fileName << ".mtl" << std::endl;

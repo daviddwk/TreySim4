@@ -11,9 +11,11 @@
 #include <Eendgine/types.hpp>
 #include <Eendgine/window.hpp>
 
+#include <cmath>
 #include <stb/stb_image.h>
 
 #include <filesystem>
+#include <print>
 
 #include "duck.hpp"
 #include "terrain.hpp"
@@ -42,7 +44,7 @@ int main() {
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
         Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
 
-    Terrain testTerrain("terrain/test", Eend::Scale(7.0f, 10.0f, 7.0f));
+    Terrain testTerrain("terrain/test", Eend::Scale(5.0f, 10.0f, 5.0f));
 
     Duck duck = Duck();
 
@@ -57,7 +59,8 @@ int main() {
 
     Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
 
-    Eend::Text testText("daniel", "", Eend::Point(20.0f), 50.0f);
+    Eend::Text testText("daniel", "", Eend::Point(20.0f), 50.0f, INFINITY);
+    std::print("{} we printing up in this\n", 123);
 
     while (!Eend::InputManager::shouldClose) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -65,7 +68,7 @@ int main() {
         Eend::Screen::bind();
         shaders.setPixelSize(5);
 
-        testText.setText(std::format("X:{:.4f} Y:{:.4f} Z:{:.4f}", duck.getPosition().x,
+        testText.setText(std::format("X:{:.4f}\nY:{:.4f}\nZ:{:.4f}", duck.getPosition().x,
             duck.getPosition().y, duck.getPosition().z));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
