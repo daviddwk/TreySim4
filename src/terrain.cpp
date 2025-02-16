@@ -9,6 +9,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <stdio.h>
 #include <string>
 
 namespace Eend = Eendgine;
@@ -137,13 +138,13 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
 Terrain::~Terrain() { Eend::Entities::StatueBatch::erase(_statueId); }
 
 //    top left +-------+ top right
-//             |\      |
-//             | \upper|
-//             |  \    |
-//             |   \   |
-//             |    \  |
-//             |lower\ |
-//             |      \|
+//             |      /|
+//             |upper/ |
+//             |    /  |
+//             |   /   |
+//             |  /    |
+//             | /lower|
+//             |/      |
 // bottom left +-------+ bottom right
 
 float Terrain::heightAtPoint(const float x, const float z) {
@@ -183,13 +184,11 @@ float Terrain::heightAtPoint(const float x, const float z) {
     const Eend::Point bottomLeftPoint = Eend::Point(bottomLeftX, bottomLeftY, bottomLeftZ);
 
     if (relativeZ < relativeX) {
-        // lower tri
-        // return topLeftHeight;
-        return pointHeightOnTri(topLeftPoint, topRightPoint, bottomRightPoint, x, z);
+        // lower
+        return pointHeightOnTri(topRightPoint, bottomLeftPoint, bottomRightPoint, x, z);
     } else {
-        // upper tri
-        // return topLeftHeight;
-        return pointHeightOnTri(topLeftPoint, bottomLeftPoint, bottomRightPoint, x, z);
+        // upper
+        return pointHeightOnTri(topLeftPoint, topRightPoint, bottomLeftPoint, x, z);
     }
 }
 

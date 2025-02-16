@@ -25,7 +25,7 @@ const unsigned int screenWidth = 1920;
 
 int main() {
 
-    Eend::Window::init(screenWidth, screenHeight, "Neigh");
+    Eend::Window::init(screenWidth, screenHeight, "Quack");
     Eend::Screen::init(screenWidth, screenHeight);
     Eend::InputManager::init();
     Eend::FrameLimiter::init(30.0f);
@@ -43,7 +43,6 @@ int main() {
         Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
 
     Terrain testTerrain("terrain/test", Eend::Scale(7.0f, 10.0f, 7.0f));
-    unsigned int textNum = 1234;
 
     Duck duck = Duck();
 
@@ -79,9 +78,6 @@ int main() {
         unsigned int numPressed = 0;
         if (Eend::InputManager::upPress) {
             Eend::Entities::DollBatch::getRef(testDollId).setAnimation("one");
-            textNum += 1;
-            // testText.setText(std::to_string(textNum));
-            // testText.clearText();
             duckPosition.x -= 0.03f * dt;
             duckRotationOffset += 90.0f;
             numPressed++;
