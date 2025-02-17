@@ -30,7 +30,7 @@ int main() {
     Eend::Window::init(screenWidth, screenHeight, "Quack");
     Eend::Screen::init(screenWidth, screenHeight);
     Eend::InputManager::init();
-    Eend::FrameLimiter::init(30.0f);
+    Eend::FrameLimiter::init(60.0f, 15.0f);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -68,8 +68,8 @@ int main() {
         Eend::Screen::bind();
         shaders.setPixelSize(5);
 
-        testText.setText(std::format("X:{:.4f}\nY:{:.4f}\nZ:{:.4f}", duck.getPosition().x,
-            duck.getPosition().y, duck.getPosition().z));
+        testText.setText(std::format("FPS:{:.4f} DT:{:.4f}\nX:{:.4f}\nY:{:.4f}\nZ:{:.4f}",
+            1.0f / dt, dt, duck.getPosition().x, duck.getPosition().y, duck.getPosition().z));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
 
@@ -81,24 +81,24 @@ int main() {
         unsigned int numPressed = 0;
         if (Eend::InputManager::upPress) {
             Eend::Entities::DollBatch::getRef(testDollId).setAnimation("one");
-            duckPosition.x -= 0.03f * dt;
+            duckPosition.x -= 5.0f * dt;
             duckRotationOffset += 90.0f;
             numPressed++;
         }
         if (Eend::InputManager::downPress) {
             Eend::Entities::DollBatch::getRef(testDollId).setAnimation("two");
-            duckPosition.x += 0.03f * dt;
+            duckPosition.x += 5.0f * dt;
             duckRotationOffset -= 90.0f;
             numPressed++;
         }
         if (Eend::InputManager::leftPress) {
-            duckPosition.z += 0.03f * dt;
+            duckPosition.z += 5.0f * dt;
             duckRotationOffset += 0.0f;
             numPressed++;
         }
         if (Eend::InputManager::rightPress) {
 
-            duckPosition.z -= 0.03f * dt;
+            duckPosition.z -= 5.0f * dt;
             // stupid hack because my trig is mid
             if (duckRotationOffset < 0.0f) {
                 duckRotationOffset = -270.0f;
@@ -110,7 +110,7 @@ int main() {
         if (numPressed) {
             duckRotation = (duckRotationOffset / (float)numPressed);
         } else {
-            duckRotation += 0.1f * dt;
+            duckRotation += 10.0f * dt;
         }
 
         duckPosition.y = testTerrain.heightAtPoint(duckPosition.x, duckPosition.z);
@@ -124,7 +124,6 @@ int main() {
         Eend::Entities::DollBatch::getRef(testDollId).setAnim(testAnimScale);
 
         Eend::Window::swapBuffers();
-
         Eend::FrameLimiter::stopInterval();
     }
     Eend::Screen::close();

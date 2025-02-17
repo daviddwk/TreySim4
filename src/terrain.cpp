@@ -23,37 +23,7 @@ float pythagorean(float a, float b);
 
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : _height(0), _width(0), _statueId(0), _scale(scale) {
-    /*
-    Json::Value root;
-    std::filesystem::path metadataPath = "resources" / path / "metadata.json";
-    std::ifstream metadata(metadataPath);
-    if (!metadata.is_open()) {
-        Eend::fatalError("could not open: " + metadataPath.string());
-    }
-    try {
-        metadata >> root;
-    } catch (...) {
-        Eend::fatalError("improper json: " + metadataPath.string());
-    }
-
-    if (root["Boards"].isArray()) {
-        unsigned int idx = 0;
-        Json::Value boards = root["Boards"][idx];
-        while (boards[idx].isObject()) {
-            Eend::BoardId id = Eend::Entities::BoardBatch::insert(boards["path"].asString());
-            auto& boardRef = Eend::Entities::BoardBatch::getRef(id);
-            _boards.push_back(id);
-
-            boardRef.setPosition(Eend::Point(boards["scale"][0].asFloat(),
-                boards["scale"][1].asFloat(), boards["scale"][2].asFloat()));
-            // boardRef.setRotation();
-            boardRef.setScale(
-                Eend::Scale2D(boards["scale"][0].asFloat(), boards["scale"][1].asFloat()));
-
-            boards = root["Boards"][++idx];
-        }
-    }
-    */
+    // height map from image
     std::filesystem::path pngHeightMap = "resources" / path / (path.filename().string() + ".png");
 
     int channels = 0;
@@ -63,12 +33,12 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             "unable to load image " + pngHeightMap.generic_string() + " for terrain generation");
     }
 
-    for (int h = 0; h < (_height - 1); ++h) {
+    for (unsigned int h = 0; h < (_height - 1); ++h) {
         _heightMap.emplace_back();
-        for (int w = 0; w < (_width - 1); ++w) {
-            const unsigned int currentIdx = w + (h * _width);
-            const unsigned int rightIdx = (w + 1) + (h * _width);
-            const unsigned int downIdx = w + ((h + 1) * _width);
+        for (unsigned int w = 0; w < (_width - 1); ++w) {
+            const size_t currentIdx = w + (h * _width);
+            const size_t rightIdx = (w + 1) + (h * _width);
+            const size_t downIdx = w + ((h + 1) * _width);
             const unsigned int avg = ((imageData[currentIdx] + imageData[rightIdx] +
                                           imageData[downIdx] + imageData[currentIdx]) /
                                       4);
@@ -77,6 +47,56 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     }
 
     stbi_image_free(imageData);
+    // a
+    Json::Value rootJson;
+    std::filesystem::path metadataPath = "resources" / path / "metadata.json";
+    std::ifstream metadata(metadataPath);
+    if (!metadata.is_open()) {
+        Eend::fatalError("could not open: " + metadataPath.string());
+    }
+    try {
+        metadata >> rootJson;
+    } catch (...) {
+        Eend::fatalError("improper json: " + metadataPath.string());
+    }
+
+    if (rootJson["Boards"].isArray()) {
+        for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
+            Json::Value boardJson = rootJson["Boards"][boardIdx];
+            Eend::BoardId id = Eend::Entities::BoardBatch::insert(boardJson["path"].asString());
+            auto& boardRef = Eend::Entities::BoardBatch::getRef(id);
+            _boards.push_back(id);
+
+            Eend::Point position(boardJson["position"][0].asFloat(),
+                boardJson["position"][1].asFloat(), boardJson["position"][2].asFloat());
+
+            boardRef.setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
+                position.y + heightAtPoint(position.x * _scale.x, position.z * _scale.z),
+                (position.z * _scale.z) + (_scale.z / 2.0)));
+            boardRef.setRotation(boardJson["rotation"].asFloat());
+            boardRef.setScale(
+                Eend::Scale2D(boardJson["scale"][0].asFloat(), boardJson["scale"][1].asFloat()));
+        }
+    }
+    if (rootJson["Statues"].isArray()) {
+        for (unsigned int statueIdx = 0; statueIdx < rootJson["Statues"].size(); ++statueIdx) {
+            Json::Value statueJson = rootJson["Statues"][statueIdx];
+            Eend::StatueId id = Eend::Entities::StatueBatch::insert(statueJson["path"].asString());
+            auto& statueRef = Eend::Entities::StatueBatch::getRef(id);
+            _statues.push_back(id);
+
+            Eend::Point position(statueJson["position"][0].asFloat(),
+                statueJson["position"][1].asFloat(), statueJson["position"][2].asFloat());
+
+            statueRef.setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
+                position.y + heightAtPoint(position.x * _scale.x, position.z * _scale.z),
+                (position.z * _scale.z) + (_scale.z / 2.0)));
+            statueRef.setRotation(
+                statueJson["rotation"][0].asFloat(), statueJson["rotation"][1].asFloat());
+            statueRef.setScale(Eend::Scale(statueJson["scale"][0].asFloat(),
+                statueJson["scale"][1].asFloat(), statueJson["scale"][2].asFloat()));
+        }
+    }
 
     if ((int)_heightMap.size() == 0) {
         Eend::fatalError("height map is empty");
@@ -117,7 +137,7 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         yPos += 1.0f;
     }
     // uv mapping
-    for (unsigned int lineIdx = 0; lineIdx < _heightMap.size(); ++lineIdx) {
+    for (size_t lineIdx = 0; lineIdx < _heightMap.size(); ++lineIdx) {
         float heightRatio = 1.0f - ((float)lineIdx / (float)(_heightMap.size() - 1.0f));
         for (unsigned int eleIdx = 0; eleIdx < _heightMap[lineIdx].size(); ++eleIdx) {
             float widthRatio = (float)eleIdx / (float)(_heightMap[lineIdx].size() - 1.0f);
@@ -128,10 +148,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     objFile << "s 0" << std::endl; // I have no idea
     objFile << "usemtl Material" << std::endl;
     // tris by vert index
-    for (unsigned int lineIdx = 0; lineIdx < (_heightMap.size() - 1); ++lineIdx) {
-
+    for (size_t lineIdx = 0; lineIdx < (_heightMap.size() - 1); ++lineIdx) {
         for (unsigned int eleIdx = 0; eleIdx < (_heightMap[lineIdx].size() - 1); ++eleIdx) {
-
             // I think this is 1 indexed :c
             unsigned int flatIdx = eleIdx + (lineIdx * _heightMap[lineIdx].size()) + 1;
             unsigned int rightIdx = flatIdx + 1;
@@ -200,10 +218,10 @@ float Terrain::heightAtPoint(const float x, const float z) {
     const float bottomRightX = (floor(scaledX) + 1) * _scale.x;
     const float bottomLeftX = floor(scaledX) * _scale.x;
 
-    const float topLeftY = _heightMap[(int)floor(scaledZ) + 1][(int)floor(scaledX)];
-    const float topRightY = _heightMap[(int)floor(scaledZ) + 1][(int)floor(scaledX) + 1];
-    const float bottomRightY = _heightMap[(int)floor(scaledZ)][(int)floor(scaledX) + 1];
-    const float bottomLeftY = _heightMap[(int)floor(scaledZ)][(int)floor(scaledX)];
+    const float topLeftY = _heightMap[(size_t)floor(scaledZ) + 1][(size_t)floor(scaledX)];
+    const float topRightY = _heightMap[(size_t)floor(scaledZ) + 1][(size_t)floor(scaledX) + 1];
+    const float bottomRightY = _heightMap[(size_t)floor(scaledZ)][(size_t)floor(scaledX) + 1];
+    const float bottomLeftY = _heightMap[(size_t)floor(scaledZ)][(size_t)floor(scaledX)];
 
     const float topLeftZ = (floor(scaledZ) + 1) * _scale.z;
     const float topRightZ = (floor(scaledZ) + 1) * _scale.z;
