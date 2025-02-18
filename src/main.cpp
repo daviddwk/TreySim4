@@ -80,13 +80,13 @@ int main() {
         float duckRotationOffset = 0.0f;
         unsigned int numPressed = 0;
         if (Eend::InputManager::upPress) {
-            Eend::Entities::DollBatch::getRef(testDollId).setAnimation("one");
+            Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("one");
             duckPosition.x -= 5.0f * dt;
             duckRotationOffset += 90.0f;
             numPressed++;
         }
         if (Eend::InputManager::downPress) {
-            Eend::Entities::DollBatch::getRef(testDollId).setAnimation("two");
+            Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("two");
             duckPosition.x += 5.0f * dt;
             duckRotationOffset -= 90.0f;
             numPressed++;
@@ -121,7 +121,7 @@ int main() {
             Eend::Point(duckPosition.x + 25.0f, duckPosition.y + 15.0f, duckPosition.z));
         sceneCamera.setTarget(duckPosition);
 
-        Eend::Entities::DollBatch::getRef(testDollId).setAnim(testAnimScale);
+        Eend::Entities::DollBatch::getRef(testDollId)->setAnim(testAnimScale);
 
         Eend::Window::swapBuffers();
         Eend::FrameLimiter::stopInterval();

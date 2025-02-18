@@ -64,17 +64,17 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
             Json::Value boardJson = rootJson["Boards"][boardIdx];
             Eend::BoardId id = Eend::Entities::BoardBatch::insert(boardJson["path"].asString());
-            auto& boardRef = Eend::Entities::BoardBatch::getRef(id);
+            Eend::Board* boardRef = Eend::Entities::BoardBatch::getRef(id);
             _boards.push_back(id);
 
             Eend::Point position(boardJson["position"][0].asFloat(),
                 boardJson["position"][1].asFloat(), boardJson["position"][2].asFloat());
 
-            boardRef.setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
+            boardRef->setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
                 position.y + heightAtPoint(position.x * _scale.x, position.z * _scale.z),
                 (position.z * _scale.z) + (_scale.z / 2.0)));
-            boardRef.setRotation(boardJson["rotation"].asFloat());
-            boardRef.setScale(
+            boardRef->setRotation(boardJson["rotation"].asFloat());
+            boardRef->setScale(
                 Eend::Scale2D(boardJson["scale"][0].asFloat(), boardJson["scale"][1].asFloat()));
         }
     }
@@ -82,18 +82,18 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         for (unsigned int statueIdx = 0; statueIdx < rootJson["Statues"].size(); ++statueIdx) {
             Json::Value statueJson = rootJson["Statues"][statueIdx];
             Eend::StatueId id = Eend::Entities::StatueBatch::insert(statueJson["path"].asString());
-            auto& statueRef = Eend::Entities::StatueBatch::getRef(id);
+            Eend::Statue* statueRef = Eend::Entities::StatueBatch::getRef(id);
             _statues.push_back(id);
 
             Eend::Point position(statueJson["position"][0].asFloat(),
                 statueJson["position"][1].asFloat(), statueJson["position"][2].asFloat());
 
-            statueRef.setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
+            statueRef->setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
                 position.y + heightAtPoint(position.x * _scale.x, position.z * _scale.z),
                 (position.z * _scale.z) + (_scale.z / 2.0)));
-            statueRef.setRotation(
+            statueRef->setRotation(
                 statueJson["rotation"][0].asFloat(), statueJson["rotation"][1].asFloat());
-            statueRef.setScale(Eend::Scale(statueJson["scale"][0].asFloat(),
+            statueRef->setScale(Eend::Scale(statueJson["scale"][0].asFloat(),
                 statueJson["scale"][1].asFloat(), statueJson["scale"][2].asFloat()));
         }
     }
