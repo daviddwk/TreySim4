@@ -185,7 +185,13 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     _statueId = Eend::Entities::StatueBatch::insert(path);
 }
 
-Terrain::~Terrain() { Eend::Entities::StatueBatch::erase(_statueId); }
+Terrain::~Terrain() {
+    Eend::Entities::StatueBatch::erase(_statueId);
+    for (Eend::BoardId& board : _boards)
+        Eend::Entities::BoardBatch::erase(board);
+    for (Eend::StatueId& statue : _statues)
+        Eend::Entities::StatueBatch::erase(statue);
+}
 
 //    top left +-------+ top right
 //             |      /|
