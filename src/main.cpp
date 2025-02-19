@@ -57,8 +57,9 @@ int main() {
     float testAnimScale = 0.0f;
     Eend::DollId testDollId = Eend::Entities::DollBatch::insert("testCube");
 
-    for (unsigned int i = 0; i < 0; ++i)
-        Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
+    for (unsigned int i = 0; i < 50; ++i)
+        Eend::DollId testDollId = Eend::Entities::DollBatch::insert("testCube");
+    // Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
 
     Eend::Text testText("daniel", "", Eend::Point(20.0f), 50.0f, INFINITY);
 
