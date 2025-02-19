@@ -26,5 +26,23 @@
       "rotation": [180.0, 0.0],
       "path": "duck/statues/body"
     }
+  ],
+  "Dolls": [
+    {
+      "position": [10, 0, 10],
+      "scale": [1.0, 1.0, 1.0],
+      "rotation": [0.0, 0.0],
+      "path": "testCube",
+      "animation": "one",
+      "pace": 0.4
+    },
+    {
+      "position": [9, 2, 9],
+      "scale": [1.0, 1.0, 1.0],
+      "rotation": [0.0, 0.0],
+      "path": "testCube",
+      "animation": "two",
+      "pace": 0.5
+    }
   ]
 }

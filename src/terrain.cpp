@@ -1,8 +1,10 @@
-#include "Eendgine/entityBatches.hpp"
 #include "terrain.hpp"
 
 #include <Eendgine/collisionGeometry.hpp>
+#include <Eendgine/doll.hpp>
+#include <Eendgine/entityBatches.hpp>
 #include <Eendgine/fatalError.hpp>
+#include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/types.hpp>
 
 #include <json/json.h>
@@ -97,6 +99,28 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
                 statueJson["scale"][1].asFloat(), statueJson["scale"][2].asFloat()));
         }
     }
+    if (rootJson["Dolls"].isArray()) {
+        for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
+            Json::Value dollJson = rootJson["Dolls"][dollIdx];
+            Eend::DollId id = Eend::Entities::DollBatch::insert(dollJson["path"].asString());
+            Eend::Doll* dollRef = Eend::Entities::DollBatch::getRef(id);
+            float pace = dollJson["pace"].asFloat();
+            _dolls.push_back(std::tie(id, pace));
+
+            Eend::Point position(dollJson["position"][0].asFloat(),
+                dollJson["position"][1].asFloat(), dollJson["position"][2].asFloat());
+
+            dollRef->setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
+                position.y + heightAtPoint(position.x * _scale.x, position.z * _scale.z),
+                (position.z * _scale.z) + (_scale.z / 2.0)));
+            dollRef->setRotation(
+                dollJson["rotation"][0].asFloat(), dollJson["rotation"][1].asFloat());
+            dollRef->setScale(Eend::Scale(dollJson["scale"][0].asFloat(),
+                dollJson["scale"][1].asFloat(), dollJson["scale"][2].asFloat()));
+            if (dollJson.isMember("animation"))
+                dollRef->setAnimation(dollJson["animation"].asString());
+        }
+    }
 
     if ((int)_heightMap.size() == 0) {
         Eend::fatalError("height map is empty");
@@ -113,7 +137,6 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     std::string fileName = pngHeightMap.stem().string();
 
     std::filesystem::path objPath = "resources" / path / path.filename().string().append(".obj");
-    std::print("opening {}\n", objPath.generic_string());
     std::ofstream objFile;
     objFile.open(objPath);
     if (!objFile.is_open())
@@ -191,6 +214,17 @@ Terrain::~Terrain() {
         Eend::Entities::BoardBatch::erase(board);
     for (Eend::StatueId& statue : _statues)
         Eend::Entities::StatueBatch::erase(statue);
+    for (auto& doll : _dolls)
+        Eend::Entities::DollBatch::erase(std::get<Eend::DollId>(doll));
+}
+
+void Terrain::update() {
+    for (auto& doll : _dolls) {
+        Eend::Doll* dollRef = Eend::Entities::DollBatch::getRef(std::get<Eend::DollId>(doll));
+        float animScale = dollRef->getAnim();
+        animScale += std::get<float>(doll) * Eend::FrameLimiter::deltaTime;
+        dollRef->setAnim(animScale);
+    }
 }
 
 //    top left +-------+ top right

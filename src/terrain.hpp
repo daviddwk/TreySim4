@@ -2,6 +2,7 @@
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
 #include <filesystem>
+#include <tuple>
 #include <vector>
 namespace Eend = Eendgine;
 
@@ -9,6 +10,8 @@ class Terrain {
     public:
         Terrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
         ~Terrain();
+
+        void update();
 
         int getHeight() { return _height; };
         int getWidth() { return _width; };
@@ -22,5 +25,6 @@ class Terrain {
         Eend::StatueId _statueId;
         std::vector<Eend::BoardId> _boards;
         std::vector<Eend::StatueId> _statues;
+        std::vector<std::tuple<Eend::DollId, float>> _dolls;
         glm::vec3 _scale;
 };

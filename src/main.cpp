@@ -61,7 +61,10 @@ int main() {
         Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
 
     Eend::Text testText("daniel", "", Eend::Point(20.0f), 50.0f, INFINITY);
-    std::print("{} we printing up in this\n", 123);
+
+    Eend::CollisionRectangle testRectangle = {
+        .upperLeft = Eend::Point(0.0f), .lowerRight = Eend::Point(5.0f)};
+    bool testColliding = false;
 
     while (!Eend::InputManager::shouldClose) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -69,8 +72,10 @@ int main() {
         Eend::Screen::bind();
         shaders.setPixelSize(5);
 
-        testText.setText(std::format("FPS:{:.4f} DT:{:.4f}\nX:{:.4f}\nY:{:.4f}\nZ:{:.4f}",
-            1.0f / dt, dt, duck.getPosition().x, duck.getPosition().y, duck.getPosition().z));
+        Eend::Point2D pen;
+        testText.setText(
+            std::format("FPS:{:.4f} DT:{:.4f}\nX:{:.4f}\nY:{:.4f}\nZ:{:.4f}\n{}\n", 1.0f / dt, dt,
+                duck.getPosition().x, duck.getPosition().y, duck.getPosition().z, testColliding));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
 
@@ -98,7 +103,6 @@ int main() {
             numPressed++;
         }
         if (Eend::InputManager::rightPress) {
-
             duckPosition.z -= 25.0f * dt;
             // stupid hack because my trig is mid
             if (duckRotationOffset < 0.0f) {
@@ -108,6 +112,11 @@ int main() {
             }
             numPressed++;
         }
+        // COORDINATE SYSTMES ARE TOTALLY WACKED UP RN
+
+        testColliding =
+            colliding(Eend::Point2D(duckPosition.x, duckPosition.z), testRectangle, &pen);
+        duckPosition = Eend::Point(duckPosition.x - pen.y, duckPosition.y, duckPosition.z - pen.x);
         if (numPressed) {
             duckRotation = (duckRotationOffset / (float)numPressed);
         } else {
@@ -115,6 +124,7 @@ int main() {
         }
 
         duckPosition.y = testTerrain.heightAtPoint(duckPosition.x, duckPosition.z);
+        testTerrain.update();
 
         duck.setPosition(duckPosition);
         duck.setRotation(duckRotation, 0.0f);
