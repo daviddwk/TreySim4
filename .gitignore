@@ -38,3 +38,4 @@ lib/glad/glad.c
 lib/stb/stb_image.h
 #lib/Eendgine
 compile_flags.txt
+.cache

@@ -156,8 +156,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             unsigned int downIdx = flatIdx + _heightMap[lineIdx].size();
             unsigned int rightDownIdx = downIdx + 1;
 
-            objFile << "f " << flatIdx << '/' << flatIdx << '/' << flatIdx << ' ';
-            objFile << rightIdx << '/' << rightIdx << '/' << rightIdx << ' ';
+            objFile << "f " << rightIdx << '/' << rightIdx << '/' << rightIdx << ' ';
+            objFile << flatIdx << '/' << flatIdx << '/' << flatIdx << ' ';
             objFile << rightDownIdx << '/' << rightDownIdx << '/' << rightDownIdx << std::endl;
 
             objFile << "f " << flatIdx << '/' << flatIdx << '/' << flatIdx << ' ';

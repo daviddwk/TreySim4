@@ -30,7 +30,7 @@ int main() {
     Eend::Window::init(screenWidth, screenHeight, "Quack");
     Eend::Screen::init(screenWidth, screenHeight);
     Eend::InputManager::init();
-    Eend::FrameLimiter::init(60.0f, 15.0f);
+    Eend::FrameLimiter::init(60.0f, 20.0f);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -57,7 +57,8 @@ int main() {
     float testAnimScale = 0.0f;
     Eend::DollId testDollId = Eend::Entities::DollBatch::insert("testCube");
 
-    Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
+    for (unsigned int i = 0; i < 0; ++i)
+        Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
 
     Eend::Text testText("daniel", "", Eend::Point(20.0f), 50.0f, INFINITY);
     std::print("{} we printing up in this\n", 123);
@@ -81,24 +82,24 @@ int main() {
         unsigned int numPressed = 0;
         if (Eend::InputManager::upPress) {
             Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("one");
-            duckPosition.x -= 5.0f * dt;
+            duckPosition.x -= 25.0f * dt;
             duckRotationOffset += 90.0f;
             numPressed++;
         }
         if (Eend::InputManager::downPress) {
             Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("two");
-            duckPosition.x += 5.0f * dt;
+            duckPosition.x += 25.0f * dt;
             duckRotationOffset -= 90.0f;
             numPressed++;
         }
         if (Eend::InputManager::leftPress) {
-            duckPosition.z += 5.0f * dt;
+            duckPosition.z += 25.0f * dt;
             duckRotationOffset += 0.0f;
             numPressed++;
         }
         if (Eend::InputManager::rightPress) {
 
-            duckPosition.z -= 5.0f * dt;
+            duckPosition.z -= 25.0f * dt;
             // stupid hack because my trig is mid
             if (duckRotationOffset < 0.0f) {
                 duckRotationOffset = -270.0f;
@@ -110,7 +111,7 @@ int main() {
         if (numPressed) {
             duckRotation = (duckRotationOffset / (float)numPressed);
         } else {
-            duckRotation += 10.0f * dt;
+            duckRotation += 100.0f * dt;
         }
 
         duckPosition.y = testTerrain.heightAtPoint(duckPosition.x, duckPosition.z);
