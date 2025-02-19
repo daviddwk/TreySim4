@@ -36,15 +36,54 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     }
 
     for (unsigned int h = 0; h < (_height - 1); ++h) {
+        // handling edge cases looks horrible ugly, i'll admit
         _heightMap.emplace_back();
+        if (h == 0)
+            _heightMap.emplace_back();
+        if (h == (_height - 2))
+            _heightMap.emplace_back();
         for (unsigned int w = 0; w < (_width - 1); ++w) {
+            unsigned int avg = 0;
             const size_t currentIdx = w + (h * _width);
             const size_t rightIdx = (w + 1) + (h * _width);
             const size_t downIdx = w + ((h + 1) * _width);
-            const unsigned int avg = ((imageData[currentIdx] + imageData[rightIdx] +
-                                          imageData[downIdx] + imageData[currentIdx]) /
-                                      4);
-            _heightMap[h].push_back(((float)avg / 256.0f) * _scale.y);
+            const size_t rightDownIdx = downIdx + 1;
+            if (h == 0) {
+                if (w == 0) {
+                    avg = imageData[currentIdx];
+                    _heightMap[h].push_back(((float)avg / 256.0f) * _scale.y);
+                }
+                avg = (imageData[currentIdx] + imageData[rightIdx]) / 2;
+                _heightMap[h].push_back(((float)avg / 256.0f) * _scale.y);
+                if (w == (_width - 2)) {
+                    avg = imageData[currentIdx];
+                    _heightMap[h].push_back(((float)avg / 256.0f) * _scale.y);
+                }
+            }
+            if (h == (_height - 2)) {
+                if (w == 0) {
+                    avg = imageData[downIdx];
+                    _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.y);
+                }
+                avg = (imageData[downIdx] + imageData[rightDownIdx]) / 2;
+                _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.y);
+                if (w == (_width - 2)) {
+                    avg = imageData[downIdx];
+                    _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.y);
+                }
+            }
+            if (w == 0) {
+                avg = (imageData[currentIdx] + imageData[downIdx]) / 2;
+                _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.y);
+            }
+            avg = ((imageData[currentIdx] + imageData[rightIdx] + imageData[downIdx] +
+                       imageData[rightDownIdx]) /
+                   4);
+            _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.y);
+            if (w == (_width - 2)) {
+                avg = (imageData[currentIdx] + imageData[downIdx]) / 2;
+                _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.y);
+            }
         }
     }
 
@@ -125,11 +164,13 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     if ((int)_heightMap.size() == 0) {
         Eend::fatalError("height map is empty");
     }
-    if ((int)_heightMap.size() != (_height - 1)) {
+    if ((int)_heightMap.size() != (_height + 1)) {
         Eend::fatalError("height map unexpected height");
     }
     for (auto& line : _heightMap) {
-        if ((int)line.size() != (_width - 1)) {
+        std::cout << "height:" << _heightMap.size() << std::endl;
+        std::cout << "line size:" << line.size() << " width:" << _width << std::endl;
+        if ((int)line.size() != (_width + 1)) {
             Eend::fatalError("height map unexpected line width");
         }
     }
