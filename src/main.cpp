@@ -44,7 +44,7 @@ int main() {
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
         Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
 
-    Terrain testTerrain("terrain/test", Eend::Scale(5.0f, 10.0f, 5.0f));
+    Terrain testTerrain("terrain/cloud", Eend::Scale(5.0f, 10.0f, 5.0f));
 
     Duck duck = Duck();
 
@@ -115,9 +115,9 @@ int main() {
         }
         // COORDINATE SYSTMES ARE TOTALLY WACKED UP RN
 
-        testColliding =
-            colliding(Eend::Point2D(duckPosition.x, duckPosition.z), testRectangle, &pen);
-        duckPosition = Eend::Point(duckPosition.x - pen.y, duckPosition.y, duckPosition.z - pen.x);
+        testColliding = testTerrain.colliding(Eend::Point2D(duckPosition.x, duckPosition.z), &pen);
+        // colliding(Eend::Point2D(duckPosition.x, duckPosition.z), testRectangle, &pen);
+        duckPosition = Eend::Point(duckPosition.x - pen.x, duckPosition.y, duckPosition.z - pen.y);
         if (numPressed) {
             duckRotation = (duckRotationOffset / (float)numPressed);
         } else {

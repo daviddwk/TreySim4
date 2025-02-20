@@ -26,9 +26,12 @@ float pythagorean(float a, float b);
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : _height(0), _width(0), _statueId(0), _scale(scale) {
     // height map from image
-    std::filesystem::path pngHeightMap = "resources" / path / (path.filename().string() + ".png");
-
+    std::filesystem::path pngHeightMap = "resources" / path / "heightMap.png";
+    std::filesystem::path pngCollisionMap = "resources" / path / "collisionMap.png";
+    int collisionHeight = 0;
+    int collisionWidth = 0;
     int channels = 0;
+
     unsigned char* imageData = stbi_load(pngHeightMap.c_str(), &_width, &_height, &channels, 0);
     if (imageData == NULL) {
         Eend::fatalError(
@@ -86,9 +89,25 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             }
         }
     }
-
     stbi_image_free(imageData);
-    // a
+    channels = 1;
+    imageData = stbi_load(pngCollisionMap.c_str(), &collisionWidth, &collisionHeight, &channels, 0);
+    if (imageData == NULL) {
+        Eend::fatalError(
+            "unable to load image " + pngCollisionMap.generic_string() + " for terrain generation");
+    }
+    for (unsigned int h = 0; h < collisionHeight; ++h) {
+        for (unsigned int w = 0; w < collisionWidth; ++w) {
+            const size_t currentIdx = w + (h * collisionWidth);
+            if (imageData[currentIdx] == 0) {
+                const Eend::Point2D upperLeft(w * _scale.x, h * _scale.z);
+                const Eend::Point2D lowerRight((w + 1) * _scale.x, (h + 1) * _scale.z);
+                _collisionRectangles.emplace_back(upperLeft, lowerRight);
+            }
+        }
+    }
+    stbi_image_free(imageData);
+    //
     Json::Value rootJson;
     std::filesystem::path metadataPath = "resources" / path / "metadata.json";
     std::ifstream metadata(metadataPath);
@@ -168,8 +187,6 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         Eend::fatalError("height map unexpected height");
     }
     for (auto& line : _heightMap) {
-        std::cout << "height:" << _heightMap.size() << std::endl;
-        std::cout << "line size:" << line.size() << " width:" << _width << std::endl;
         if ((int)line.size() != (_width + 1)) {
             Eend::fatalError("height map unexpected line width");
         }
@@ -229,6 +246,7 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             objFile << rightDownIdx << '/' << rightDownIdx << '/' << rightDownIdx << std::endl;
         }
     }
+    objFile.close();
 
     std::ofstream mtlFile(path / (path.filename().string() + ".mtl"));
     mtlFile << "#TreySim4" << std::endl;
@@ -243,7 +261,6 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     mtlFile << "illum 2" << std::endl;
     mtlFile << "map_Kd diffuse.png" << std::endl;
 
-    objFile.close();
     mtlFile.close();
 
     _statueId = Eend::Entities::StatueBatch::insert(path);
@@ -266,6 +283,14 @@ void Terrain::update() {
         animScale += std::get<float>(doll) * Eend::FrameLimiter::deltaTime;
         dollRef->setAnim(animScale);
     }
+}
+
+bool Terrain::colliding(const Eend::Point2D point, Eend::Point2D* penetration) {
+    for (auto& rectangle : _collisionRectangles) {
+        if (Eend::colliding(point, rectangle, penetration))
+            return true;
+    }
+    return false;
 }
 
 //    top left +-------+ top right
