@@ -21,7 +21,7 @@ void Duck::setPosition(Eend::Point position) {
     _position = position;
     Eend::Statue* bodyRef = Eend::Entities::StatueBatch::getRef(_bodyId);
     Eend::Board* headRef = Eend::Entities::BoardBatch::getRef(_headId);
-    bodyRef->setPosition(Eend::Point(position.x, position.y + 0.08f, position.z + 0.5f));
+    bodyRef->setPosition(Eend::Point(position.x - 0.5f, position.y + 0.08f, position.z));
     headRef->setPosition(Eend::Point(position.x, position.y + 3.00f, position.z));
 }
 

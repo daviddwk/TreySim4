@@ -100,8 +100,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         for (unsigned int w = 0; w < collisionWidth; ++w) {
             const size_t currentIdx = w + (h * collisionWidth);
             if (imageData[currentIdx] == 0) {
-                const Eend::Point2D upperLeft(w * _scale.x, h * _scale.z);
-                const Eend::Point2D lowerRight((w + 1) * _scale.x, (h + 1) * _scale.z);
+                const Eend::Point2D upperLeft((w * _scale.x) + 1, (h * _scale.z) + 1);
+                const Eend::Point2D lowerRight(((w + 1) * _scale.x) + 1, ((h + 1) * _scale.z) + 1);
                 _collisionRectangles.emplace_back(upperLeft, lowerRight);
             }
         }
