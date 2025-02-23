@@ -13,7 +13,7 @@ class Terrain {
         ~Terrain();
 
         void update();
-        bool colliding(Eend::Point2D point, Eend::Point2D* penetration);
+        bool colliding(Eend::Point2D point);
 
         int getHeight() { return _height; };
         int getWidth() { return _width; };

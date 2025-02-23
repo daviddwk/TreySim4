@@ -115,7 +115,7 @@ int main() {
         }
         // COORDINATE SYSTMES ARE TOTALLY WACKED UP RN
 
-        testColliding = testTerrain.colliding(Eend::Point2D(duckPosition.x, duckPosition.z), &pen);
+        testColliding = testTerrain.colliding(Eend::Point2D(duckPosition.x, duckPosition.z));
         // colliding(Eend::Point2D(duckPosition.x, duckPosition.z), testRectangle, &pen);
         duckPosition = Eend::Point(duckPosition.x - pen.x, duckPosition.y, duckPosition.z - pen.y);
         if (numPressed) {

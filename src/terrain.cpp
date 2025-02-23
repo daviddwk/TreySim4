@@ -285,9 +285,9 @@ void Terrain::update() {
     }
 }
 
-bool Terrain::colliding(const Eend::Point2D point, Eend::Point2D* penetration) {
+bool Terrain::colliding(const Eend::Point2D point) {
     for (auto& rectangle : _collisionRectangles) {
-        if (Eend::colliding(point, rectangle, penetration))
+        if (Eend::colliding(point, rectangle))
             return true;
     }
     return false;
