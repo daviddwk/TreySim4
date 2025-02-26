@@ -38,14 +38,14 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             "unable to load image " + pngHeightMap.generic_string() + " for terrain generation");
     }
 
-    for (unsigned int h = 0; h < (_height - 1); ++h) {
+    for (int h = 0; h < (_height - 1); ++h) {
         // handling edge cases looks horrible ugly, i'll admit
         _heightMap.emplace_back();
         if (h == 0)
             _heightMap.emplace_back();
         if (h == (_height - 2))
             _heightMap.emplace_back();
-        for (unsigned int w = 0; w < (_width - 1); ++w) {
+        for (int w = 0; w < (_width - 1); ++w) {
             unsigned int avg = 0;
             const size_t currentIdx = w + (h * _width);
             const size_t rightIdx = (w + 1) + (h * _width);
@@ -96,8 +96,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         Eend::fatalError(
             "unable to load image " + pngCollisionMap.generic_string() + " for terrain generation");
     }
-    for (unsigned int h = 0; h < collisionHeight; ++h) {
-        for (unsigned int w = 0; w < collisionWidth; ++w) {
+    for (int h = 0; h < collisionHeight; ++h) {
+        for (int w = 0; w < collisionWidth; ++w) {
             const size_t currentIdx = w + (h * collisionWidth);
             if (imageData[currentIdx] == 0) {
                 const Eend::Point2D upperLeft((w * _scale.x) + 1, (h * _scale.z) + 1);

@@ -1,0 +1,94 @@
+{
+  "Boards": [
+    {
+      "position": [9, 5, 9],
+      "scale": [5.0, 10.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/tree"
+    },
+    {
+      "position": [19, 5, 9],
+      "scale": [5.0, 10.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/tree"
+    },
+    {
+      "position": [9, 5, 16],
+      "scale": [5.0, 10.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/tree"
+    },
+    {
+      "position": [14, 5, 7],
+      "scale": [5.0, 10.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/tree"
+    },
+    {
+      "position": [13, 5, 12],
+      "scale": [5.0, 10.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/tree"
+    },
+    {
+      "position": [26, 5, 8],
+      "scale": [5.0, 10.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/tree"
+    },
+    {
+      "position": [39, 5, 16],
+      "scale": [5.0, 10.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/tree"
+    },
+    {
+      "position": [36, 5, 22],
+      "scale": [5.0, 10.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/tree"
+    },
+    {
+      "position": [38, 1, 23],
+      "scale": [5.0, 2.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/grass"
+    },
+    {
+      "position": [40, 1, 18],
+      "scale": [5.0, 2.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/grass"
+    },
+    {
+      "position": [34, 1, 19],
+      "scale": [5.0, 2.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/grass"
+    },
+    {
+      "position": [38, 1, 14],
+      "scale": [5.0, 2.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/grass"
+    },
+    {
+      "position": [43, 1, 5],
+      "scale": [3.0, 2.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/rocks"
+    },
+    {
+      "position": [54, 1, 12],
+      "scale": [3.0, 2.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/rocks"
+    },
+    {
+      "position": [9, 1, 39],
+      "scale": [3.0, 2.0],
+      "rotation": 0.0,
+      "path": "terrain/grassy/boards/rocks"
+    },
+  ]
+}

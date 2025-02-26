@@ -44,10 +44,11 @@ int main() {
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
         Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
 
-    Terrain testTerrain("terrain/test", Eend::Scale(3.0f, 20.0f, 3.0f));
+    Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 20.0f, 3.0f));
 
     Duck duck = Duck();
 
+    duck.setPosition(Eend::Point(50.0f, 0.0f, 50.0f));
     Eend::Point duckPosition = duck.getPosition();
     sceneCamera.setPosition(
         Eend::Point(duckPosition.x, duckPosition.y + 15.0f, duckPosition.z + 25.0f));
