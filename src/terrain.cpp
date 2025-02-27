@@ -19,8 +19,8 @@
 
 namespace Eend = Eendgine;
 
-float pointHeightOnTri(
-    const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3, float x, float z);
+float pointHeightOnTri(const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3,
+    const Eend::Point2D& point);
 float pythagorean(float a, float b);
 
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
@@ -127,12 +127,11 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             Eend::Board* boardRef = Eend::Entities::BoardBatch::getRef(id);
             _boards.push_back(id);
 
-            Eend::Point position(boardJson["position"][0].asFloat(),
-                boardJson["position"][1].asFloat(), boardJson["position"][2].asFloat());
+            float tileXIdx = boardJson["position"][0].asFloat();
+            float tileYIdx = boardJson["position"][2].asFloat();
+            float heightOffset = boardJson["position"][1].asFloat();
 
-            boardRef->setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
-                position.y + heightAtPoint(position.x * _scale.x, position.z * _scale.z),
-                (position.z * _scale.z) + (_scale.z / 2.0)));
+            boardRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
             boardRef->setRotation(boardJson["rotation"].asFloat());
             boardRef->setScale(
                 Eend::Scale2D(boardJson["scale"][0].asFloat(), boardJson["scale"][1].asFloat()));
@@ -145,12 +144,11 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             Eend::Statue* statueRef = Eend::Entities::StatueBatch::getRef(id);
             _statues.push_back(id);
 
-            Eend::Point position(statueJson["position"][0].asFloat(),
-                statueJson["position"][1].asFloat(), statueJson["position"][2].asFloat());
+            float tileXIdx = statueJson["position"][0].asFloat();
+            float tileYIdx = statueJson["position"][2].asFloat();
+            float heightOffset = statueJson["position"][1].asFloat();
 
-            statueRef->setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
-                position.y + heightAtPoint(position.x * _scale.x, position.z * _scale.z),
-                (position.z * _scale.z) + (_scale.z / 2.0)));
+            statueRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
             statueRef->setRotation(
                 statueJson["rotation"][0].asFloat(), statueJson["rotation"][1].asFloat());
             statueRef->setScale(Eend::Scale(statueJson["scale"][0].asFloat(),
@@ -165,12 +163,11 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float pace = dollJson["pace"].asFloat();
             _dolls.push_back(std::tie(id, pace));
 
-            Eend::Point position(dollJson["position"][0].asFloat(),
-                dollJson["position"][1].asFloat(), dollJson["position"][2].asFloat());
+            float tileXIdx = dollJson["position"][0].asFloat();
+            float tileYIdx = dollJson["position"][2].asFloat();
+            float heightOffset = dollJson["position"][1].asFloat();
 
-            dollRef->setPosition(Eend::Point((position.x * _scale.x) + (_scale.x / 2.0),
-                position.y + heightAtPoint(position.x * _scale.x, position.z * _scale.z),
-                (position.z * _scale.z) + (_scale.z / 2.0)));
+            dollRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
             dollRef->setRotation(
                 dollJson["rotation"][0].asFloat(), dollJson["rotation"][1].asFloat());
             dollRef->setScale(Eend::Scale(dollJson["scale"][0].asFloat(),
@@ -303,14 +300,22 @@ bool Terrain::colliding(const Eend::Point2D point) {
 //             |/      |
 // bottom left +-------+ bottom right
 
-float Terrain::heightAtPoint(const float x, const float z) {
+Eend::Point Terrain::positionAtTile(
+    const float tileXIdx, const float tileYIdx, const float heightOffset) {
+    return Eend::Point((tileXIdx * _scale.x) + (_scale.x / 2.0),
+        heightOffset +
+            heightAtPoint(Eend::Point2D((float)tileXIdx * _scale.x, tileYIdx * _scale.z)),
+        (tileYIdx * _scale.z) + (_scale.z / 2.0));
+}
 
-    const float scaledX = x / _scale.x;
-    const float scaledZ = z / _scale.z;
+float Terrain::heightAtPoint(Eend::Point2D point) {
+
+    const float scaledX = point.x / _scale.x;
+    const float scaledZ = point.y / _scale.z;
     // IDK WHERE
     // BUT I AM HANDLING THE SCALING WRONG
 
-    if (x < 0 || z < 0 || scaledX >= (_heightMap[0].size() - 1) ||
+    if (point.x < 0 || point.y < 0 || scaledX >= (_heightMap[0].size() - 1) ||
         scaledZ >= (_heightMap.size() - 1)) {
         // outside of the terrain area
         return 0.0f;
@@ -341,10 +346,10 @@ float Terrain::heightAtPoint(const float x, const float z) {
 
     if (relativeZ < relativeX) {
         // lower
-        return pointHeightOnTri(topRightPoint, bottomLeftPoint, bottomRightPoint, x, z);
+        return pointHeightOnTri(topRightPoint, bottomLeftPoint, bottomRightPoint, point);
     } else {
         // upper
-        return pointHeightOnTri(topLeftPoint, topRightPoint, bottomLeftPoint, x, z);
+        return pointHeightOnTri(topLeftPoint, topRightPoint, bottomLeftPoint, point);
     }
 }
 
@@ -352,8 +357,8 @@ float pythagorean(const float a, const float b) {
     return std::sqrt(std::pow(a, 2.0f) + std::pow(b, 2.0f));
 }
 
-float pointHeightOnTri(
-    const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3, float x, float z) {
+inline float pointHeightOnTri(const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3,
+    const Eend::Point2D& point) {
     // undefined behavior if plane is parallel
     // WHAT?
     // https://math.stackexchange.com/questions/1154340/how-to-find-the-height-of-a-2d-coordinate-on-a-3d-triangle
@@ -361,5 +366,5 @@ float pointHeightOnTri(
     float b = (p1.z * p3.x + p2.z * p1.x + p3.z * p2.x - p2.z * p3.x - p1.z * p2.x - p3.z * p1.x);
     float c = (p2.y * p3.x + p1.y * p2.x + p3.y * p1.x - p1.y * p3.x - p2.y * p1.x - p2.x * p3.y);
     float d = -a * p1.x - b * p1.y - c * p1.z;
-    return -(a * x + c * z + d) / b;
+    return -(a * point.x + c * point.y + d) / b;
 }

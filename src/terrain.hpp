@@ -18,7 +18,8 @@ class Terrain {
         int getHeight() { return _height; };
         int getWidth() { return _width; };
 
-        float heightAtPoint(float x, float y);
+        float heightAtPoint(Eend::Point2D point);
+        Eend::Point positionAtTile(float tileXIdx, float tileYIdx, float heightOffset);
 
     private:
         int _height;

@@ -125,7 +125,7 @@ int main() {
             duckRotation += 100.0f * dt;
         }
 
-        duckPosition.y = testTerrain.heightAtPoint(duckPosition.x, duckPosition.z);
+        duckPosition.y = testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.z));
         testTerrain.update();
         if (!testColliding) {
             duck.setPosition(duckPosition);
