@@ -27,7 +27,7 @@ class Terrain {
         std::vector<std::vector<float>> _heightMap;
         Eend::StatueId _statueId;
         std::vector<Eend::CollisionRectangle> _collisionRectangles;
-        std::vector<Eend::BoardId> _boards;
+        std::vector<std::tuple<Eend::BoardId, float>> _boards;
         std::vector<Eend::StatueId> _statues;
         std::vector<std::tuple<Eend::DollId, float>> _dolls;
         glm::vec3 _scale;

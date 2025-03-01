@@ -1,3 +1,4 @@
+#include "Eendgine/board.hpp"
 #include "terrain.hpp"
 
 #include <Eendgine/collisionGeometry.hpp>
@@ -125,7 +126,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             Json::Value boardJson = rootJson["Boards"][boardIdx];
             Eend::BoardId id = Eend::Entities::BoardBatch::insert(boardJson["path"].asString());
             Eend::Board* boardRef = Eend::Entities::BoardBatch::getRef(id);
-            _boards.push_back(id);
+            float pace = boardJson["pace"].asFloat(); // should be 0 if not there?
+            _boards.push_back(std::tie(id, pace));
 
             float tileXIdx = boardJson["position"][0].asFloat();
             float tileYIdx = boardJson["position"][2].asFloat();
@@ -265,8 +267,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
 
 Terrain::~Terrain() {
     Eend::Entities::StatueBatch::erase(_statueId);
-    for (Eend::BoardId& board : _boards)
-        Eend::Entities::BoardBatch::erase(board);
+    for (auto& board : _boards)
+        Eend::Entities::BoardBatch::erase(std::get<Eend::BoardId>(board));
     for (Eend::StatueId& statue : _statues)
         Eend::Entities::StatueBatch::erase(statue);
     for (auto& doll : _dolls)
@@ -274,11 +276,18 @@ Terrain::~Terrain() {
 }
 
 void Terrain::update() {
+    static float cumulative = 0.0f;
+    cumulative += Eend::FrameLimiter::deltaTime;
     for (auto& doll : _dolls) {
         Eend::Doll* dollRef = Eend::Entities::DollBatch::getRef(std::get<Eend::DollId>(doll));
         float animScale = dollRef->getAnim();
         animScale += std::get<float>(doll) * Eend::FrameLimiter::deltaTime;
         dollRef->setAnim(animScale);
+    }
+    for (auto& board : _boards) {
+        Eend::Board* boardRef = Eend::Entities::BoardBatch::getRef(std::get<Eend::BoardId>(board));
+        if (std::get<float>(board) != 0)
+            boardRef->setTextureIdx((size_t)(cumulative / std::get<float>(board)));
     }
 }
 
