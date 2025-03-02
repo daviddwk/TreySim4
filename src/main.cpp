@@ -135,7 +135,7 @@ int main() {
             Eend::Point(duckPosition.x, duckPosition.y + 15.0f, duckPosition.z + 25.0f));
         sceneCamera.setTarget(duckPosition);
 
-        Eend::Entities::DollBatch::getRef(testDollId)->setAnimScale(testAnimScale);
+        Eend::Entities::DollBatch::getRef(testDollId)->setAnim(testAnimScale);
 
         Eend::Window::swapBuffers();
         Eend::FrameLimiter::stopInterval();
