@@ -68,7 +68,7 @@ int main() {
         .upperLeft = Eend::Point(0.0f), .lowerRight = Eend::Point(5.0f)};
     bool testColliding = false;
 
-    while (!Eend::InputManager::shouldClose) {
+    while (!Eend::InputManager::getShouldClose()) {
         float dt = Eend::FrameLimiter::deltaTime;
         Eend::FrameLimiter::startInterval();
         Eend::Screen::bind();
@@ -81,10 +81,10 @@ int main() {
                                      "mouseX:{} dx:{} mouseY:{} dy:{}\n"
                                      "left:{} right:{} mid:{}\n",
             1.0f / dt, dt, duck.getPosition().x, duck.getPosition().y, duck.getPosition().z,
-            testColliding, Eend::InputManager::mouseX, Eend::InputManager::deltaMouseX,
-            Eend::InputManager::mouseY, Eend::InputManager::deltaMouseY,
-            Eend::InputManager::leftClick, Eend::InputManager::rightClick,
-            Eend::InputManager::middleClick));
+            testColliding, Eend::InputManager::getMouseX(), Eend::InputManager::getDeltaMouseX(),
+            Eend::InputManager::getMouseY(), Eend::InputManager::getDeltaMouseY(),
+            Eend::InputManager::getLeftClick(), Eend::InputManager::getRightClick(),
+            Eend::InputManager::getMiddleClick()));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
 
@@ -94,29 +94,29 @@ int main() {
 
         float duckRotationOffset = 0.0f;
         unsigned int numPressed = 0;
-        if (Eend::InputManager::upPress) {
+        if (Eend::InputManager::getUpPress()) {
             Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("one");
             duckPosition.z -= 25.0f * dt;
             // stupid hack because my trig is mid
-            if (Eend::InputManager::rightPress) {
+            if (Eend::InputManager::getRightPress()) {
                 duckRotationOffset = -180.0f;
             } else {
                 duckRotationOffset += 180.0f;
             }
             numPressed++;
         }
-        if (Eend::InputManager::downPress) {
+        if (Eend::InputManager::getDownPress()) {
             Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("two");
             duckPosition.z += 25.0f * dt;
             duckRotationOffset += 0.0f;
             numPressed++;
         }
-        if (Eend::InputManager::leftPress) {
+        if (Eend::InputManager::getLeftPress()) {
             duckPosition.x -= 25.0f * dt;
             duckRotationOffset += 90.0f;
             numPressed++;
         }
-        if (Eend::InputManager::rightPress) {
+        if (Eend::InputManager::getRightPress()) {
             duckPosition.x += 25.0f * dt;
             duckRotationOffset -= 90.0f;
             numPressed++;
@@ -148,6 +148,7 @@ int main() {
         Eend::FrameLimiter::stopInterval();
     }
     Eend::Screen::close();
+    Eend::Window::close();
     Eend::FrameLimiter::close();
     return 0;
 }
