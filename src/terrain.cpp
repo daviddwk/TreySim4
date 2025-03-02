@@ -13,7 +13,6 @@
 
 #include <cmath>
 #include <fstream>
-#include <iostream>
 #include <print>
 #include <stdio.h>
 #include <string>
@@ -133,10 +132,10 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float tileYIdx = boardJson["position"][2].asFloat();
             float heightOffset = boardJson["position"][1].asFloat();
 
-            boardRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
-            boardRef->setRotation(boardJson["rotation"].asFloat());
-            boardRef->setScale(
-                Eend::Scale2D(boardJson["scale"][0].asFloat(), boardJson["scale"][1].asFloat()));
+            boardRef->position = positionAtTile(tileXIdx, tileYIdx, heightOffset);
+            boardRef->rotation = boardJson["rotation"].asFloat();
+            boardRef->scale =
+                Eend::Scale2D(boardJson["scale"][0].asFloat(), boardJson["scale"][1].asFloat());
         }
     }
     if (rootJson["Statues"].isArray()) {
@@ -150,11 +149,11 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float tileYIdx = statueJson["position"][2].asFloat();
             float heightOffset = statueJson["position"][1].asFloat();
 
-            statueRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
-            statueRef->setRotation(
+            statueRef->position = positionAtTile(tileXIdx, tileYIdx, heightOffset);
+            statueRef->rotation = Eend::Rotation(
                 statueJson["rotation"][0].asFloat(), statueJson["rotation"][1].asFloat());
-            statueRef->setScale(Eend::Scale(statueJson["scale"][0].asFloat(),
-                statueJson["scale"][1].asFloat(), statueJson["scale"][2].asFloat()));
+            statueRef->scale = Eend::Scale(statueJson["scale"][0].asFloat(),
+                statueJson["scale"][1].asFloat(), statueJson["scale"][2].asFloat());
         }
     }
     if (rootJson["Dolls"].isArray()) {
@@ -169,11 +168,11 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float tileYIdx = dollJson["position"][2].asFloat();
             float heightOffset = dollJson["position"][1].asFloat();
 
-            dollRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
-            dollRef->setRotation(
+            dollRef->position = positionAtTile(tileXIdx, tileYIdx, heightOffset);
+            dollRef->rotation = Eend::Rotation(
                 dollJson["rotation"][0].asFloat(), dollJson["rotation"][1].asFloat());
-            dollRef->setScale(Eend::Scale(dollJson["scale"][0].asFloat(),
-                dollJson["scale"][1].asFloat(), dollJson["scale"][2].asFloat()));
+            dollRef->scale = Eend::Scale(dollJson["scale"][0].asFloat(),
+                dollJson["scale"][1].asFloat(), dollJson["scale"][2].asFloat());
             if (dollJson.isMember("animation"))
                 dollRef->setAnimation(dollJson["animation"].asString());
         }
@@ -280,9 +279,9 @@ void Terrain::update() {
     cumulative += Eend::FrameLimiter::deltaTime;
     for (auto& doll : _dolls) {
         Eend::Doll* dollRef = Eend::Entities::DollBatch::getRef(std::get<Eend::DollId>(doll));
-        float animScale = dollRef->getAnim();
+        float animScale = dollRef->getAnimScale();
         animScale += std::get<float>(doll) * Eend::FrameLimiter::deltaTime;
-        dollRef->setAnim(animScale);
+        dollRef->setAnimScale(animScale);
     }
     for (auto& board : _boards) {
         Eend::Board* boardRef = Eend::Entities::BoardBatch::getRef(std::get<Eend::BoardId>(board));
