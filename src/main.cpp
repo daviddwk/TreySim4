@@ -75,9 +75,16 @@ int main() {
         shaders.setPixelSize(5);
 
         Eend::Point2D pen;
-        testText.setText(
-            std::format("FPS:{:.4f} DT:{:.4f}\nX:{:.4f}\nY:{:.4f}\nZ:{:.4f}\n{}\n", 1.0f / dt, dt,
-                duck.getPosition().x, duck.getPosition().y, duck.getPosition().z, testColliding));
+        testText.setText(std::format("FPS:{:.4f} DT:{:.4f}\n"
+                                     "X:{:.4f} Y:{:.4f} Z:{:.4f}\n"
+                                     "{}\n"
+                                     "mouseX:{} dx:{} mouseY:{} dy:{}\n"
+                                     "left:{} right:{} mid:{}\n",
+            1.0f / dt, dt, duck.getPosition().x, duck.getPosition().y, duck.getPosition().z,
+            testColliding, Eend::InputManager::mouseX, Eend::InputManager::deltaMouseX,
+            Eend::InputManager::mouseY, Eend::InputManager::deltaMouseY,
+            Eend::InputManager::leftClick, Eend::InputManager::rightClick,
+            Eend::InputManager::middleClick));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
 
