@@ -15,7 +15,6 @@
 #include <fstream>
 #include <iostream>
 #include <print>
-#include <stdio.h>
 #include <string>
 
 namespace Eend = Eendgine;

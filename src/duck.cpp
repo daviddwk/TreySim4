@@ -29,3 +29,5 @@ void Duck::setRotation(float x, float y) {
     Eend::Statue* bodyRef = Eend::Entities::StatueBatch::getRef(_bodyId);
     bodyRef->setRotation(x, y);
 };
+
+Eend::Point Duck::getPosition() { return _position; };

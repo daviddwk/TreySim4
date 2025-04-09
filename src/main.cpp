@@ -17,6 +17,7 @@
 #include <filesystem>
 #include <print>
 
+#include "Eendgine/panel.hpp"
 #include "duck.hpp"
 #include "terrain.hpp"
 
@@ -48,7 +49,7 @@ int main() {
 
     Duck duck = Duck();
 
-    duck.setPosition(Eend::Point(50.0f, 0.0f, 50.0f));
+    duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
     Eend::Point duckPosition = duck.getPosition();
     sceneCamera.setPosition(
         Eend::Point(duckPosition.x, duckPosition.y + 15.0f, duckPosition.z + 25.0f));
@@ -68,27 +69,50 @@ int main() {
         .upperLeft = Eend::Point(0.0f), .lowerRight = Eend::Point(5.0f)};
     bool testColliding = false;
 
+    Eend::PanelId exitId = Eend::Entities::PanelBatch::insert("exit");
+    Eend::Panel* exitRef = Eend::Entities::PanelBatch::getRef(exitId);
+    exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
+    exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
+
     while (!Eend::InputManager::getShouldClose()) {
         float dt = Eend::FrameLimiter::deltaTime;
         Eend::FrameLimiter::startInterval();
         Eend::Screen::bind();
         shaders.setPixelSize(5);
 
-        Eend::Point2D pen;
+        Eend::Panel::MouseStatus exitMouseStatus =
+            Eend::Entities::PanelBatch::getRef(exitId)->isClicked(Eend::InputManager::getMouseX(),
+                Eend::InputManager::getMouseY(), Eend::InputManager::getLeftClick());
+        std::string exitMouseString = "";
+        if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
+            exitMouseString = "click";
+        }
+        if (exitMouseStatus == Eend::Panel::MouseStatus::hover) {
+            exitMouseString = "hover";
+        }
+        if (exitMouseStatus == Eend::Panel::MouseStatus::none) {
+            exitMouseString = "none";
+        }
+
+        if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
+            Eend::InputManager::setShouldClose(true);
+        }
+
         testText.setText(std::format("FPS:{:.4f} DT:{:.4f}\n"
                                      "X:{:.4f} Y:{:.4f} Z:{:.4f}\n"
-                                     "{}\n"
+                                     "duck:{} mouse:{} \n"
                                      "mouseX:{} dx:{} mouseY:{} dy:{}\n"
                                      "left:{} right:{} mid:{}\n",
             1.0f / dt, dt, duck.getPosition().x, duck.getPosition().y, duck.getPosition().z,
-            testColliding, Eend::InputManager::getMouseX(), Eend::InputManager::getDeltaMouseX(),
-            Eend::InputManager::getMouseY(), Eend::InputManager::getDeltaMouseY(),
-            Eend::InputManager::getLeftClick(), Eend::InputManager::getRightClick(),
-            Eend::InputManager::getMiddleClick()));
+            testColliding, exitMouseString, Eend::InputManager::getMouseX(),
+            Eend::InputManager::getDeltaMouseX(), Eend::InputManager::getMouseY(),
+            Eend::InputManager::getDeltaMouseY(), Eend::InputManager::getLeftClick(),
+            Eend::InputManager::getRightClick(), Eend::InputManager::getMiddleClick()));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
 
         duckPosition = duck.getPosition();
+        Eend::Point oldDuckPosition = duckPosition;
 
         Eend::InputManager::processInput();
 
@@ -123,9 +147,20 @@ int main() {
         }
         // COORDINATE SYSTMES ARE TOTALLY WACKED UP RN
 
-        testColliding = testTerrain.colliding(Eend::Point2D(duckPosition.x, duckPosition.z));
-        // colliding(Eend::Point2D(duckPosition.x, duckPosition.z), testRectangle, &pen);
-        duckPosition = Eend::Point(duckPosition.x - pen.x, duckPosition.y, duckPosition.z - pen.y);
+        if (!testTerrain.colliding(Eend::Point2D(duckPosition.x, duckPosition.z))) {
+            testColliding = false;
+        } else if (!testTerrain.colliding(Eend::Point2D(oldDuckPosition.x, duckPosition.z))) {
+            duckPosition.x = oldDuckPosition.x;
+            testColliding = true;
+        } else if (!testTerrain.colliding(Eend::Point2D(duckPosition.x, oldDuckPosition.z))) {
+            duckPosition.z = oldDuckPosition.z;
+            testColliding = true;
+        } else {
+            duckPosition.x = oldDuckPosition.x;
+            duckPosition.z = oldDuckPosition.z;
+            testColliding = true;
+        }
+
         if (numPressed) {
             duckRotation = (duckRotationOffset / (float)numPressed);
         } else {
@@ -134,9 +169,7 @@ int main() {
 
         duckPosition.y = testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.z));
         testTerrain.update();
-        if (!testColliding) {
-            duck.setPosition(duckPosition);
-        }
+        duck.setPosition(duckPosition);
         duck.setRotation(duckRotation, 0.0f);
         sceneCamera.setPosition(
             Eend::Point(duckPosition.x, duckPosition.y + 15.0f, duckPosition.z + 25.0f));

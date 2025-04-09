@@ -13,7 +13,7 @@ class Duck {
         void setPosition(Eend::Point position);
         void setRotation(float x, float y);
 
-        Eend::Point getPosition() { return _position; };
+        Eend::Point getPosition();
 
     private:
         Eend::StatueId _bodyId;
