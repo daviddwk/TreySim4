@@ -3,6 +3,391 @@
     "arguments": [
       "/usr/bin/c++",
       "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++20",
+      "-c",
+      "-o",
+      "CMakeFiles/stb.dir/stb_image.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/lib/stb/stb_image.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine/lib/stb",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/lib/stb/stb_image.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/lib/stb/CMakeFiles/stb.dir/stb_image.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/board.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/board.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/board.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/board.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/camera.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/camera.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/camera.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/camera.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/collisionGeometry.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/collisionGeometry.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/collisionGeometry.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/collisionGeometry.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/doll.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/doll.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/doll.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/doll.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/entityBatches.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/entityBatches.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/entityBatches.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/entityBatches.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/fatalError.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/fatalError.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/fatalError.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/fatalError.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/frameLimiter.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/frameLimiter.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/frameLimiter.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/frameLimiter.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/inputManager.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/inputManager.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/inputManager.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/inputManager.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/lib/stb/stb_image.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/lib/stb/stb_image.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/lib/stb/stb_image.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/lib/stb/stb_image.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/loadModel.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/loadModel.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/loadModel.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/loadModel.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/panel.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/panel.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/panel.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/panel.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/random.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/random.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/random.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/random.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/screen.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/screen.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/screen.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/screen.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/shader.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/shader.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/shader.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/shader.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/shaders.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/shaders.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/shaders.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/shaders.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/statue.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/statue.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/statue.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/statue.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/text.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/text.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/text.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/text.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/texture.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/texture.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/texture.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/texture.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/textureCache.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/textureCache.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/textureCache.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/textureCache.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-I/home/david/Code/TreySim4/lib/Eendgine/lib",
+      "-std=gnu++23",
+      "-Werror",
+      "-fopenmp",
+      "-c",
+      "-o",
+      "CMakeFiles/Eendgine.dir/window.cpp.o",
+      "/home/david/Code/TreySim4/lib/Eendgine/window.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build/lib/Eendgine",
+    "file": "/home/david/Code/TreySim4/lib/Eendgine/window.cpp",
+    "output": "/home/david/Code/TreySim4/build/lib/Eendgine/CMakeFiles/Eendgine.dir/window.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-std=gnu++23",
+      "-Wall",
+      "-c",
+      "-o",
+      "CMakeFiles/game.dir/src/dog.cpp.o",
+      "/home/david/Code/TreySim4/src/dog.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build",
+    "file": "/home/david/Code/TreySim4/src/dog.cpp",
+    "output": "/home/david/Code/TreySim4/build/CMakeFiles/game.dir/src/dog.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-std=gnu++23",
+      "-Wall",
+      "-c",
+      "-o",
+      "CMakeFiles/game.dir/src/duck.cpp.o",
+      "/home/david/Code/TreySim4/src/duck.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build",
+    "file": "/home/david/Code/TreySim4/src/duck.cpp",
+    "output": "/home/david/Code/TreySim4/build/CMakeFiles/game.dir/src/duck.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
       "-std=gnu++23",
       "-Wall",
       "-c",
@@ -13,5 +398,20 @@
     "directory": "/home/david/Code/TreySim4/build",
     "file": "/home/david/Code/TreySim4/src/main.cpp",
     "output": "/home/david/Code/TreySim4/build/CMakeFiles/game.dir/src/main.cpp.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/c++",
+      "-I/home/david/Code/TreySim4/lib",
+      "-std=gnu++23",
+      "-Wall",
+      "-c",
+      "-o",
+      "CMakeFiles/game.dir/src/terrain.cpp.o",
+      "/home/david/Code/TreySim4/src/terrain.cpp"
+    ],
+    "directory": "/home/david/Code/TreySim4/build",
+    "file": "/home/david/Code/TreySim4/src/terrain.cpp",
+    "output": "/home/david/Code/TreySim4/build/CMakeFiles/game.dir/src/terrain.cpp.o"
   }
 ]

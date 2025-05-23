@@ -18,6 +18,7 @@
 #include <print>
 
 #include "Eendgine/panel.hpp"
+#include "dog.hpp"
 #include "duck.hpp"
 #include "terrain.hpp"
 
@@ -45,9 +46,10 @@ int main() {
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
         Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
 
-    Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 20.0f, 3.0f));
+    Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
     Duck duck = Duck();
+    Dog dog = Dog(Eend::Point2D(0.0f, 0.0f), Eend::Scale2D(100.0f, 100.0f), 0.0f, &testTerrain);
 
     duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
     Eend::Point duckPosition = duck.getPosition();
@@ -120,7 +122,7 @@ int main() {
         unsigned int numPressed = 0;
         if (Eend::InputManager::getUpPress()) {
             Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("one");
-            duckPosition.z -= 25.0f * dt;
+            duckPosition.y += 25.0f * dt;
             // stupid hack because my trig is mid
             if (Eend::InputManager::getRightPress()) {
                 duckRotationOffset = -180.0f;
@@ -131,7 +133,7 @@ int main() {
         }
         if (Eend::InputManager::getDownPress()) {
             Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("two");
-            duckPosition.z += 25.0f * dt;
+            duckPosition.y -= 25.0f * dt;
             duckRotationOffset += 0.0f;
             numPressed++;
         }
@@ -147,17 +149,17 @@ int main() {
         }
         // COORDINATE SYSTMES ARE TOTALLY WACKED UP RN
 
-        if (!testTerrain.colliding(Eend::Point2D(duckPosition.x, duckPosition.z))) {
+        if (!testTerrain.colliding(Eend::Point2D(duckPosition.x, duckPosition.y))) {
             testColliding = false;
-        } else if (!testTerrain.colliding(Eend::Point2D(oldDuckPosition.x, duckPosition.z))) {
+        } else if (!testTerrain.colliding(Eend::Point2D(oldDuckPosition.x, duckPosition.y))) {
             duckPosition.x = oldDuckPosition.x;
             testColliding = true;
-        } else if (!testTerrain.colliding(Eend::Point2D(duckPosition.x, oldDuckPosition.z))) {
-            duckPosition.z = oldDuckPosition.z;
+        } else if (!testTerrain.colliding(Eend::Point2D(duckPosition.x, oldDuckPosition.y))) {
+            duckPosition.y = oldDuckPosition.y;
             testColliding = true;
         } else {
             duckPosition.x = oldDuckPosition.x;
-            duckPosition.z = oldDuckPosition.z;
+            duckPosition.y = oldDuckPosition.y;
             testColliding = true;
         }
 
@@ -167,12 +169,15 @@ int main() {
             duckRotation += 100.0f * dt;
         }
 
-        duckPosition.y = testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.z));
+        duckPosition.z = testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
         testTerrain.update();
         duck.setPosition(duckPosition);
         duck.setRotation(duckRotation, 0.0f);
+
+        dog.update(dt, Eend::Point(0.0f));
+
         sceneCamera.setPosition(
-            Eend::Point(duckPosition.x, duckPosition.y + 15.0f, duckPosition.z + 25.0f));
+            Eend::Point(duckPosition.x, duckPosition.y - 25.0f, duckPosition.z + 15.0f));
         sceneCamera.setTarget(duckPosition);
 
         Eend::Entities::DollBatch::getRef(testDollId)->setAnim(testAnimScale);

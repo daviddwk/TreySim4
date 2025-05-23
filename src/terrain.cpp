@@ -21,7 +21,6 @@ namespace Eend = Eendgine;
 
 float pointHeightOnTri(const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3,
     const Eend::Point2D& point);
-float pythagorean(float a, float b);
 
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : _height(0), _width(0), _statueId(0), _scale(scale) {
@@ -54,38 +53,38 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             if (h == 0) {
                 if (w == 0) {
                     avg = imageData[currentIdx];
-                    _heightMap[h].push_back(((float)avg / 256.0f) * _scale.y);
+                    _heightMap[h].push_back(((float)avg / 256.0f) * _scale.z);
                 }
                 avg = (imageData[currentIdx] + imageData[rightIdx]) / 2;
-                _heightMap[h].push_back(((float)avg / 256.0f) * _scale.y);
+                _heightMap[h].push_back(((float)avg / 256.0f) * _scale.z);
                 if (w == (_width - 2)) {
                     avg = imageData[currentIdx];
-                    _heightMap[h].push_back(((float)avg / 256.0f) * _scale.y);
+                    _heightMap[h].push_back(((float)avg / 256.0f) * _scale.z);
                 }
             }
             if (h == (_height - 2)) {
                 if (w == 0) {
                     avg = imageData[downIdx];
-                    _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.y);
+                    _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.z);
                 }
                 avg = (imageData[downIdx] + imageData[rightDownIdx]) / 2;
-                _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.y);
+                _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.z);
                 if (w == (_width - 2)) {
                     avg = imageData[downIdx];
-                    _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.y);
+                    _heightMap[h + 2].push_back(((float)avg / 256.0f) * _scale.z);
                 }
             }
             if (w == 0) {
                 avg = (imageData[currentIdx] + imageData[downIdx]) / 2;
-                _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.y);
+                _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.z);
             }
             avg = ((imageData[currentIdx] + imageData[rightIdx] + imageData[downIdx] +
                        imageData[rightDownIdx]) /
                    4);
-            _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.y);
+            _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.z);
             if (w == (_width - 2)) {
                 avg = (imageData[currentIdx] + imageData[downIdx]) / 2;
-                _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.y);
+                _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.z);
             }
         }
     }
@@ -100,8 +99,9 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         for (int w = 0; w < collisionWidth; ++w) {
             const size_t currentIdx = w + (h * collisionWidth);
             if (imageData[currentIdx] == 0) {
-                const Eend::Point2D upperLeft((w * _scale.x) + 1, (h * _scale.z) + 1);
-                const Eend::Point2D lowerRight(((w + 1) * _scale.x) + 1, ((h + 1) * _scale.z) + 1);
+                const Eend::Point2D upperLeft((w * _scale.x) + 1, -((h * _scale.y) + 1));
+                const Eend::Point2D lowerRight(
+                    ((w + 1) * _scale.x) + 1, -(((h + 1) * _scale.y) + 1));
                 _collisionRectangles.emplace_back(upperLeft, lowerRight);
             }
         }
@@ -208,12 +208,12 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     for (auto& line : _heightMap) {
         for (float& height : line) {
             // x and y Pos also UV map?
-            objFile << "v " << xPos * _scale.x << " " << height << " " << yPos * _scale.z
+            objFile << "v " << xPos * _scale.x << " " << yPos * _scale.y << " " << height
                     << std::endl; // height << std::endl;
             xPos += 1.0f;
         }
         xPos = 0.0f;
-        yPos += 1.0f;
+        yPos -= 1.0f;
     }
     // uv mapping
     for (size_t lineIdx = 0; lineIdx < _heightMap.size(); ++lineIdx) {
@@ -298,71 +298,140 @@ bool Terrain::colliding(const Eend::Point2D point) {
     return false;
 }
 
-//    top left +-------+ top right
-//             |      /|
-//             |upper/ |
-//             |    /  |
-//             |   /   |
-//             |  /    |
-//             | /lower|
-//             |/      |
-// bottom left +-------+ bottom right
-
 Eend::Point Terrain::positionAtTile(
     const float tileXIdx, const float tileYIdx, const float heightOffset) {
     return Eend::Point((tileXIdx * _scale.x) + (_scale.x / 2.0),
+        (tileYIdx * -_scale.y) + (-_scale.y / 2.0),
         heightOffset +
-            heightAtPoint(Eend::Point2D((float)tileXIdx * _scale.x, tileYIdx * _scale.z)),
-        (tileYIdx * _scale.z) + (_scale.z / 2.0));
+            heightAtPoint(Eend::Point2D((float)tileXIdx * _scale.x, tileYIdx * -_scale.y)));
 }
 
 float Terrain::heightAtPoint(Eend::Point2D point) {
 
-    const float scaledX = point.x / _scale.x;
-    const float scaledZ = point.y / _scale.z;
-    // IDK WHERE
-    // BUT I AM HANDLING THE SCALING WRONG
+    //    top left +-------+ top right
+    //             |\      |
+    //             | \upper|
+    //             |  \    |
+    //             |   \   |
+    //             |    \  |
+    //             |lower\ |
+    //             |      \|
+    // bottom left +-------+ bottom right
 
-    if (point.x < 0 || point.y < 0 || scaledX >= (_heightMap[0].size() - 1) ||
-        scaledZ >= (_heightMap.size() - 1)) {
-        // outside of the terrain area
+    const float scaledX = point.x / _scale.x;
+    const float scaledY = point.y / _scale.y;
+
+    const bool outsideTerrain = scaledX < 0 || scaledY > 0 ||
+                                scaledX > ((float)_heightMap[0].size() - 1.0f) ||
+                                scaledY < (-(float)_heightMap.size() - 1.0f);
+    // could make this an optional
+    if (outsideTerrain) {
+        std::print("outside sx {} sy {}\n {} {}\n", scaledX, scaledY,
+            (float)_heightMap[0].size() - 1.0f, -(float)_heightMap.size() - 1.0f);
         return 0.0f;
     }
 
-    const float relativeX = scaledX - floor(scaledX);
-    const float relativeZ = scaledZ - floor(scaledZ);
+    const float relativeX = scaledX - (float)floor(scaledX);
+    const float relativeY = -scaledY - (float)floor(-scaledY);
+    const bool upperTri = (relativeX - relativeY) > 0;
 
-    const float topLeftX = floor(scaledX) * _scale.x;
-    const float topRightX = (floor(scaledX) + 1) * _scale.x;
-    const float bottomRightX = (floor(scaledX) + 1) * _scale.x;
-    const float bottomLeftX = floor(scaledX) * _scale.x;
+    if (upperTri) {
+        const size_t topLeftXIdx = (size_t)floor(scaledX);
+        const size_t topLeftYIdx = (size_t)floor(-scaledY);
 
-    const float topLeftY = _heightMap[(size_t)floor(scaledZ) + 1][(size_t)floor(scaledX)];
-    const float topRightY = _heightMap[(size_t)floor(scaledZ) + 1][(size_t)floor(scaledX) + 1];
-    const float bottomRightY = _heightMap[(size_t)floor(scaledZ)][(size_t)floor(scaledX) + 1];
-    const float bottomLeftY = _heightMap[(size_t)floor(scaledZ)][(size_t)floor(scaledX)];
+        const size_t topRightXIdx = (size_t)floor(scaledX + 1);
+        const size_t topRightYIdx = (size_t)floor(-scaledY);
 
-    const float topLeftZ = (floor(scaledZ) + 1) * _scale.z;
-    const float topRightZ = (floor(scaledZ) + 1) * _scale.z;
-    const float bottomRightZ = floor(scaledZ) * _scale.z;
-    const float bottomLeftZ = floor(scaledZ) * _scale.z;
+        const size_t bottomRightXIdx = (size_t)floor(scaledX + 1);
+        const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
+
+        const Eend::Point topLeftPoint = Eend::Point((float)topLeftXIdx * _scale.x,
+            (float)topLeftYIdx * _scale.y, _heightMap[topLeftYIdx][topLeftXIdx]);
+        const Eend::Point topRightPoint = Eend::Point((float)topRightXIdx * _scale.x,
+            (float)topRightYIdx * _scale.y, _heightMap[topRightYIdx][topRightXIdx]);
+        const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
+            (float)bottomRightYIdx * _scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
+
+        std::print("topLeftPoint {} {} {}\n", topLeftPoint.x, topLeftPoint.y, topLeftPoint.z);
+        std::print("topRightPoint {} {} {}\n", topRightPoint.x, topRightPoint.y, topRightPoint.z);
+        std::print("bottomRightPoint {} {} {}\n", bottomRightPoint.x, bottomRightPoint.y,
+            bottomRightPoint.z);
+
+        return pointHeightOnTri(topLeftPoint, topRightPoint, bottomRightPoint, point);
+    } else {
+        // lower tri
+        const size_t topLeftXIdx = (size_t)floor(scaledX);
+        const size_t topLeftYIdx = (size_t)floor(-scaledY);
+
+        const size_t bottomLeftXIdx = (size_t)floor(scaledX);
+        const size_t bottomLeftYIdx = (size_t)floor(-scaledY + 1);
+
+        const size_t bottomRightXIdx = (size_t)floor(scaledX + 1);
+        const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
+
+        const Eend::Point topLeftPoint = Eend::Point((float)topLeftXIdx * _scale.x,
+            (float)topLeftYIdx * _scale.y, _heightMap[topLeftYIdx][topLeftXIdx]);
+        const Eend::Point bottomLeftPoint = Eend::Point((float)bottomLeftXIdx * _scale.x,
+            (float)bottomLeftYIdx * _scale.y, _heightMap[bottomLeftYIdx][bottomLeftXIdx]);
+        const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
+            (float)bottomRightYIdx * _scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
+
+        std::print("topLeftPoint {} {} {}\n", topLeftPoint.x, topLeftPoint.y, topLeftPoint.z);
+        std::print("bottomRightPoint {} {} {}\n", bottomRightPoint.x, bottomRightPoint.y,
+            bottomRightPoint.z);
+        std::print(
+            "bottomLeftPoint {} {} {}\n", bottomLeftPoint.x, bottomLeftPoint.y, bottomLeftPoint.z);
+
+        return pointHeightOnTri(topLeftPoint, bottomRightPoint, bottomLeftPoint, point);
+    }
+
+    /*
+        const float scaledX = point.x / _scale.x;
+        const float scaledY = point.y / _scale.y;
+        // IDK WHERE
+        // BUT I AM HANDLING THE SCALING WRONG
+
+        if (point.x < 0 || point.y > 0 || scaledX >= (_heightMap[0].size() - 1) ||
+            scaledY >= (_heightMap.size() - 1)) {
+            // outside of the terrain area
+            return 0.0f;
+        }
+
+        const float relativeX = scaledX - floor(scaledX);
+        const float relativeY = scaledY - floor(scaledY);
+
+        const float topLeftX = floor(scaledX) * _scale.x;
+        const float topRightX = (floor(scaledX) + 1) * _scale.x;
+        const float bottomRightX = (floor(scaledX) + 1) * _scale.x;
+        const float bottomLeftX = floor(scaledX) * _scale.x;
+
+        const float topLeftY = (floor(scaledY) + 1) * _scale.y;
+        const float topRightY = (floor(scaledY) + 1) * _scale.y;
+        const float bottomRightY = floor(scaledY) * _scale.y;
+        const float bottomLeftY = floor(scaledY) * _scale.y;
+
+
+    const float topLeftZ = _heightMap[(size_t)floor(-scaledY) + 1][(size_t)floor(scaledX)];
+    const float topRightZ = _heightMap[(size_t)floor(-scaledY) + 1][(size_t)floor(scaledX) + 1];
+    const float bottomRightZ = _heightMap[(size_t)floor(-scaledY)][(size_t)floor(scaledX) + 1];
+    const float bottomLeftZ = _heightMap[(size_t)floor(-scaledY)][(size_t)floor(scaledX)];
 
     const Eend::Point topLeftPoint = Eend::Point(topLeftX, topLeftY, topLeftZ);
     const Eend::Point topRightPoint = Eend::Point(topRightX, topRightY, topRightZ);
     const Eend::Point bottomRightPoint = Eend::Point(bottomRightX, bottomRightY, bottomRightZ);
     const Eend::Point bottomLeftPoint = Eend::Point(bottomLeftX, bottomLeftY, bottomLeftZ);
 
-    if (relativeZ < relativeX) {
+    if (relativeY < relativeX) {
         // lower
+        std::print("tr{} {} {}\nbl{} {} {}\nbr{} {} {}\np{} {}\n", topRightPoint.x,
+    topRightPoint.y, topRightPoint.z, bottomLeftPoint.x, bottomLeftPoint.y, bottomLeftPoint.z,
+            bottomRightPoint.x, bottomRightPoint.y, bottomRightPoint.z, point.x, point.y);
         return pointHeightOnTri(topRightPoint, bottomLeftPoint, bottomRightPoint, point);
     } else {
         // upper
         return pointHeightOnTri(topLeftPoint, topRightPoint, bottomLeftPoint, point);
     }
-}
-
-float pythagorean(const float a, const float b) {
-    return std::sqrt(std::pow(a, 2.0f) + std::pow(b, 2.0f));
+    */
 }
 
 inline float pointHeightOnTri(const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3,
@@ -370,9 +439,9 @@ inline float pointHeightOnTri(const Eend::Point& p1, const Eend::Point& p2, cons
     // undefined behavior if plane is parallel
     // WHAT?
     // https://math.stackexchange.com/questions/1154340/how-to-find-the-height-of-a-2d-coordinate-on-a-3d-triangle
-    float a = -(p3.z * p2.y - p1.z * p2.y - p3.z * p1.y + p1.y * p2.z + p3.y * p1.z - p2.z * p3.y);
-    float b = (p1.z * p3.x + p2.z * p1.x + p3.z * p2.x - p2.z * p3.x - p1.z * p2.x - p3.z * p1.x);
-    float c = (p2.y * p3.x + p1.y * p2.x + p3.y * p1.x - p1.y * p3.x - p2.y * p1.x - p2.x * p3.y);
-    float d = -a * p1.x - b * p1.y - c * p1.z;
-    return -(a * point.x + c * point.y + d) / b;
+    // float a = -(p3.Z * p2.Y - p1.Z * p2.Y - p3.Z * p1.Y + p1.Y * p2.Z + p3.Y * p1.Z - p2.Z *
+    // p3.Y); float b = (p1.Z * p3.X + p2.Z * p1.X + p3.Z * p2.X - p2.Z * p3.X - p1.Z * p2.X - p3.Z
+    // * p1.X); float c = (p2.Y * p3.X + p1.Y * p2.X + p3.Y * p1.X - p1.Y * p3.X - p2.Y * p1.X -
+    // p2.X * p3.Y); float d = -a * p1.X - b * p1.Y - c * p1.Z; return -(a * x + b * y + d) / c;
+    return p1.z;
 }
