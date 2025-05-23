@@ -99,12 +99,15 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         for (int w = 0; w < collisionWidth; ++w) {
             const size_t currentIdx = w + (h * collisionWidth);
             if (imageData[currentIdx] == 0) {
-                const Eend::Point2D upperLeft((w * _scale.x) + 1, -((h * _scale.y) + 1));
-                const Eend::Point2D lowerRight(
-                    ((w + 1) * _scale.x) + 1, -(((h + 1) * _scale.y) + 1));
+                const Eend::Point2D upperLeft((w * _scale.x) + 1, -(((h + 1) * _scale.y) + 1));
+                const Eend::Point2D lowerRight(((w + 1) * _scale.x) + 1, -((h * _scale.y) + 1));
+                std::print(
+                    "ul {} {} lr {} {}\n", upperLeft.x, upperLeft.y, lowerRight.x, lowerRight.y);
                 _collisionRectangles.emplace_back(upperLeft, lowerRight);
+                // DEBUG break;
             }
         }
+        // DEBUG break;
     }
     stbi_image_free(imageData);
     //
@@ -326,8 +329,6 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
                                 scaledY < (-(float)_heightMap.size() - 1.0f);
     // could make this an optional
     if (outsideTerrain) {
-        std::print("outside sx {} sy {}\n {} {}\n", scaledX, scaledY,
-            (float)_heightMap[0].size() - 1.0f, -(float)_heightMap.size() - 1.0f);
         return 0.0f;
     }
 
@@ -352,11 +353,6 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
             (float)bottomRightYIdx * _scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
 
-        std::print("topLeftPoint {} {} {}\n", topLeftPoint.x, topLeftPoint.y, topLeftPoint.z);
-        std::print("topRightPoint {} {} {}\n", topRightPoint.x, topRightPoint.y, topRightPoint.z);
-        std::print("bottomRightPoint {} {} {}\n", bottomRightPoint.x, bottomRightPoint.y,
-            bottomRightPoint.z);
-
         return pointHeightOnTri(topLeftPoint, topRightPoint, bottomRightPoint, point);
     } else {
         // lower tri
@@ -375,12 +371,6 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
             (float)bottomLeftYIdx * _scale.y, _heightMap[bottomLeftYIdx][bottomLeftXIdx]);
         const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
             (float)bottomRightYIdx * _scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
-
-        std::print("topLeftPoint {} {} {}\n", topLeftPoint.x, topLeftPoint.y, topLeftPoint.z);
-        std::print("bottomRightPoint {} {} {}\n", bottomRightPoint.x, bottomRightPoint.y,
-            bottomRightPoint.z);
-        std::print(
-            "bottomLeftPoint {} {} {}\n", bottomLeftPoint.x, bottomLeftPoint.y, bottomLeftPoint.z);
 
         return pointHeightOnTri(topLeftPoint, bottomRightPoint, bottomLeftPoint, point);
     }
