@@ -19,8 +19,7 @@
 
 namespace Eend = Eendgine;
 
-float pointHeightOnTri(const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3,
-    const Eend::Point2D& point);
+float pointHeightOnTri(const Eend::Triangle& tri, const Eend::Point2D& point);
 
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : _height(0), _width(0), _statueId(0), _scale(scale) {
@@ -348,8 +347,10 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
             (float)topRightYIdx * -_scale.y, _heightMap[topRightYIdx][topRightXIdx]);
         const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
             (float)bottomRightYIdx * -_scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
+        const Eend::Triangle triangle = {
+            .p1 = topLeftPoint, .p2 = topRightPoint, .p3 = bottomRightPoint};
 
-        return pointHeightOnTri(topLeftPoint, topRightPoint, bottomRightPoint, point);
+        return pointHeightOnTri(triangle, point);
     } else {
         // lower tri
         const size_t topLeftXIdx = (size_t)floor(scaledX);
@@ -368,7 +369,8 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
             (float)bottomRightYIdx * -_scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
 
-        return pointHeightOnTri(topLeftPoint, bottomRightPoint, bottomLeftPoint, point);
+        return pointHeightOnTri(
+            (Eend::Triangle){topLeftPoint, bottomLeftPoint, bottomRightPoint}, point);
     }
 
     /*
@@ -420,19 +422,16 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
     */
 }
 
-inline float pointHeightOnTri(const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3,
-    const Eend::Point2D& point) {
-
+inline float pointHeightOnTri(const Eend::Triangle& tri, const Eend::Point2D& point) {
     // could use a tri construct here instead of 3 points
 
     // calc tri normal
     // https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
-
-    const Eend::Point u = p2 - p1;
-    const Eend::Point v = p3 - p1;
+    const Eend::Point u = tri.p2 - tri.p1;
+    const Eend::Point v = tri.p3 - tri.p1;
     const Eend::Point normal = glm::cross(u, v);
     // calc d for point normal plane
-    const float d = -((normal.x * p1.x) + (normal.y * p1.y) + (normal.z * p1.z));
+    const float d = -((normal.x * tri.p1.x) + (normal.y * tri.p1.y) + (normal.z * tri.p1.z));
     // solve for point.z
     return -((normal.x * point.x) + (normal.y * point.y) + d) / normal.z;
 }
