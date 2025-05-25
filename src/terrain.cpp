@@ -343,11 +343,11 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
 
         const Eend::Point topLeftPoint = Eend::Point((float)topLeftXIdx * _scale.x,
-            (float)topLeftYIdx * _scale.y, _heightMap[topLeftYIdx][topLeftXIdx]);
+            (float)topLeftYIdx * -_scale.y, _heightMap[topLeftYIdx][topLeftXIdx]);
         const Eend::Point topRightPoint = Eend::Point((float)topRightXIdx * _scale.x,
-            (float)topRightYIdx * _scale.y, _heightMap[topRightYIdx][topRightXIdx]);
+            (float)topRightYIdx * -_scale.y, _heightMap[topRightYIdx][topRightXIdx]);
         const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
-            (float)bottomRightYIdx * _scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
+            (float)bottomRightYIdx * -_scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
 
         return pointHeightOnTri(topLeftPoint, topRightPoint, bottomRightPoint, point);
     } else {
@@ -362,11 +362,11 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
 
         const Eend::Point topLeftPoint = Eend::Point((float)topLeftXIdx * _scale.x,
-            (float)topLeftYIdx * _scale.y, _heightMap[topLeftYIdx][topLeftXIdx]);
+            (float)topLeftYIdx * -_scale.y, _heightMap[topLeftYIdx][topLeftXIdx]);
         const Eend::Point bottomLeftPoint = Eend::Point((float)bottomLeftXIdx * _scale.x,
-            (float)bottomLeftYIdx * _scale.y, _heightMap[bottomLeftYIdx][bottomLeftXIdx]);
+            (float)bottomLeftYIdx * -_scale.y, _heightMap[bottomLeftYIdx][bottomLeftXIdx]);
         const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
-            (float)bottomRightYIdx * _scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
+            (float)bottomRightYIdx * -_scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
 
         return pointHeightOnTri(topLeftPoint, bottomRightPoint, bottomLeftPoint, point);
     }
@@ -422,12 +422,17 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
 
 inline float pointHeightOnTri(const Eend::Point& p1, const Eend::Point& p2, const Eend::Point& p3,
     const Eend::Point2D& point) {
-    // undefined behavior if plane is parallel
-    // WHAT?
-    // https://math.stackexchange.com/questions/1154340/how-to-find-the-height-of-a-2d-coordinate-on-a-3d-triangle
-    // float a = -(p3.Z * p2.Y - p1.Z * p2.Y - p3.Z * p1.Y + p1.Y * p2.Z + p3.Y * p1.Z - p2.Z *
-    // p3.Y); float b = (p1.Z * p3.X + p2.Z * p1.X + p3.Z * p2.X - p2.Z * p3.X - p1.Z * p2.X - p3.Z
-    // * p1.X); float c = (p2.Y * p3.X + p1.Y * p2.X + p3.Y * p1.X - p1.Y * p3.X - p2.Y * p1.X -
-    // p2.X * p3.Y); float d = -a * p1.X - b * p1.Y - c * p1.Z; return -(a * x + b * y + d) / c;
-    return p1.z;
+
+    // could use a tri construct here instead of 3 points
+
+    // calc tri normal
+    // https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
+
+    const Eend::Point u = p2 - p1;
+    const Eend::Point v = p3 - p1;
+    const Eend::Point normal = glm::cross(u, v);
+    // calc d for point normal plane
+    const float d = -((normal.x * p1.x) + (normal.y * p1.y) + (normal.z * p1.z));
+    // solve for point.z
+    return -((normal.x * point.x) + (normal.y * point.y) + d) / normal.z;
 }
