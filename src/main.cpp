@@ -172,7 +172,7 @@ int main() {
         duckPosition.z = testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
         testTerrain.update();
         duck.setPosition(duckPosition);
-        duck.setRotation(duckRotation, 0.0f);
+        duck.setRotation(0.0f, 0.0f, duckRotation);
 
         dog.update(dt, Eend::Point(0.0f));
 

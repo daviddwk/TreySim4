@@ -11,7 +11,7 @@ class Duck {
         ~Duck();
 
         void setPosition(Eend::Point position);
-        void setRotation(float x, float y);
+        void setRotation(float x, float y, float z);
 
         Eend::Point getPosition();
 

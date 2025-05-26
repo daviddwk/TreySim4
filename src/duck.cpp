@@ -21,13 +21,13 @@ void Duck::setPosition(Eend::Point position) {
     _position = position;
     Eend::Statue* bodyRef = Eend::Entities::StatueBatch::getRef(_bodyId);
     Eend::Board* headRef = Eend::Entities::BoardBatch::getRef(_headId);
-    bodyRef->setPosition(Eend::Point(position.x - 0.5f, position.y + 0.08f, position.z));
-    headRef->setPosition(Eend::Point(position.x, position.y + 3.00f, position.z));
+    bodyRef->setPosition(Eend::Point(position.x - 0.5f, position.y, position.z + 0.08f));
+    headRef->setPosition(Eend::Point(position.x, position.y, position.z + 3.00f));
 }
 
-void Duck::setRotation(float x, float y) {
+void Duck::setRotation(float x, float y, float z) {
     Eend::Statue* bodyRef = Eend::Entities::StatueBatch::getRef(_bodyId);
-    bodyRef->setRotation(x, y);
+    bodyRef->setRotation(x, y, z);
 };
 
 Eend::Point Duck::getPosition() { return _position; };

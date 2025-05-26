@@ -148,8 +148,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float heightOffset = statueJson["position"][1].asFloat();
 
             statueRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
-            statueRef->setRotation(
-                statueJson["rotation"][0].asFloat(), statueJson["rotation"][1].asFloat());
+            statueRef->setRotation(statueJson["rotation"][0].asFloat(),
+                statueJson["rotation"][1].asFloat(), statueJson["rotation"][2].asFloat());
             statueRef->setScale(Eend::Scale(statueJson["scale"][0].asFloat(),
                 statueJson["scale"][1].asFloat(), statueJson["scale"][2].asFloat()));
         }
@@ -167,8 +167,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float heightOffset = dollJson["position"][1].asFloat();
 
             dollRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
-            dollRef->setRotation(
-                dollJson["rotation"][0].asFloat(), dollJson["rotation"][1].asFloat());
+            dollRef->setRotation(dollJson["rotation"][0].asFloat(),
+                dollJson["rotation"][1].asFloat(), dollJson["rotation"][2].asFloat());
             dollRef->setScale(Eend::Scale(dollJson["scale"][0].asFloat(),
                 dollJson["scale"][1].asFloat(), dollJson["scale"][2].asFloat()));
             if (dollJson.isMember("animation"))
@@ -306,6 +306,9 @@ Eend::Point Terrain::positionAtTile(
 
 float Terrain::heightAtPoint(Eend::Point2D point) {
 
+    // TODO I'm flipping the y around randomly here
+    // be more explicit about pixel coords vs 3d coords
+
     //    top left +-------+ top right
     //             |\      |
     //             | \upper|
@@ -372,54 +375,6 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         return pointHeightOnTri(
             (Eend::Triangle){topLeftPoint, bottomLeftPoint, bottomRightPoint}, point);
     }
-
-    /*
-        const float scaledX = point.x / _scale.x;
-        const float scaledY = point.y / _scale.y;
-        // IDK WHERE
-        // BUT I AM HANDLING THE SCALING WRONG
-
-        if (point.x < 0 || point.y > 0 || scaledX >= (_heightMap[0].size() - 1) ||
-            scaledY >= (_heightMap.size() - 1)) {
-            // outside of the terrain area
-            return 0.0f;
-        }
-
-        const float relativeX = scaledX - floor(scaledX);
-        const float relativeY = scaledY - floor(scaledY);
-
-        const float topLeftX = floor(scaledX) * _scale.x;
-        const float topRightX = (floor(scaledX) + 1) * _scale.x;
-        const float bottomRightX = (floor(scaledX) + 1) * _scale.x;
-        const float bottomLeftX = floor(scaledX) * _scale.x;
-
-        const float topLeftY = (floor(scaledY) + 1) * _scale.y;
-        const float topRightY = (floor(scaledY) + 1) * _scale.y;
-        const float bottomRightY = floor(scaledY) * _scale.y;
-        const float bottomLeftY = floor(scaledY) * _scale.y;
-
-
-    const float topLeftZ = _heightMap[(size_t)floor(-scaledY) + 1][(size_t)floor(scaledX)];
-    const float topRightZ = _heightMap[(size_t)floor(-scaledY) + 1][(size_t)floor(scaledX) + 1];
-    const float bottomRightZ = _heightMap[(size_t)floor(-scaledY)][(size_t)floor(scaledX) + 1];
-    const float bottomLeftZ = _heightMap[(size_t)floor(-scaledY)][(size_t)floor(scaledX)];
-
-    const Eend::Point topLeftPoint = Eend::Point(topLeftX, topLeftY, topLeftZ);
-    const Eend::Point topRightPoint = Eend::Point(topRightX, topRightY, topRightZ);
-    const Eend::Point bottomRightPoint = Eend::Point(bottomRightX, bottomRightY, bottomRightZ);
-    const Eend::Point bottomLeftPoint = Eend::Point(bottomLeftX, bottomLeftY, bottomLeftZ);
-
-    if (relativeY < relativeX) {
-        // lower
-        std::print("tr{} {} {}\nbl{} {} {}\nbr{} {} {}\np{} {}\n", topRightPoint.x,
-    topRightPoint.y, topRightPoint.z, bottomLeftPoint.x, bottomLeftPoint.y, bottomLeftPoint.z,
-            bottomRightPoint.x, bottomRightPoint.y, bottomRightPoint.z, point.x, point.y);
-        return pointHeightOnTri(topRightPoint, bottomLeftPoint, bottomRightPoint, point);
-    } else {
-        // upper
-        return pointHeightOnTri(topLeftPoint, topRightPoint, bottomLeftPoint, point);
-    }
-    */
 }
 
 inline float pointHeightOnTri(const Eend::Triangle& tri, const Eend::Point2D& point) {
