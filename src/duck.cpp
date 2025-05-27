@@ -14,9 +14,9 @@ Duck::~Duck() {
 
 void Duck::setPosition(Eend::Point position) {
     if (position.x > _position.x) {
-        Eend::Entities::BoardBatch::getRef(_headId)->setTexture("eyesOpen");
+        Eend::Entities::BoardBatch::getRef(_headId)->setStrip("eyesOpen");
     } else if (position.x < _position.x) {
-        Eend::Entities::BoardBatch::getRef(_headId)->setTexture("eyesClose");
+        Eend::Entities::BoardBatch::getRef(_headId)->setStrip("eyesClose");
     }
     _position = position;
     Eend::Statue* bodyRef = Eend::Entities::StatueBatch::getRef(_bodyId);

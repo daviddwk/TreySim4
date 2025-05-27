@@ -6,7 +6,7 @@ namespace Eend = Eendgine;
 const float DOG_UP_OFFSET = 2.0f;
 const float DOG_SPEED = 20.0f;
 const float DOG_CLOSE_ENOUGH = 1.0f;
-const float DOG_INC_ANIM_PER_SEC = 2.0f;
+const float DOG_ANIM_INCREMENT_TIME = 0.25f;
 
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
     : _bodyId(Eend::Entities::BoardBatch::insert(std::filesystem::path("dog/boards/walk"))),
@@ -29,9 +29,9 @@ void Dog::update(float dt, Eend::Point2D approachPoint) {
     // add some offsets for the dog visually here
     Eend::Entities::BoardBatch::getRef(_bodyId)->setPosition(
         Eend::Point(_position.x, _position.y, _terrain->heightAtPoint(_position) + DOG_UP_OFFSET));
-    if (_time > 0.5f) {
-        Eend::Entities::BoardBatch::getRef(_bodyId)->setTextureIdx(
-            (size_t)(_time * DOG_INC_ANIM_PER_SEC));
+    if (_time > DOG_ANIM_INCREMENT_TIME) {
+        _time = 0;
+        Eend::Entities::BoardBatch::getRef(_bodyId)->nextStripIdx();
     }
 
     // terrain->heightAtPoint(_position)

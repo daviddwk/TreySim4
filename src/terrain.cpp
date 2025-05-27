@@ -283,8 +283,9 @@ void Terrain::update() {
     }
     for (auto& board : _boards) {
         Eend::Board* boardRef = Eend::Entities::BoardBatch::getRef(std::get<Eend::BoardId>(board));
-        if (std::get<float>(board) != 0)
-            boardRef->setTextureIdx((size_t)(cumulative / std::get<float>(board)));
+        if (std::get<float>(board) != 0) {
+            boardRef->setStripIdx((size_t)(cumulative / std::get<float>(board)));
+        }
     }
 }
 
