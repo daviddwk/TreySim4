@@ -23,6 +23,7 @@ void Dog::setSpeed(float speed) { _speed = speed; }
 void Dog::update(float dt, Eend::Point2D approachPoint) {
     _time += dt;
     const glm::vec2 difference = approachPoint - _position;
+    Eend::Entities::BoardBatch::getRef(_bodyId)->setFlip(difference.x < 0.0f);
     if (glm::length(difference) > DOG_CLOSE_ENOUGH) {
         _position += glm::normalize(approachPoint - _position) * DOG_SPEED * dt;
     }
