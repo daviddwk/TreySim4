@@ -36,11 +36,11 @@ int main() {
 
     glEnable(GL_DEPTH_TEST);
 
-    Eend::ShaderProgram newShader("shaders/shader3D.vert", "shaders/shader3D.frag");
-    Eend::Shaders shaders(Eend::ShaderProgram("shaders/shader.vert", "shaders/shader.frag"),
-        Eend::ShaderProgram("shaders/shader3D.vert", "shaders/shader3D.frag"),
-        Eend::ShaderProgram("shaders/shaderInpol.vert", "shaders/shaderInpol.frag"),
-        Eend::ShaderProgram("shaders/shaderScreen.vert", "shaders/shaderScreen.frag"));
+    Eend::Shaders shaders(Eend::ShaderProgram("shaders/panel.vert", "shaders/panel.frag"),
+        Eend::ShaderProgram("shaders/board.vert", "shaders/board.frag"),
+        Eend::ShaderProgram("shaders/statue.vert", "shaders/statue.frag"),
+        Eend::ShaderProgram("shaders/doll.vert", "shaders/doll.frag"),
+        Eend::ShaderProgram("shaders/screen.vert", "shaders/screen.frag"));
 
     Eend::Camera2D hudCamera(screenWidth, screenHeight);
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
