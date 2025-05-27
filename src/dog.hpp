@@ -18,4 +18,5 @@ class Dog {
         Eend::Point2D _position;
         float _speed;
         Terrain* _terrain;
+        float _time;
 };

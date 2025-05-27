@@ -49,7 +49,7 @@ int main() {
     Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
     Duck duck = Duck();
-    Dog dog = Dog(Eend::Point2D(0.0f, 0.0f), Eend::Scale2D(100.0f, 100.0f), 0.0f, &testTerrain);
+    Dog dog = Dog(Eend::Point2D(0.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, &testTerrain);
 
     duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
     Eend::Point duckPosition = duck.getPosition();
@@ -174,7 +174,7 @@ int main() {
         duck.setPosition(duckPosition);
         duck.setRotation(0.0f, 0.0f, duckRotation);
 
-        dog.update(dt, Eend::Point(0.0f));
+        dog.update(dt, duckPosition);
 
         sceneCamera.setPosition(
             Eend::Point(duckPosition.x, duckPosition.y - 25.0f, duckPosition.z + 15.0f));
