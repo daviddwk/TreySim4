@@ -21,6 +21,7 @@
 #include "dog.hpp"
 #include "duck.hpp"
 #include "terrain.hpp"
+#include "textBox.hpp"
 
 namespace Eend = Eendgine;
 
@@ -75,6 +76,9 @@ int main() {
     Eend::Panel* exitRef = Eend::Entities::PanelBatch::getRef(exitId);
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
     exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
+
+    TextBoxQueue::queue("duck", "help me", 3.0f);
+    TextBoxQueue::queue("duck", "aaa me", 3.0f);
 
     while (!Eend::InputManager::getShouldClose()) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -175,6 +179,7 @@ int main() {
         duck.setRotation(0.0f, 0.0f, duckRotation);
 
         dog.update(dt, duckPosition);
+        TextBoxQueue::update();
 
         sceneCamera.setPosition(
             Eend::Point(duckPosition.x, duckPosition.y - 25.0f, duckPosition.z + 15.0f));
