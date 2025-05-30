@@ -77,12 +77,12 @@ int main() {
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
     exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
-    TextBoxQueue::queue("duck", Font::DANIEL, "Help meeeee!", 3.0f);
-    TextBoxQueue::queue("dog", Font::DANIEL, "It's over for you bucko.", 3.0f);
+    TextBoxQueue::queue("duck", Font::DANIEL, "Help meeeee!", 3.0f, true);
+    TextBoxQueue::queue("dog", Font::DANIEL, "It's over for you bucko.", 3.0f, false);
     TextBoxQueue::queue("duck", Font::DANIEL,
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
-        10.0f);
+        5.0f, true);
 
     while (!Eend::InputManager::getShouldClose()) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -91,8 +91,7 @@ int main() {
         shaders.setPixelSize(5);
 
         Eend::Panel::MouseStatus exitMouseStatus =
-            Eend::Entities::PanelBatch::getRef(exitId)->isClicked(Eend::InputManager::getMouseX(),
-                Eend::InputManager::getMouseY(), Eend::InputManager::getLeftClick());
+            Eend::Entities::PanelBatch::getRef(exitId)->isClicked();
         std::string exitMouseString = "";
         if (exitMouseStatus == Eend::Panel::MouseStatus::CLICK) {
             exitMouseString = "click";
