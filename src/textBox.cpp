@@ -1,10 +1,10 @@
 #include "textBox.hpp"
 
-TextBox::TextBox(std::string thumbnail, std::string text, float seconds)
+TextBox::TextBox(std::string thumbnail, Font font, std::string text, float seconds)
     : duration(seconds),
       _background(Eend::Entities::PanelBatch::insert(std::filesystem::path("textbox/background"))),
       _thumbnail(Eend::Entities::PanelBatch::insert(std::filesystem::path("textbox/thumbnail"))),
-      _text("daniel", text, Eend::Point(300.0f, 750.0f, 0.0f), 50.0f, 800.0f) {
+      _font(font), _text(font, text, Eend::Point(300.0f, 750.0f, 0.0f), 50.0f, 800.0f) {
     Eend::Panel* backgroundRef = Eend::Entities::PanelBatch::getRef(_background);
     Eend::Panel* thumbnailRef = Eend::Entities::PanelBatch::getRef(_thumbnail);
     assert(backgroundRef != NULL);
@@ -23,8 +23,8 @@ TextBox::~TextBox() {
     Eend::Entities::PanelBatch::erase(_thumbnail);
 }
 
-void TextBoxQueue::queue(std::string thumbnail, std::string text, float seconds) {
-    _textBoxQueue.push(TextBoxParams(thumbnail, text, seconds));
+void TextBoxQueue::queue(std::string thumbnail, Font font, std::string text, float seconds) {
+    _textBoxQueue.push(TextBoxParams(thumbnail, font, text, seconds));
 }
 
 void TextBoxQueue::update() {
@@ -42,7 +42,7 @@ void TextBoxQueue::update() {
             _startTime = std::chrono::steady_clock::now();
             const TextBoxParams params = _textBoxQueue.front();
             _textBoxQueue.pop();
-            _textBox = new TextBox(params.thumbnail, params.text, params.duration);
+            _textBox = new TextBox(params.thumbnail, params.font, params.text, params.duration);
         }
     }
 }

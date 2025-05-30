@@ -6,7 +6,6 @@
 #include <Eendgine/screen.hpp>
 #include <Eendgine/shader.hpp>
 #include <Eendgine/shaders.hpp>
-#include <Eendgine/text.hpp>
 #include <Eendgine/textureCache.hpp>
 #include <Eendgine/types.hpp>
 #include <Eendgine/window.hpp>
@@ -21,6 +20,7 @@
 #include "dog.hpp"
 #include "duck.hpp"
 #include "terrain.hpp"
+#include "text.hpp"
 #include "textBox.hpp"
 
 namespace Eend = Eendgine;
@@ -66,7 +66,7 @@ int main() {
         Eend::DollId testDollId = Eend::Entities::DollBatch::insert("testCube");
     // Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
 
-    Eend::Text testText("daniel", "", Eend::Point(20.0f), 50.0f, INFINITY);
+    Text testText(Font::daniel, "", Eend::Point(20.0f), 50.0f, INFINITY);
 
     Eend::CollisionRectangle testRectangle = {
         .upperLeft = Eend::Point(0.0f), .lowerRight = Eend::Point(5.0f)};
@@ -77,9 +77,9 @@ int main() {
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
     exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
-    TextBoxQueue::queue("duck", "Help meeeee!", 3.0f);
-    TextBoxQueue::queue("dog", "It's over for you bucko.", 3.0f);
-    TextBoxQueue::queue("duck",
+    TextBoxQueue::queue("duck", Font::daniel, "Help meeeee!", 3.0f);
+    TextBoxQueue::queue("dog", Font::daniel, "It's over for you bucko.", 3.0f);
+    TextBoxQueue::queue("duck", Font::daniel,
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         10.0f);
