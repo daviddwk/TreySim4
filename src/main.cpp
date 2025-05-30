@@ -66,7 +66,7 @@ int main() {
         Eend::DollId testDollId = Eend::Entities::DollBatch::insert("testCube");
     // Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
 
-    Text testText(Font::daniel, "", Eend::Point(20.0f), 50.0f, INFINITY);
+    Text testText(Font::DANIEL, "", Eend::Point(20.0f), 50.0f, INFINITY);
 
     Eend::CollisionRectangle testRectangle = {
         .upperLeft = Eend::Point(0.0f), .lowerRight = Eend::Point(5.0f)};
@@ -77,9 +77,9 @@ int main() {
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
     exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
-    TextBoxQueue::queue("duck", Font::daniel, "Help meeeee!", 3.0f);
-    TextBoxQueue::queue("dog", Font::daniel, "It's over for you bucko.", 3.0f);
-    TextBoxQueue::queue("duck", Font::daniel,
+    TextBoxQueue::queue("duck", Font::DANIEL, "Help meeeee!", 3.0f);
+    TextBoxQueue::queue("dog", Font::DANIEL, "It's over for you bucko.", 3.0f);
+    TextBoxQueue::queue("duck", Font::DANIEL,
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         10.0f);
@@ -94,17 +94,17 @@ int main() {
             Eend::Entities::PanelBatch::getRef(exitId)->isClicked(Eend::InputManager::getMouseX(),
                 Eend::InputManager::getMouseY(), Eend::InputManager::getLeftClick());
         std::string exitMouseString = "";
-        if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
+        if (exitMouseStatus == Eend::Panel::MouseStatus::CLICK) {
             exitMouseString = "click";
         }
-        if (exitMouseStatus == Eend::Panel::MouseStatus::hover) {
+        if (exitMouseStatus == Eend::Panel::MouseStatus::HOVER) {
             exitMouseString = "hover";
         }
-        if (exitMouseStatus == Eend::Panel::MouseStatus::none) {
+        if (exitMouseStatus == Eend::Panel::MouseStatus::NONE) {
             exitMouseString = "none";
         }
 
-        if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
+        if (exitMouseStatus == Eend::Panel::MouseStatus::CLICK) {
             Eend::InputManager::setShouldClose(true);
         }
 
@@ -119,7 +119,7 @@ int main() {
             Eend::InputManager::getDeltaMouseY(), Eend::InputManager::getLeftClick(),
             Eend::InputManager::getRightClick(), Eend::InputManager::getMiddleClick()));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
-        Eend::Screen::render(shaders.getShader(Eend::Shader::screen));
+        Eend::Screen::render(shaders.getShader(Eend::Shader::SCREEN));
 
         duckPosition = duck.getPosition();
         Eend::Point oldDuckPosition = duckPosition;

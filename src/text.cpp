@@ -18,7 +18,7 @@ Text::Text(Font font, std::string text, Eend::Point position, float scale, float
     // auto rootPath = std::filesystem::path("resources") / std::filesystem::path("fonts");
     _fontPath = std::filesystem::path("fonts");
     switch (font) {
-    case daniel:
+    case DANIEL:
         _fontPath = _fontPath / std::filesystem::path("daniel");
         break;
     }
