@@ -32,7 +32,6 @@ void TextBoxQueue::update() {
         auto now = std::chrono::steady_clock::now();
         float secondsElapsed =
             std::chrono::duration_cast<std::chrono::seconds>(now - _startTime).count();
-        std::print("{}\n", secondsElapsed);
         if (secondsElapsed > _textBox->duration) {
             delete _textBox;
             _textBox = NULL;

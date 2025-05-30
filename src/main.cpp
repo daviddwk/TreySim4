@@ -77,8 +77,12 @@ int main() {
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
     exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
-    TextBoxQueue::queue("duck", "help me", 3.0f);
-    TextBoxQueue::queue("duck", "aaa me", 3.0f);
+    TextBoxQueue::queue("duck", "Help meeeee!", 3.0f);
+    TextBoxQueue::queue("dog", "It's over for you bucko.", 3.0f);
+    TextBoxQueue::queue("duck",
+        "What the duck did you just call me? You little quack! "
+        "Aaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
+        10.0f);
 
     while (!Eend::InputManager::getShouldClose()) {
         float dt = Eend::FrameLimiter::deltaTime;

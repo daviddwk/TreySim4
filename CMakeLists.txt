@@ -18,4 +18,4 @@ set_target_properties(
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}"
 )
 target_link_libraries(game Eendgine stb)
-target_compile_options(game PRIVATE -Wall)
+target_compile_options(game PRIVATE -Wall -ggdb)
