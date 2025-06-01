@@ -81,7 +81,7 @@ int main() {
     TextBoxQueue::queue("dog", Font::DANIEL, "It's over for you bucko.", 3.0f, false);
     TextBoxQueue::queue("duck", Font::DANIEL,
         "What the duck did you just call me? You little quack! "
-        "Aaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
+        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f, true);
 
     while (!Eend::InputManager::getShouldClose()) {
