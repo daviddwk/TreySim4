@@ -19,6 +19,7 @@
 #include "Eendgine/panel.hpp"
 #include "dog.hpp"
 #include "duck.hpp"
+#include "healthBar.hpp"
 #include "terrain.hpp"
 #include "text.hpp"
 #include "textBox.hpp"
@@ -84,6 +85,8 @@ int main() {
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f, true);
 
+    HealthBar healthBar;
+
     while (!Eend::InputManager::getShouldClose()) {
         float dt = Eend::FrameLimiter::deltaTime;
         Eend::FrameLimiter::startInterval();
@@ -143,6 +146,7 @@ int main() {
             duckPosition.y -= 25.0f * dt;
             duckRotationOffset += 0.0f;
             numPressed++;
+            healthBar.damage(1);
         }
         if (Eend::InputManager::getLeftPress()) {
             duckPosition.x -= 25.0f * dt;

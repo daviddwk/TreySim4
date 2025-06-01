@@ -13,9 +13,9 @@ Duck::~Duck() {
 }
 
 void Duck::setPosition(Eend::Point position) {
-    if (position.x > _position.x) {
+    if (position.y < _position.y) {
         Eend::Entities::BoardBatch::getRef(_headId)->setStrip("eyesOpen");
-    } else if (position.x < _position.x) {
+    } else if (position.y > _position.y) {
         Eend::Entities::BoardBatch::getRef(_headId)->setStrip("eyesClose");
     }
     _position = position;
