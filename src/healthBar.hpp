@@ -1,6 +1,9 @@
-#include "text.hpp"
+#pragma once
+
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
+
+#include "text.hpp"
 
 class HealthBar {
     public:
@@ -11,7 +14,7 @@ class HealthBar {
         void heal(unsigned int heal);
 
     private:
-        void updateBar();
+        void update();
 
         Eend::PanelId _background;
         Eend::PanelId _bar;

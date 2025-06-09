@@ -31,3 +31,4 @@ void Duck::setRotation(float x, float y, float z) {
 };
 
 Eend::Point Duck::getPosition() { return _position; };
+Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(_position.x, _position.y); };

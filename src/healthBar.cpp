@@ -33,7 +33,7 @@ bool HealthBar::damage(unsigned int damage) {
         _health -= damage;
         ret = false;
     }
-    updateBar();
+    update();
     return ret;
 }
 
@@ -43,10 +43,10 @@ void HealthBar::heal(unsigned int heal) {
     } else {
         _health += heal;
     }
-    updateBar();
+    update();
 }
 
-void HealthBar::updateBar() {
+void HealthBar::update() {
     Eend::Panel* barRef = Eend::Entities::PanelBatch::getRef(_bar);
     barRef->setScale(Eend::Scale2D(BAR_SCALE_MAX * ((float)_health / (float)HEALTH_MAX), 75.0f));
     if (_health > 70.0) {

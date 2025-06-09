@@ -20,6 +20,8 @@ Dog::~Dog() { Eend::Entities::BoardBatch::erase(_bodyId); }
 
 void Dog::setSpeed(float speed) { _speed = speed; }
 
+Eend::Point2D Dog::getPosition() { return _position; };
+
 void Dog::update(float dt, Eend::Point2D approachPoint) {
     _time += dt;
     const glm::vec2 difference = approachPoint - _position;

@@ -20,6 +20,7 @@
 #include "dog.hpp"
 #include "duck.hpp"
 #include "healthBar.hpp"
+#include "puppyMill.hpp"
 #include "terrain.hpp"
 #include "text.hpp"
 #include "textBox.hpp"
@@ -51,7 +52,7 @@ int main() {
     Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
     Duck duck = Duck();
-    Dog dog = Dog(Eend::Point2D(0.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, &testTerrain);
+    PuppyMill puppyMill(&testTerrain);
 
     duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
     Eend::Point duckPosition = duck.getPosition();
@@ -84,8 +85,6 @@ int main() {
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f, true);
-
-    HealthBar healthBar;
 
     while (!Eend::InputManager::getShouldClose()) {
         float dt = Eend::FrameLimiter::deltaTime;
@@ -146,7 +145,6 @@ int main() {
             duckPosition.y -= 25.0f * dt;
             duckRotationOffset += 0.0f;
             numPressed++;
-            healthBar.damage(1);
         }
         if (Eend::InputManager::getLeftPress()) {
             duckPosition.x -= 25.0f * dt;
@@ -185,7 +183,8 @@ int main() {
         duck.setPosition(duckPosition);
         duck.setRotation(0.0f, 0.0f, duckRotation);
 
-        dog.update(dt, duckPosition);
+        puppyMill.damage(&duck);
+        puppyMill.update(dt, &duck);
         TextBoxQueue::update();
 
         sceneCamera.setPosition(

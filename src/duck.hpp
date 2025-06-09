@@ -1,5 +1,9 @@
+#pragma once
+
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
+
+#include "healthBar.hpp"
 
 namespace Eend = Eendgine;
 
@@ -14,6 +18,9 @@ class Duck {
         void setRotation(float x, float y, float z);
 
         Eend::Point getPosition();
+        Eend::Point2D getPosition2D();
+
+        HealthBar health;
 
     private:
         Eend::StatueId _bodyId;

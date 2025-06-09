@@ -1,6 +1,9 @@
-#include "terrain.hpp"
+#pragma once
+
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
+
+#include "terrain.hpp"
 
 namespace Eend = Eendgine;
 
@@ -10,6 +13,7 @@ class Dog {
         ~Dog();
 
         void setSpeed(float speed);
+        Eend::Point2D getPosition();
 
         void update(float dt, Eend::Point2D approachPoint);
 
