@@ -55,23 +55,12 @@ int main() {
     PuppyMill puppyMill(&testTerrain);
 
     duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
-    Eend::Point duckPosition = duck.getPosition();
-    sceneCamera.setPosition(
-        Eend::Point(duckPosition.x, duckPosition.y + 15.0f, duckPosition.z + 25.0f));
-    sceneCamera.setTarget(duckPosition);
-    float duckRotation = 0.0f;
 
     float testAnimScale = 0.0f;
     Eend::DollId testDollId = Eend::Entities::DollBatch::insert("testCube");
 
-    for (unsigned int i = 0; i < 50; ++i)
-        Eend::DollId testDollId = Eend::Entities::DollBatch::insert("testCube");
-    // Eend::StatueId testStatue = Eend::Entities::StatueBatch::insert("duck/statues/body");
-
     Text testText(Font::DANIEL, "", Eend::Point(20.0f), 50.0f, INFINITY);
 
-    Eend::CollisionRectangle testRectangle = {
-        .upperLeft = Eend::Point(0.0f), .lowerRight = Eend::Point(5.0f)};
     bool testColliding = false;
 
     Eend::PanelId exitId = Eend::Entities::PanelBatch::insert("exit");
@@ -122,71 +111,16 @@ int main() {
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::render(shaders.getShader(Eend::Shader::SCREEN));
 
-        duckPosition = duck.getPosition();
-        Eend::Point oldDuckPosition = duckPosition;
-
         Eend::InputManager::processInput();
 
-        float duckRotationOffset = 0.0f;
-        unsigned int numPressed = 0;
-        if (Eend::InputManager::getUpPress()) {
-            Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("one");
-            duckPosition.y += 25.0f * dt;
-            // stupid hack because my trig is mid
-            if (Eend::InputManager::getRightPress()) {
-                duckRotationOffset = -180.0f;
-            } else {
-                duckRotationOffset += 180.0f;
-            }
-            numPressed++;
-        }
-        if (Eend::InputManager::getDownPress()) {
-            Eend::Entities::DollBatch::getRef(testDollId)->setAnimation("two");
-            duckPosition.y -= 25.0f * dt;
-            duckRotationOffset += 0.0f;
-            numPressed++;
-        }
-        if (Eend::InputManager::getLeftPress()) {
-            duckPosition.x -= 25.0f * dt;
-            duckRotationOffset += 90.0f;
-            numPressed++;
-        }
-        if (Eend::InputManager::getRightPress()) {
-            duckPosition.x += 25.0f * dt;
-            duckRotationOffset -= 90.0f;
-            numPressed++;
-        }
-        // COORDINATE SYSTMES ARE TOTALLY WACKED UP RN
-
-        if (!testTerrain.colliding(Eend::Point2D(duckPosition.x, duckPosition.y))) {
-            testColliding = false;
-        } else if (!testTerrain.colliding(Eend::Point2D(oldDuckPosition.x, duckPosition.y))) {
-            duckPosition.x = oldDuckPosition.x;
-            testColliding = true;
-        } else if (!testTerrain.colliding(Eend::Point2D(duckPosition.x, oldDuckPosition.y))) {
-            duckPosition.y = oldDuckPosition.y;
-            testColliding = true;
-        } else {
-            duckPosition.x = oldDuckPosition.x;
-            duckPosition.y = oldDuckPosition.y;
-            testColliding = true;
-        }
-
-        if (numPressed) {
-            duckRotation = (duckRotationOffset / (float)numPressed);
-        } else {
-            duckRotation += 100.0f * dt;
-        }
-
-        duckPosition.z = testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+        duck.update(dt, &testTerrain);
         testTerrain.update();
-        duck.setPosition(duckPosition);
-        duck.setRotation(0.0f, 0.0f, duckRotation);
 
         puppyMill.damage(&duck);
         puppyMill.update(dt, &duck);
         TextBoxQueue::update();
 
+        Eend::Point duckPosition = duck.getPosition();
         sceneCamera.setPosition(
             Eend::Point(duckPosition.x, duckPosition.y - 25.0f, duckPosition.z + 15.0f));
         sceneCamera.setTarget(duckPosition);

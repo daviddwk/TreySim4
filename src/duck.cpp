@@ -1,3 +1,5 @@
+#include <Eendgine/inputManager.hpp>
+
 #include "duck.hpp"
 
 Duck::Duck()
@@ -32,3 +34,60 @@ void Duck::setRotation(float x, float y, float z) {
 
 Eend::Point Duck::getPosition() { return _position; };
 Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(_position.x, _position.y); };
+
+void Duck::update(float dt, Terrain* terrain) {
+
+    Eend::Point duckPosition = getPosition();
+    Eend::Point oldDuckPosition = duckPosition;
+
+    float duckRotation = 0.0f;
+
+    float duckRotationOffset = 0.0f;
+    unsigned int numPressed = 0;
+    if (Eend::InputManager::getUpPress()) {
+        duckPosition.y += 25.0f * dt;
+        // stupid hack because my trig is mid
+        if (Eend::InputManager::getRightPress()) {
+            duckRotationOffset = -180.0f;
+        } else {
+            duckRotationOffset += 180.0f;
+        }
+        numPressed++;
+    }
+    if (Eend::InputManager::getDownPress()) {
+        duckPosition.y -= 25.0f * dt;
+        duckRotationOffset += 0.0f;
+        numPressed++;
+    }
+    if (Eend::InputManager::getLeftPress()) {
+        duckPosition.x -= 25.0f * dt;
+        duckRotationOffset += 90.0f;
+        numPressed++;
+    }
+    if (Eend::InputManager::getRightPress()) {
+        duckPosition.x += 25.0f * dt;
+        duckRotationOffset -= 90.0f;
+        numPressed++;
+    }
+    // COORDINATE SYSTMES ARE TOTALLY WACKED UP RN
+
+    if (!terrain->colliding(Eend::Point2D(duckPosition.x, duckPosition.y))) {
+    } else if (!terrain->colliding(Eend::Point2D(oldDuckPosition.x, duckPosition.y))) {
+        duckPosition.x = oldDuckPosition.x;
+    } else if (!terrain->colliding(Eend::Point2D(duckPosition.x, oldDuckPosition.y))) {
+        duckPosition.y = oldDuckPosition.y;
+    } else {
+        duckPosition.x = oldDuckPosition.x;
+        duckPosition.y = oldDuckPosition.y;
+    }
+
+    if (numPressed) {
+        duckRotation = (duckRotationOffset / (float)numPressed);
+    } else {
+        duckRotation += 100.0f * dt;
+    }
+
+    duckPosition.z = terrain->heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+    setPosition(duckPosition);
+    setRotation(0.0f, 0.0f, duckRotation);
+}

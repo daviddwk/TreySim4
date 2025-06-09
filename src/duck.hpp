@@ -4,6 +4,7 @@
 #include <Eendgine/types.hpp>
 
 #include "healthBar.hpp"
+#include "terrain.hpp"
 
 namespace Eend = Eendgine;
 
@@ -19,6 +20,8 @@ class Duck {
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
+
+        void update(float dt, Terrain* terrain);
 
         HealthBar health;
 
