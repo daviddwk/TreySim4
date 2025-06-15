@@ -24,7 +24,7 @@ void PuppyMill::damage(Duck* duck) {
         tickLast = now;
         for (Dog& dog : _dogs) {
             if (glm::length(dog.getPosition() - duck->getPosition2D()) < DOG_RADIUS) {
-                duck->health.damage(DMG_DOG);
+                duck->health.damage(DOG_DMG);
             }
         }
     }
