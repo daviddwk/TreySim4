@@ -117,6 +117,7 @@ int main() {
         testTerrain.update();
 
         puppyMill.damage(&duck);
+
         puppyMill.update(dt, &duck);
         TextBoxQueue::update();
 
