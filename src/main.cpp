@@ -48,6 +48,7 @@ int main() {
     Eend::Camera2D hudCamera(screenWidth, screenHeight);
     Eend::Camera3D sceneCamera((float)screenWidth / (float)screenHeight,
         Eend::Point(-20.0f, 5.0f, 0.0f), Eend::Point(3.0f, 0.0f, 3.0f));
+    TextBoxQueue::construct();
 
     Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
@@ -68,9 +69,9 @@ int main() {
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
     exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
-    TextBoxQueue::queue("duck", Font::DANIEL, "Help meeeee!", 3.0f, true);
-    TextBoxQueue::queue("dog", Font::DANIEL, "It's over for you bucko.", 3.0f, false);
-    TextBoxQueue::queue("duck", Font::DANIEL,
+    TextBoxQueue::get().queue("duck", Font::DANIEL, "Help meeeee!", 3.0f, true);
+    TextBoxQueue::get().queue("dog", Font::DANIEL, "It's over for you bucko.", 3.0f, false);
+    TextBoxQueue::get().queue("duck", Font::DANIEL,
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f, true);
@@ -119,7 +120,7 @@ int main() {
         puppyMill.damage(&duck);
 
         puppyMill.update(dt, &duck);
-        TextBoxQueue::update();
+        TextBoxQueue::get().update();
 
         Eend::Point duckPosition = duck.getPosition();
         sceneCamera.setPosition(
@@ -131,6 +132,7 @@ int main() {
         Eend::Window::swapBuffers();
         Eend::FrameLimiter::stopInterval();
     }
+    TextBoxQueue::destruct();
     Eend::Screen::close();
     Eend::Window::close();
     Eend::FrameLimiter::close();

@@ -3,9 +3,9 @@
 TextBox::TextBox(
     std::string thumbnail, Font font, std::string text, float seconds, bool clickToContinue)
     : duration(seconds), clickToContinue(clickToContinue),
+      _arrow(Eend::Entities::PanelBatch::insert(std::filesystem::path("textbox/arrow"))),
       _background(Eend::Entities::PanelBatch::insert(std::filesystem::path("textbox/background"))),
       _thumbnail(Eend::Entities::PanelBatch::insert(std::filesystem::path("textbox/thumbnail"))),
-      _arrow(Eend::Entities::PanelBatch::insert(std::filesystem::path("textbox/arrow"))),
       _font(font), _text(font, text, Eend::Point(300.0f, 750.0f, 0.0f), 50.0f, 800.0f) {
 
     Eend::Panel* backgroundRef = Eend::Entities::PanelBatch::getRef(_background);
@@ -32,6 +32,22 @@ TextBox::~TextBox() {
     Eend::Entities::PanelBatch::erase(_background);
     Eend::Entities::PanelBatch::erase(_thumbnail);
     Eend::Entities::PanelBatch::erase(_arrow);
+}
+
+void TextBoxQueue::construct() {
+    assert(_instance == nullptr);
+    _instance = new TextBoxQueue;
+}
+
+void TextBoxQueue::destruct() {
+    assert(_instance != nullptr);
+    delete _instance;
+    _instance = nullptr;
+}
+
+TextBoxQueue& TextBoxQueue::get() {
+    assert(_instance != nullptr);
+    return *_instance;
 }
 
 void TextBoxQueue::queue(

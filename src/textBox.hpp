@@ -34,13 +34,25 @@ struct TextBoxParams {
 
 class TextBoxQueue {
     public:
-        static void queue(std::string thumbnail, Font font, std::string text, float seconds,
+        static void construct();
+        static void destruct();
+        static TextBoxQueue& get();
+
+        TextBoxQueue(const TextBoxQueue&) = delete;
+        TextBoxQueue& operator=(const TextBoxQueue&) = delete;
+
+        void queue(std::string thumbnail, Font font, std::string text, float seconds,
             bool clickToContinue);
-        static void update();
+        void update();
 
     private:
-        inline static bool _continue = false;
-        inline static std::chrono::steady_clock::time_point _startTime;
-        inline static TextBox* _textBox = NULL;
-        inline static std::queue<TextBoxParams> _textBoxQueue;
+        TextBoxQueue() = default;
+        ~TextBoxQueue() = default;
+
+        inline static TextBoxQueue* _instance = nullptr;
+
+        bool _continue = false;
+        std::chrono::steady_clock::time_point _startTime;
+        TextBox* _textBox = NULL;
+        std::queue<TextBoxParams> _textBoxQueue;
 };
