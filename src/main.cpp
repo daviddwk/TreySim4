@@ -32,10 +32,10 @@ const unsigned int screenWidth = 1920;
 
 int main() {
 
-    Eend::Window::init(screenWidth, screenHeight, "Quack");
-    Eend::Screen::init(screenWidth, screenHeight);
-    Eend::InputManager::init();
-    Eend::FrameLimiter::init(60.0f, 20.0f);
+    Eend::Window::construct(screenWidth, screenHeight, "Quack");
+    Eend::Screen::construct(screenWidth, screenHeight);
+    Eend::InputManager::construct();
+    Eend::FrameLimiter::construct(60.0f, 20.0f);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -76,10 +76,10 @@ int main() {
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f, true);
 
-    while (!Eend::InputManager::getShouldClose()) {
-        float dt = Eend::FrameLimiter::deltaTime;
-        Eend::FrameLimiter::startInterval();
-        Eend::Screen::bind();
+    while (!Eend::InputManager::get().getShouldClose()) {
+        float dt = Eend::FrameLimiter::get().deltaTime;
+        Eend::FrameLimiter::get().startInterval();
+        Eend::Screen::get().bind();
         shaders.setPixelSize(5);
 
         Eend::Panel::MouseStatus exitMouseStatus =
@@ -96,7 +96,7 @@ int main() {
         }
 
         if (exitMouseStatus == Eend::Panel::MouseStatus::CLICK) {
-            Eend::InputManager::setShouldClose(true);
+            Eend::InputManager::get().setShouldClose(true);
         }
 
         testText.setText(std::format("FPS:{:.4f} DT:{:.4f}\n"
@@ -105,14 +105,14 @@ int main() {
                                      "mouseX:{} dx:{} mouseY:{} dy:{}\n"
                                      "left:{} right:{} mid:{}\n",
             1.0f / dt, dt, duck.getPosition().x, duck.getPosition().y, duck.getPosition().z,
-            testColliding, exitMouseString, Eend::InputManager::getMouseX(),
-            Eend::InputManager::getDeltaMouseX(), Eend::InputManager::getMouseY(),
-            Eend::InputManager::getDeltaMouseY(), Eend::InputManager::getLeftClick(),
-            Eend::InputManager::getRightClick(), Eend::InputManager::getMiddleClick()));
+            testColliding, exitMouseString, Eend::InputManager::get().getMouseX(),
+            Eend::InputManager::get().getDeltaMouseX(), Eend::InputManager::get().getMouseY(),
+            Eend::InputManager::get().getDeltaMouseY(), Eend::InputManager::get().getLeftClick(),
+            Eend::InputManager::get().getRightClick(), Eend::InputManager::get().getMiddleClick()));
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
-        Eend::Screen::render(shaders.getShader(Eend::Shader::SCREEN));
+        Eend::Screen::get().render(shaders.getShader(Eend::Shader::SCREEN));
 
-        Eend::InputManager::processInput();
+        Eend::InputManager::get().processInput();
 
         duck.update(dt, &testTerrain);
         testTerrain.update();
@@ -129,12 +129,12 @@ int main() {
 
         Eend::Entities::DollBatch::getRef(testDollId)->setAnim(testAnimScale);
 
-        Eend::Window::swapBuffers();
-        Eend::FrameLimiter::stopInterval();
+        Eend::Window::get().swapBuffers();
+        Eend::FrameLimiter::get().stopInterval();
     }
     TextBoxQueue::destruct();
-    Eend::Screen::close();
-    Eend::Window::close();
-    Eend::FrameLimiter::close();
+    Eend::Screen::destruct();
+    Eend::Window::destruct();
+    Eend::FrameLimiter::destruct();
     return 0;
 }

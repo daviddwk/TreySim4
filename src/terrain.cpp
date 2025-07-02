@@ -274,11 +274,11 @@ Terrain::~Terrain() {
 
 void Terrain::update() {
     static float cumulative = 0.0f;
-    cumulative += Eend::FrameLimiter::deltaTime;
+    cumulative += Eend::FrameLimiter::get().deltaTime;
     for (auto& doll : _dolls) {
         Eend::Doll* dollRef = Eend::Entities::DollBatch::getRef(std::get<Eend::DollId>(doll));
         float animScale = dollRef->getAnim();
-        animScale += std::get<float>(doll) * Eend::FrameLimiter::deltaTime;
+        animScale += std::get<float>(doll) * Eend::FrameLimiter::get().deltaTime;
         dollRef->setAnim(animScale);
     }
     for (auto& board : _boards) {

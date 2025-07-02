@@ -44,27 +44,27 @@ void Duck::update(float dt, Terrain* terrain) {
 
     float duckRotationOffset = 0.0f;
     unsigned int numPressed = 0;
-    if (Eend::InputManager::getUpPress()) {
+    if (Eend::InputManager::get().getUpPress()) {
         duckPosition.y += 25.0f * dt;
         // stupid hack because my trig is mid
-        if (Eend::InputManager::getRightPress()) {
+        if (Eend::InputManager::get().getRightPress()) {
             duckRotationOffset = -180.0f;
         } else {
             duckRotationOffset += 180.0f;
         }
         numPressed++;
     }
-    if (Eend::InputManager::getDownPress()) {
+    if (Eend::InputManager::get().getDownPress()) {
         duckPosition.y -= 25.0f * dt;
         duckRotationOffset += 0.0f;
         numPressed++;
     }
-    if (Eend::InputManager::getLeftPress()) {
+    if (Eend::InputManager::get().getLeftPress()) {
         duckPosition.x -= 25.0f * dt;
         duckRotationOffset += 90.0f;
         numPressed++;
     }
-    if (Eend::InputManager::getRightPress()) {
+    if (Eend::InputManager::get().getRightPress()) {
         duckPosition.x += 25.0f * dt;
         duckRotationOffset -= 90.0f;
         numPressed++;
