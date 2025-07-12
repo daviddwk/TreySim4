@@ -77,9 +77,10 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
                 avg = (imageData[currentIdx] + imageData[downIdx]) / 2;
                 _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.z);
             }
-            avg = ((imageData[currentIdx] + imageData[rightIdx] + imageData[downIdx] +
-                       imageData[rightDownIdx]) /
-                   4);
+            avg =
+                ((imageData[currentIdx] + imageData[rightIdx] + imageData[downIdx] +
+                  imageData[rightDownIdx]) /
+                 4);
             _heightMap[h + 1].push_back(((float)avg / 256.0f) * _scale.z);
             if (w == (_width - 2)) {
                 avg = (imageData[currentIdx] + imageData[downIdx]) / 2;
@@ -121,8 +122,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     if (rootJson["Boards"].isArray()) {
         for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
             Json::Value boardJson = rootJson["Boards"][boardIdx];
-            Eend::BoardId id = Eend::Entities::BoardBatch::insert(boardJson["path"].asString());
-            Eend::Board* boardRef = Eend::Entities::BoardBatch::getRef(id);
+            Eend::BoardId id = Eend::Entities::getBoards().insert(boardJson["path"].asString());
+            Eend::Board* boardRef = Eend::Entities::getBoards().getRef(id);
             float pace = boardJson["pace"].asFloat(); // should be 0 if not there?
             _boards.push_back(std::tie(id, pace));
 
@@ -139,8 +140,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     if (rootJson["Statues"].isArray()) {
         for (unsigned int statueIdx = 0; statueIdx < rootJson["Statues"].size(); ++statueIdx) {
             Json::Value statueJson = rootJson["Statues"][statueIdx];
-            Eend::StatueId id = Eend::Entities::StatueBatch::insert(statueJson["path"].asString());
-            Eend::Statue* statueRef = Eend::Entities::StatueBatch::getRef(id);
+            Eend::StatueId id = Eend::Entities::getStatues().insert(statueJson["path"].asString());
+            Eend::Statue* statueRef = Eend::Entities::getStatues().getRef(id);
             _statues.push_back(id);
 
             float tileXIdx = statueJson["position"][0].asFloat();
@@ -148,17 +149,20 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float heightOffset = statueJson["position"][1].asFloat();
 
             statueRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
-            statueRef->setRotation(statueJson["rotation"][0].asFloat(),
-                statueJson["rotation"][1].asFloat(), statueJson["rotation"][2].asFloat());
-            statueRef->setScale(Eend::Scale(statueJson["scale"][0].asFloat(),
-                statueJson["scale"][1].asFloat(), statueJson["scale"][2].asFloat()));
+            statueRef->setRotation(
+                statueJson["rotation"][0].asFloat(), statueJson["rotation"][1].asFloat(),
+                statueJson["rotation"][2].asFloat());
+            statueRef->setScale(
+                Eend::Scale(
+                    statueJson["scale"][0].asFloat(), statueJson["scale"][1].asFloat(),
+                    statueJson["scale"][2].asFloat()));
         }
     }
     if (rootJson["Dolls"].isArray()) {
         for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
             Json::Value dollJson = rootJson["Dolls"][dollIdx];
-            Eend::DollId id = Eend::Entities::DollBatch::insert(dollJson["path"].asString());
-            Eend::Doll* dollRef = Eend::Entities::DollBatch::getRef(id);
+            Eend::DollId id = Eend::Entities::getDolls().insert(dollJson["path"].asString());
+            Eend::Doll* dollRef = Eend::Entities::getDolls().getRef(id);
             float pace = dollJson["pace"].asFloat();
             _dolls.push_back(std::tie(id, pace));
 
@@ -167,10 +171,13 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float heightOffset = dollJson["position"][1].asFloat();
 
             dollRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
-            dollRef->setRotation(dollJson["rotation"][0].asFloat(),
-                dollJson["rotation"][1].asFloat(), dollJson["rotation"][2].asFloat());
-            dollRef->setScale(Eend::Scale(dollJson["scale"][0].asFloat(),
-                dollJson["scale"][1].asFloat(), dollJson["scale"][2].asFloat()));
+            dollRef->setRotation(
+                dollJson["rotation"][0].asFloat(), dollJson["rotation"][1].asFloat(),
+                dollJson["rotation"][2].asFloat());
+            dollRef->setScale(
+                Eend::Scale(
+                    dollJson["scale"][0].asFloat(), dollJson["scale"][1].asFloat(),
+                    dollJson["scale"][2].asFloat()));
             if (dollJson.isMember("animation"))
                 dollRef->setAnimation(dollJson["animation"].asString());
         }
@@ -259,30 +266,30 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
 
     mtlFile.close();
 
-    _statueId = Eend::Entities::StatueBatch::insert(path);
+    _statueId = Eend::Entities::getStatues().insert(path);
 }
 
 Terrain::~Terrain() {
-    Eend::Entities::StatueBatch::erase(_statueId);
+    Eend::Entities::getStatues().erase(_statueId);
     for (auto& board : _boards)
-        Eend::Entities::BoardBatch::erase(std::get<Eend::BoardId>(board));
+        Eend::Entities::getBoards().erase(std::get<Eend::BoardId>(board));
     for (Eend::StatueId& statue : _statues)
-        Eend::Entities::StatueBatch::erase(statue);
+        Eend::Entities::getStatues().erase(statue);
     for (auto& doll : _dolls)
-        Eend::Entities::DollBatch::erase(std::get<Eend::DollId>(doll));
+        Eend::Entities::getDolls().erase(std::get<Eend::DollId>(doll));
 }
 
 void Terrain::update() {
     static float cumulative = 0.0f;
     cumulative += Eend::FrameLimiter::get().deltaTime;
     for (auto& doll : _dolls) {
-        Eend::Doll* dollRef = Eend::Entities::DollBatch::getRef(std::get<Eend::DollId>(doll));
+        Eend::Doll* dollRef = Eend::Entities::getDolls().getRef(std::get<Eend::DollId>(doll));
         float animScale = dollRef->getAnim();
         animScale += std::get<float>(doll) * Eend::FrameLimiter::get().deltaTime;
         dollRef->setAnim(animScale);
     }
     for (auto& board : _boards) {
-        Eend::Board* boardRef = Eend::Entities::BoardBatch::getRef(std::get<Eend::BoardId>(board));
+        Eend::Board* boardRef = Eend::Entities::getBoards().getRef(std::get<Eend::BoardId>(board));
         if (std::get<float>(board) != 0) {
             boardRef->setStripIdx((size_t)(cumulative / std::get<float>(board)));
         }
@@ -297,10 +304,10 @@ bool Terrain::colliding(const Eend::Point2D point) {
     return false;
 }
 
-Eend::Point Terrain::positionAtTile(
-    const float tileXIdx, const float tileYIdx, const float heightOffset) {
-    return Eend::Point((tileXIdx * _scale.x) + (_scale.x / 2.0),
-        (tileYIdx * -_scale.y) + (-_scale.y / 2.0),
+Eend::Point
+Terrain::positionAtTile(const float tileXIdx, const float tileYIdx, const float heightOffset) {
+    return Eend::Point(
+        (tileXIdx * _scale.x) + (_scale.x / 2.0), (tileYIdx * -_scale.y) + (-_scale.y / 2.0),
         heightOffset +
             heightAtPoint(Eend::Point2D((float)tileXIdx * _scale.x, tileYIdx * -_scale.y)));
 }
@@ -345,12 +352,15 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const size_t bottomRightXIdx = (size_t)floor(scaledX + 1);
         const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
 
-        const Eend::Point topLeftPoint = Eend::Point((float)topLeftXIdx * _scale.x,
-            (float)topLeftYIdx * -_scale.y, _heightMap[topLeftYIdx][topLeftXIdx]);
-        const Eend::Point topRightPoint = Eend::Point((float)topRightXIdx * _scale.x,
-            (float)topRightYIdx * -_scale.y, _heightMap[topRightYIdx][topRightXIdx]);
-        const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
-            (float)bottomRightYIdx * -_scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
+        const Eend::Point topLeftPoint = Eend::Point(
+            (float)topLeftXIdx * _scale.x, (float)topLeftYIdx * -_scale.y,
+            _heightMap[topLeftYIdx][topLeftXIdx]);
+        const Eend::Point topRightPoint = Eend::Point(
+            (float)topRightXIdx * _scale.x, (float)topRightYIdx * -_scale.y,
+            _heightMap[topRightYIdx][topRightXIdx]);
+        const Eend::Point bottomRightPoint = Eend::Point(
+            (float)bottomRightXIdx * _scale.x, (float)bottomRightYIdx * -_scale.y,
+            _heightMap[bottomRightYIdx][bottomRightXIdx]);
         const Eend::Triangle triangle = {
             .p1 = topLeftPoint, .p2 = topRightPoint, .p3 = bottomRightPoint};
 
@@ -366,12 +376,15 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const size_t bottomRightXIdx = (size_t)floor(scaledX + 1);
         const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
 
-        const Eend::Point topLeftPoint = Eend::Point((float)topLeftXIdx * _scale.x,
-            (float)topLeftYIdx * -_scale.y, _heightMap[topLeftYIdx][topLeftXIdx]);
-        const Eend::Point bottomLeftPoint = Eend::Point((float)bottomLeftXIdx * _scale.x,
-            (float)bottomLeftYIdx * -_scale.y, _heightMap[bottomLeftYIdx][bottomLeftXIdx]);
-        const Eend::Point bottomRightPoint = Eend::Point((float)bottomRightXIdx * _scale.x,
-            (float)bottomRightYIdx * -_scale.y, _heightMap[bottomRightYIdx][bottomRightXIdx]);
+        const Eend::Point topLeftPoint = Eend::Point(
+            (float)topLeftXIdx * _scale.x, (float)topLeftYIdx * -_scale.y,
+            _heightMap[topLeftYIdx][topLeftXIdx]);
+        const Eend::Point bottomLeftPoint = Eend::Point(
+            (float)bottomLeftXIdx * _scale.x, (float)bottomLeftYIdx * -_scale.y,
+            _heightMap[bottomLeftYIdx][bottomLeftXIdx]);
+        const Eend::Point bottomRightPoint = Eend::Point(
+            (float)bottomRightXIdx * _scale.x, (float)bottomRightYIdx * -_scale.y,
+            _heightMap[bottomRightYIdx][bottomRightXIdx]);
 
         return pointHeightOnTri(
             (Eend::Triangle){topLeftPoint, bottomLeftPoint, bottomRightPoint}, point);

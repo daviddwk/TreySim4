@@ -3,32 +3,32 @@
 #include "duck.hpp"
 
 Duck::Duck()
-    : _bodyId(Eend::Entities::StatueBatch::insert(std::filesystem::path("duck/statues/body"))),
-      _headId(Eend::Entities::BoardBatch::insert(std::filesystem::path("duck/boards/head"))),
+    : _bodyId(Eend::Entities::getStatues().insert(std::filesystem::path("duck/statues/body"))),
+      _headId(Eend::Entities::getBoards().insert(std::filesystem::path("duck/boards/head"))),
       _position(Eend::Point(0.0f)), _rotX(0.0f), _rotY(0.0f) {
-    Eend::Entities::BoardBatch::getRef(_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
+    Eend::Entities::getBoards().getRef(_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
 }
 
 Duck::~Duck() {
-    Eend::Entities::StatueBatch::erase(_bodyId);
-    Eend::Entities::BoardBatch::erase(_headId);
+    Eend::Entities::getStatues().erase(_bodyId);
+    Eend::Entities::getBoards().erase(_headId);
 }
 
 void Duck::setPosition(Eend::Point position) {
     if (position.y < _position.y) {
-        Eend::Entities::BoardBatch::getRef(_headId)->setStrip("eyesOpen");
+        Eend::Entities::getBoards().getRef(_headId)->setStrip("eyesOpen");
     } else if (position.y > _position.y) {
-        Eend::Entities::BoardBatch::getRef(_headId)->setStrip("eyesClose");
+        Eend::Entities::getBoards().getRef(_headId)->setStrip("eyesClose");
     }
     _position = position;
-    Eend::Statue* bodyRef = Eend::Entities::StatueBatch::getRef(_bodyId);
-    Eend::Board* headRef = Eend::Entities::BoardBatch::getRef(_headId);
+    Eend::Statue* bodyRef = Eend::Entities::getStatues().getRef(_bodyId);
+    Eend::Board* headRef = Eend::Entities::getBoards().getRef(_headId);
     bodyRef->setPosition(Eend::Point(position.x - 0.5f, position.y, position.z + 0.08f));
     headRef->setPosition(Eend::Point(position.x, position.y, position.z + 3.00f));
 }
 
 void Duck::setRotation(float x, float y, float z) {
-    Eend::Statue* bodyRef = Eend::Entities::StatueBatch::getRef(_bodyId);
+    Eend::Statue* bodyRef = Eend::Entities::getStatues().getRef(_bodyId);
     bodyRef->setRotation(x, y, z);
 };
 
