@@ -3,32 +3,32 @@
 #include "duck.hpp"
 
 Duck::Duck()
-    : _bodyId(Eend::Entities::getStatues().insert(std::filesystem::path("duck/statues/body"))),
-      _headId(Eend::Entities::getBoards().insert(std::filesystem::path("duck/boards/head"))),
+    : _bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
+      _headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
       _position(Eend::Point(0.0f)), _rotX(0.0f), _rotY(0.0f) {
-    Eend::Entities::getBoards().getRef(_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
+    Eend::Entities::boards().getRef(_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
 }
 
 Duck::~Duck() {
-    Eend::Entities::getStatues().erase(_bodyId);
-    Eend::Entities::getBoards().erase(_headId);
+    Eend::Entities::statues().erase(_bodyId);
+    Eend::Entities::boards().erase(_headId);
 }
 
 void Duck::setPosition(Eend::Point position) {
     if (position.y < _position.y) {
-        Eend::Entities::getBoards().getRef(_headId)->setStrip("eyesOpen");
+        Eend::Entities::boards().getRef(_headId)->setStrip("eyesOpen");
     } else if (position.y > _position.y) {
-        Eend::Entities::getBoards().getRef(_headId)->setStrip("eyesClose");
+        Eend::Entities::boards().getRef(_headId)->setStrip("eyesClose");
     }
     _position = position;
-    Eend::Statue* bodyRef = Eend::Entities::getStatues().getRef(_bodyId);
-    Eend::Board* headRef = Eend::Entities::getBoards().getRef(_headId);
+    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(_bodyId);
+    Eend::Board* headRef = Eend::Entities::boards().getRef(_headId);
     bodyRef->setPosition(Eend::Point(position.x - 0.5f, position.y, position.z + 0.08f));
     headRef->setPosition(Eend::Point(position.x, position.y, position.z + 3.00f));
 }
 
 void Duck::setRotation(float x, float y, float z) {
-    Eend::Statue* bodyRef = Eend::Entities::getStatues().getRef(_bodyId);
+    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(_bodyId);
     bodyRef->setRotation(x, y, z);
 };
 

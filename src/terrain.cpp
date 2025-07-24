@@ -122,8 +122,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     if (rootJson["Boards"].isArray()) {
         for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
             Json::Value boardJson = rootJson["Boards"][boardIdx];
-            Eend::BoardId id = Eend::Entities::getBoards().insert(boardJson["path"].asString());
-            Eend::Board* boardRef = Eend::Entities::getBoards().getRef(id);
+            Eend::BoardId id = Eend::Entities::boards().insert(boardJson["path"].asString());
+            Eend::Board* boardRef = Eend::Entities::boards().getRef(id);
             float pace = boardJson["pace"].asFloat(); // should be 0 if not there?
             _boards.push_back(std::tie(id, pace));
 
@@ -140,8 +140,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     if (rootJson["Statues"].isArray()) {
         for (unsigned int statueIdx = 0; statueIdx < rootJson["Statues"].size(); ++statueIdx) {
             Json::Value statueJson = rootJson["Statues"][statueIdx];
-            Eend::StatueId id = Eend::Entities::getStatues().insert(statueJson["path"].asString());
-            Eend::Statue* statueRef = Eend::Entities::getStatues().getRef(id);
+            Eend::StatueId id = Eend::Entities::statues().insert(statueJson["path"].asString());
+            Eend::Statue* statueRef = Eend::Entities::statues().getRef(id);
             _statues.push_back(id);
 
             float tileXIdx = statueJson["position"][0].asFloat();
@@ -161,8 +161,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     if (rootJson["Dolls"].isArray()) {
         for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
             Json::Value dollJson = rootJson["Dolls"][dollIdx];
-            Eend::DollId id = Eend::Entities::getDolls().insert(dollJson["path"].asString());
-            Eend::Doll* dollRef = Eend::Entities::getDolls().getRef(id);
+            Eend::DollId id = Eend::Entities::dolls().insert(dollJson["path"].asString());
+            Eend::Doll* dollRef = Eend::Entities::dolls().getRef(id);
             float pace = dollJson["pace"].asFloat();
             _dolls.push_back(std::tie(id, pace));
 
@@ -266,30 +266,30 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
 
     mtlFile.close();
 
-    _statueId = Eend::Entities::getStatues().insert(path);
+    _statueId = Eend::Entities::statues().insert(path);
 }
 
 Terrain::~Terrain() {
-    Eend::Entities::getStatues().erase(_statueId);
+    Eend::Entities::statues().erase(_statueId);
     for (auto& board : _boards)
-        Eend::Entities::getBoards().erase(std::get<Eend::BoardId>(board));
+        Eend::Entities::boards().erase(std::get<Eend::BoardId>(board));
     for (Eend::StatueId& statue : _statues)
-        Eend::Entities::getStatues().erase(statue);
+        Eend::Entities::statues().erase(statue);
     for (auto& doll : _dolls)
-        Eend::Entities::getDolls().erase(std::get<Eend::DollId>(doll));
+        Eend::Entities::dolls().erase(std::get<Eend::DollId>(doll));
 }
 
 void Terrain::update() {
     static float cumulative = 0.0f;
     cumulative += Eend::FrameLimiter::get().deltaTime;
     for (auto& doll : _dolls) {
-        Eend::Doll* dollRef = Eend::Entities::getDolls().getRef(std::get<Eend::DollId>(doll));
+        Eend::Doll* dollRef = Eend::Entities::dolls().getRef(std::get<Eend::DollId>(doll));
         float animScale = dollRef->getAnim();
         animScale += std::get<float>(doll) * Eend::FrameLimiter::get().deltaTime;
         dollRef->setAnim(animScale);
     }
     for (auto& board : _boards) {
-        Eend::Board* boardRef = Eend::Entities::getBoards().getRef(std::get<Eend::BoardId>(board));
+        Eend::Board* boardRef = Eend::Entities::boards().getRef(std::get<Eend::BoardId>(board));
         if (std::get<float>(board) != 0) {
             boardRef->setStripIdx((size_t)(cumulative / std::get<float>(board)));
         }

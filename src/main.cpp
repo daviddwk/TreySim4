@@ -19,6 +19,7 @@
 #include "Eendgine/panel.hpp"
 #include "dog.hpp"
 #include "duck.hpp"
+#include "dustCloud.hpp"
 #include "healthBar.hpp"
 #include "puppyMill.hpp"
 #include "terrain.hpp"
@@ -38,8 +39,6 @@ int main() {
     Eend::FrameLimiter::construct(60.0f, 20.0f);
     Eend::Entities::construct();
 
-    glEnable(GL_DEPTH_TEST);
-
     Eend::Shaders shaders(
         Eend::ShaderProgram("shaders/panel.vert", "shaders/panel.frag"),
         Eend::ShaderProgram("shaders/board.vert", "shaders/board.frag"),
@@ -51,6 +50,7 @@ int main() {
     Eend::Camera3D sceneCamera(
         (float)screenWidth / (float)screenHeight, Eend::Point(-20.0f, 5.0f, 0.0f),
         Eend::Point(3.0f, 0.0f, 3.0f));
+
     TextBoxQueue::construct();
 
     Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
@@ -59,16 +59,17 @@ int main() {
     PuppyMill puppyMill(&testTerrain);
 
     duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
+    DustCloud cloud(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
 
     float testAnimScale = 0.0f;
-    Eend::DollId testDollId = Eend::Entities::getDolls().insert("testCube");
+    Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
 
     Text testText(Font::DANIEL, "", Eend::Point(20.0f), 50.0f, INFINITY);
 
     bool testColliding = false;
 
-    Eend::PanelId exitId = Eend::Entities::getPanels().insert("exit");
-    Eend::Panel* exitRef = Eend::Entities::getPanels().getRef(exitId);
+    Eend::PanelId exitId = Eend::Entities::panels().insert("exit");
+    Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitId);
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
     exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
@@ -87,7 +88,7 @@ int main() {
         shaders.setPixelSize(5);
 
         Eend::Panel::MouseStatus exitMouseStatus =
-            Eend::Entities::getPanels().getRef(exitId)->isClicked();
+            Eend::Entities::panels().getRef(exitId)->isClicked();
         std::string exitMouseString = "";
         if (exitMouseStatus == Eend::Panel::MouseStatus::CLICK) {
             exitMouseString = "click";
@@ -137,7 +138,7 @@ int main() {
             Eend::Point(duckPosition.x, duckPosition.y - 25.0f, duckPosition.z + 15.0f));
         sceneCamera.setTarget(duckPosition);
 
-        Eend::Entities::getDolls().getRef(testDollId)->setAnim(testAnimScale);
+        Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
 
         Eend::Window::get().swapBuffers();
         Eend::FrameLimiter::get().stopInterval();

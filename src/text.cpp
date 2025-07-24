@@ -59,14 +59,14 @@ Text::Text(Font font, std::string text, Eend::Point position, float scale, float
     // this should point to a folder with just font pngs?
     // need to unwrap optional here
     for (size_t char_idx = 0; char_idx < _text.length(); ++char_idx) {
-        _panelIds.push_back(Eend::Entities::getPanels().insert(_fontPath));
+        _panelIds.push_back(Eend::Entities::panels().insert(_fontPath));
     }
     updateText();
 }
 
 Text::~Text() {
     for (const Eend::PanelId& id : _panelIds) {
-        Eend::Entities::getPanels().erase(id);
+        Eend::Entities::panels().erase(id);
     }
 }
 
@@ -77,11 +77,11 @@ void Text::setText(const std::string& text) {
     _text = text;
 
     for (const Eend::PanelId& id : _panelIds) {
-        Eend::Entities::getPanels().erase(id);
+        Eend::Entities::panels().erase(id);
     }
     _panelIds.clear();
     for (size_t char_idx = 0; char_idx < _text.length(); ++char_idx) {
-        _panelIds.push_back(Eend::Entities::getPanels().insert(_fontPath));
+        _panelIds.push_back(Eend::Entities::panels().insert(_fontPath));
     }
     updateText();
 }
@@ -147,7 +147,7 @@ void Text::updateText() {
         std::tie(firstColumn, lastColumn) = _charColumns[glyph].value();
         unsigned int charWidth = (lastColumn - firstColumn) + 1;
 
-        Eend::Panel* panelRef = Eend::Entities::getPanels().getRef(_panelIds[char_idx]);
+        Eend::Panel* panelRef = Eend::Entities::panels().getRef(_panelIds[char_idx]);
 
         if (horizontal + ((float)charWidth / (float)_texture.height) * _scale > _width) {
             horizontal = 0;

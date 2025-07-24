@@ -4,12 +4,10 @@ const unsigned int HEALTH_MAX = 100;
 const float BAR_SCALE_MAX = 500.0f;
 
 HealthBar::HealthBar()
-    : _background(
-          Eend::Entities::getPanels().insert(std::filesystem::path("healthbar/background"))),
-      _bar(Eend::Entities::getPanels().insert(std::filesystem::path("healthbar/bar"))),
-      _health(100) {
-    Eend::Panel* backgroundRef = Eend::Entities::getPanels().getRef(_background);
-    Eend::Panel* barRef = Eend::Entities::getPanels().getRef(_bar);
+    : _background(Eend::Entities::panels().insert(std::filesystem::path("healthbar/background"))),
+      _bar(Eend::Entities::panels().insert(std::filesystem::path("healthbar/bar"))), _health(100) {
+    Eend::Panel* backgroundRef = Eend::Entities::panels().getRef(_background);
+    Eend::Panel* barRef = Eend::Entities::panels().getRef(_bar);
 
     backgroundRef->setScale(Eend::Scale2D(BAR_SCALE_MAX + 30.0f, 85.0f));
     backgroundRef->setPosition(Eend::Point(1285.0f, 20.0f, -10.0f));
@@ -20,8 +18,8 @@ HealthBar::HealthBar()
 }
 
 HealthBar::~HealthBar() {
-    Eend::Entities::getPanels().erase(_background);
-    Eend::Entities::getPanels().erase(_bar);
+    Eend::Entities::panels().erase(_background);
+    Eend::Entities::panels().erase(_bar);
 }
 
 bool HealthBar::damage(unsigned int damage) {
@@ -47,7 +45,7 @@ void HealthBar::heal(unsigned int heal) {
 }
 
 void HealthBar::update() {
-    Eend::Panel* barRef = Eend::Entities::getPanels().getRef(_bar);
+    Eend::Panel* barRef = Eend::Entities::panels().getRef(_bar);
     barRef->setScale(Eend::Scale2D(BAR_SCALE_MAX * ((float)_health / (float)HEALTH_MAX), 75.0f));
     if (_health > 70.0) {
         barRef->setTexture("high");
