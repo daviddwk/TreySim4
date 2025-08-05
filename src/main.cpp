@@ -59,7 +59,6 @@ int main() {
     PuppyMill puppyMill(&testTerrain);
 
     duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
-    DustCloud cloud(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
 
     float testAnimScale = 0.0f;
     Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
