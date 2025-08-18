@@ -9,6 +9,8 @@
 
 namespace Eend = Eendgine;
 
+using ParticleMovement = std::function<std::optional<Eend::Point>(int, std::chrono::milliseconds)>;
+
 class Particles {
     private:
         class Particle {
@@ -22,13 +24,11 @@ class Particles {
         };
         class ParticleCloud {
             public:
-                ParticleCloud(Eend::Point origin, auto movement)
+                ParticleCloud(Eend::Point origin, ParticleMovement movement)
                     : origin(origin), movement(movement), start(std::chrono::steady_clock::now()),
                       isAlive(true), particles(std::vector<Particle>()) {}
-
                 Eend::Point origin;
-                const std::function<std::optional<Eend::Point>(int, std::chrono::milliseconds)>*
-                    movement;
+                ParticleMovement movement;
                 std::chrono::time_point<std::chrono::steady_clock> start;
                 bool isAlive;
                 std::vector<Particle> particles;
@@ -42,8 +42,7 @@ class Particles {
         void create(
             const Eend::Point& origin, const Eend::Scale2D& scale,
             const std::vector<Particle>::size_type count, const std::filesystem::path& boardPath,
-            const std::function<std::optional<Eend::Point>(int, std::chrono::milliseconds)>*
-                movement);
+            const ParticleMovement movement);
 
         void update(const float dt);
 

@@ -37,7 +37,7 @@ Particles& Particles::get() {
 void Particles::create(
     const Eend::Point& origin, const Eend::Scale2D& scale,
     const std::vector<Particle>::size_type count, const std::filesystem::path& boardPath,
-    const std::function<std::optional<Eend::Point>(int, std::chrono::milliseconds)>* movement) {
+    const ParticleMovement movement) {
 
     std::vector<Particle>::size_type cloudIdx = _particleClouds.size();
 
@@ -59,8 +59,7 @@ void Particles::update(const float dt) {
                 std::chrono::milliseconds duration =
                     std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::steady_clock::now() - cloudIter->start);
-                std::optional<Eend::Point> position =
-                    (*cloudIter->movement)(particle.seed, duration);
+                std::optional<Eend::Point> position = cloudIter->movement(particle.seed, duration);
                 if (position) {
                     cloudIsAlive = true;
                     Eend::Entities::boards().getRef(particle.id)->setPosition(*position);
@@ -71,7 +70,7 @@ void Particles::update(const float dt) {
             }
         }
         if (cloudIsAlive) {
-            cloudIter++;
+            ++cloudIter;
         } else {
             cloudIter = _particleClouds.erase(cloudIter);
         }

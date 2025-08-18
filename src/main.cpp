@@ -11,6 +11,7 @@
 #include <Eendgine/window.hpp>
 
 #include <cmath>
+#include <optional>
 #include <stb/stb_image.h>
 
 #include <filesystem>
@@ -21,6 +22,7 @@
 #include "duck.hpp"
 #include "dustCloud.hpp"
 #include "healthBar.hpp"
+#include "particles.hpp"
 #include "puppyMill.hpp"
 #include "terrain.hpp"
 #include "text.hpp"
@@ -38,6 +40,7 @@ int main() {
     Eend::InputManager::construct();
     Eend::FrameLimiter::construct(60.0f, 20.0f);
     Eend::Entities::construct();
+    Particles::construct();
 
     Eend::Shaders shaders(
         Eend::ShaderProgram("shaders/panel.vert", "shaders/panel.frag"),
@@ -79,6 +82,18 @@ int main() {
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f, true);
+    ParticleMovement particleMovement =
+        [](int seed, std::chrono::milliseconds time) -> std::optional<Eend::Point> {
+        if (time.count() < 10000) {
+            return std::make_optional(
+                Eend::Point(
+                    (static_cast<double>(time.count()) / static_cast<double>(seed % 1000))));
+        }
+        return std::nullopt;
+    };
+    Particles::get().create(
+        Eend::Point(20.0f, 20.0f, 0.0f), Eend::Scale2D(10.0f, 10.0f), 10,
+        std::filesystem::path("duck/boards/head"), particleMovement);
 
     while (!Eend::InputManager::get().getShouldClose()) {
         float dt = Eend::FrameLimiter::get().deltaTime;
@@ -119,6 +134,8 @@ int main() {
                 Eend::InputManager::get().getRightClick(),
                 Eend::InputManager::get().getMiddleClick()));
         // clang-format on
+
+        Particles::get().update(dt);
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::get().render(shaders.getShader(Eend::Shader::SCREEN));
 
@@ -143,6 +160,7 @@ int main() {
         Eend::FrameLimiter::get().stopInterval();
     }
     TextBoxQueue::destruct();
+    Particles::destruct();
     Eend::Entities::destruct();
     Eend::Screen::destruct();
     Eend::Window::destruct();
