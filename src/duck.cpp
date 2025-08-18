@@ -1,6 +1,24 @@
 #include <Eendgine/inputManager.hpp>
+#include <cmath>
+#include <complex>
 
 #include "duck.hpp"
+#include "particles.hpp"
+
+static ParticleMovement particleMovement =
+    [](int seed, std::chrono::milliseconds time) -> std::optional<Eend::Point> {
+    if (time.count() < 10000) {
+        const unsigned int bits = 8;
+        const unsigned int max = std::pow(2, bits);
+
+        double x = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 0) % max);
+        double y = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 1) % max);
+        double z = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 2) % max);
+
+        return std::make_optional(Eend::Point(x, y, z));
+    }
+    return std::nullopt;
+};
 
 Duck::Duck()
     : _bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
@@ -69,7 +87,6 @@ void Duck::update(float dt, Terrain* terrain) {
         duckRotationOffset -= 90.0f;
         numPressed++;
     }
-    // COORDINATE SYSTMES ARE TOTALLY WACKED UP RN
 
     if (!terrain->colliding(Eend::Point2D(duckPosition.x, duckPosition.y))) {
     } else if (!terrain->colliding(Eend::Point2D(oldDuckPosition.x, duckPosition.y))) {
@@ -88,6 +105,13 @@ void Duck::update(float dt, Terrain* terrain) {
     }
 
     duckPosition.z = terrain->heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+
+    if (Eend::InputManager::get().getSpacePress()) {
+        Particles::get().create(
+            duckPosition, Eend::Scale2D(2.0f, 2.0f), 5, std::filesystem::path("duck/boards/poo"),
+            particleMovement);
+    }
+
     setPosition(duckPosition);
     setRotation(0.0f, 0.0f, duckRotation);
 }

@@ -82,18 +82,6 @@ int main() {
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f, true);
-    ParticleMovement particleMovement =
-        [](int seed, std::chrono::milliseconds time) -> std::optional<Eend::Point> {
-        if (time.count() < 10000) {
-            return std::make_optional(
-                Eend::Point(
-                    (static_cast<double>(time.count()) / static_cast<double>(seed % 1000))));
-        }
-        return std::nullopt;
-    };
-    Particles::get().create(
-        Eend::Point(20.0f, 20.0f, 0.0f), Eend::Scale2D(10.0f, 10.0f), 10,
-        std::filesystem::path("duck/boards/head"), particleMovement);
 
     while (!Eend::InputManager::get().getShouldClose()) {
         float dt = Eend::FrameLimiter::get().deltaTime;

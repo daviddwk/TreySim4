@@ -15,18 +15,14 @@ class Particles {
     private:
         class Particle {
             public:
-                Particle(const int seed, const Eend::BoardId id)
-                    : seed(seed), id(id), isAlive(true) {}
-
+                Particle(const int seed, const Eend::BoardId id);
                 int seed;
                 Eendgine::BoardId id;
                 bool isAlive;
         };
         class ParticleCloud {
             public:
-                ParticleCloud(Eend::Point origin, ParticleMovement movement)
-                    : origin(origin), movement(movement), start(std::chrono::steady_clock::now()),
-                      isAlive(true), particles(std::vector<Particle>()) {}
+                ParticleCloud(Eend::Point origin, ParticleMovement movement);
                 Eend::Point origin;
                 ParticleMovement movement;
                 std::chrono::time_point<std::chrono::steady_clock> start;

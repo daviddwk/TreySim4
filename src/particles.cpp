@@ -8,6 +8,13 @@
 
 namespace Eend = Eendgine;
 
+Particles::Particle::Particle(const int seed, const Eend::BoardId id)
+    : seed(seed), id(id), isAlive(true) {}
+
+Particles::ParticleCloud::ParticleCloud(Eend::Point origin, ParticleMovement movement)
+    : origin(origin), movement(movement), start(std::chrono::steady_clock::now()), isAlive(true),
+      particles(std::vector<Particle>()) {}
+
 Particles::Particles() {}
 
 Particles::~Particles() {
@@ -59,10 +66,12 @@ void Particles::update(const float dt) {
                 std::chrono::milliseconds duration =
                     std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::steady_clock::now() - cloudIter->start);
-                std::optional<Eend::Point> position = cloudIter->movement(particle.seed, duration);
-                if (position) {
+                std::optional<Eend::Point> relativePosition =
+                    cloudIter->movement(particle.seed, duration);
+                if (relativePosition) {
                     cloudIsAlive = true;
-                    Eend::Entities::boards().getRef(particle.id)->setPosition(*position);
+                    Eend::Point position = *relativePosition + cloudIter->origin;
+                    Eend::Entities::boards().getRef(particle.id)->setPosition(position);
                 } else {
                     particle.isAlive = false;
                     Eend::Entities::boards().erase(particle.id);
