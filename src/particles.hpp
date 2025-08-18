@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <cstdint>
 #include <optional>
 #include <vector>
 
@@ -9,22 +10,23 @@
 
 namespace Eend = Eendgine;
 
-using ParticleMovement = std::function<std::optional<Eend::Point>(int, std::chrono::milliseconds)>;
+using ParticleBehavior =
+    std::function<std::optional<Eend::Point>(int32_t, std::chrono::milliseconds)>;
 
 class Particles {
     private:
         class Particle {
             public:
                 Particle(const int seed, const Eend::BoardId id);
-                int seed;
+                int32_t seed;
                 Eendgine::BoardId id;
                 bool isAlive;
         };
         class ParticleCloud {
             public:
-                ParticleCloud(Eend::Point origin, ParticleMovement movement);
+                ParticleCloud(Eend::Point origin, ParticleBehavior movement);
                 Eend::Point origin;
-                ParticleMovement movement;
+                ParticleBehavior movement;
                 std::chrono::time_point<std::chrono::steady_clock> start;
                 bool isAlive;
                 std::vector<Particle> particles;
@@ -38,7 +40,7 @@ class Particles {
         void create(
             const Eend::Point& origin, const Eend::Scale2D& scale,
             const std::vector<Particle>::size_type count, const std::filesystem::path& boardPath,
-            const ParticleMovement movement);
+            const ParticleBehavior movement);
 
         void update(const float dt);
 

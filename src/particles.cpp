@@ -3,15 +3,14 @@
 
 #include <Eendgine/random.hpp>
 
-#include <algorithm>
 #include <chrono>
 
 namespace Eend = Eendgine;
 
-Particles::Particle::Particle(const int seed, const Eend::BoardId id)
+Particles::Particle::Particle(const int32_t seed, const Eend::BoardId id)
     : seed(seed), id(id), isAlive(true) {}
 
-Particles::ParticleCloud::ParticleCloud(Eend::Point origin, ParticleMovement movement)
+Particles::ParticleCloud::ParticleCloud(Eend::Point origin, ParticleBehavior movement)
     : origin(origin), movement(movement), start(std::chrono::steady_clock::now()), isAlive(true),
       particles(std::vector<Particle>()) {}
 
@@ -44,16 +43,16 @@ Particles& Particles::get() {
 void Particles::create(
     const Eend::Point& origin, const Eend::Scale2D& scale,
     const std::vector<Particle>::size_type count, const std::filesystem::path& boardPath,
-    const ParticleMovement movement) {
+    const ParticleBehavior movement) {
 
     std::vector<Particle>::size_type cloudIdx = _particleClouds.size();
 
     _particleClouds.emplace_back(origin, movement);
 
-    for (auto particleIdx = 0; particleIdx < count; ++particleIdx) {
+    for (std::vector<Particle>::size_type particleIdx = 0; particleIdx < count; ++particleIdx) {
         const Eend::BoardId id = Eend::Entities::boards().insert(boardPath);
         Eend::Entities::boards().getRef(id)->setScale(scale);
-        int seed = Eend::randomIntLimit();
+        uint32_t seed = Eend::randomIntLimit();
         _particleClouds[cloudIdx].particles.emplace_back(seed, id);
     }
 }
@@ -61,6 +60,7 @@ void Particles::create(
 void Particles::update(const float dt) {
     for (auto cloudIter = _particleClouds.begin(); cloudIter != _particleClouds.end();) {
         bool cloudIsAlive = false;
+
         for (auto& particle : cloudIter->particles) {
             if (particle.isAlive) {
                 std::chrono::milliseconds duration =

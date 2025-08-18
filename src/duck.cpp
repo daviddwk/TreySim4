@@ -5,15 +5,18 @@
 #include "duck.hpp"
 #include "particles.hpp"
 
-static ParticleMovement particleMovement =
+static ParticleBehavior particleMovement =
     [](int seed, std::chrono::milliseconds time) -> std::optional<Eend::Point> {
     if (time.count() < 10000) {
         const unsigned int bits = 8;
         const unsigned int max = std::pow(2, bits);
 
-        double x = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 0) % max);
-        double y = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 1) % max);
-        double z = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 2) % max);
+        double x = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 0) % max) *
+                   (((seed >> bits * 0) % 2) ? 1 : -1);
+        double y = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 1) % max) *
+                   (((seed >> bits * 1) % 2) ? 1 : -1);
+        double z = static_cast<float>(time.count()) /
+                   (8.0f * static_cast<float>((seed >> bits * 2) % max));
 
         return std::make_optional(Eend::Point(x, y, z));
     }
