@@ -10,10 +10,22 @@
 
 namespace Eend = Eendgine;
 
-using ParticleBehavior =
-    std::function<std::optional<Eend::Point>(int32_t, std::chrono::milliseconds)>;
-
 class Particles {
+    public:
+        class Properties {
+            public:
+                Properties(Eend::Point relativePosition, Eend::Scale2D scale)
+                    : relativePosition(relativePosition), scale(scale) {}
+                Eend::Point relativePosition;
+                Eend::Scale2D scale;
+        };
+        using Behavior =
+            std::function<std::optional<Properties>(int32_t, std::chrono::milliseconds)>;
+
+        static void construct();
+        static void destruct();
+        static Particles& get();
+
     private:
         class Particle {
             public:
@@ -22,25 +34,20 @@ class Particles {
                 Eendgine::BoardId id;
                 bool isAlive;
         };
-        class ParticleCloud {
+        class Cloud {
             public:
-                ParticleCloud(Eend::Point origin, ParticleBehavior movement);
+                Cloud(Eend::Point origin, Behavior movement);
                 Eend::Point origin;
-                ParticleBehavior movement;
+                Behavior movement;
                 std::chrono::time_point<std::chrono::steady_clock> start;
                 bool isAlive;
                 std::vector<Particle> particles;
         };
 
     public:
-        static void construct();
-        static void destruct();
-        static Particles& get();
-
         void create(
-            const Eend::Point& origin, const Eend::Scale2D& scale,
-            const std::vector<Particle>::size_type count, const std::filesystem::path& boardPath,
-            const ParticleBehavior movement);
+            const Eend::Point& origin, const std::vector<Particle>::size_type count,
+            const std::filesystem::path& boardPath, const Behavior movement);
 
         void update(const float dt);
 
@@ -48,7 +55,6 @@ class Particles {
         ~Particles();
 
     private:
-        std::vector<ParticleCloud> _particleClouds;
-
+        std::vector<Cloud> _clouds;
         inline static Particles* _instance = nullptr;
 };

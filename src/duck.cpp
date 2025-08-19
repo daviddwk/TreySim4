@@ -1,24 +1,28 @@
 #include <Eendgine/inputManager.hpp>
 #include <cmath>
-#include <complex>
 
 #include "duck.hpp"
 #include "particles.hpp"
 
-static ParticleBehavior particleMovement =
-    [](int seed, std::chrono::milliseconds time) -> std::optional<Eend::Point> {
-    if (time.count() < 10000) {
+static Particles::Behavior particleMovement =
+    [](int seed, std::chrono::milliseconds time) -> std::optional<Particles::Properties> {
+    if (time.count() < 1000) {
         const unsigned int bits = 8;
         const unsigned int max = std::pow(2, bits);
 
-        double x = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 0) % max) *
-                   (((seed >> bits * 0) % 2) ? 1 : -1);
-        double y = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 1) % max) *
-                   (((seed >> bits * 1) % 2) ? 1 : -1);
-        double z = static_cast<float>(time.count()) /
-                   (8.0f * static_cast<float>((seed >> bits * 2) % max));
+        const float speedScale = 0.3f;
 
-        return std::make_optional(Eend::Point(x, y, z));
+        float x = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 0) % max) *
+                  (((seed >> bits * 0) % 2) ? 1 : -1) * speedScale;
+        float y = static_cast<float>(time.count()) / static_cast<float>((seed >> bits * 1) % max) *
+                  (((seed >> bits * 1) % 2) ? 1 : -1) * speedScale;
+        float z = static_cast<float>(time.count()) /
+                  (8.0f * static_cast<float>((seed >> bits * 2) % max)) * speedScale;
+
+        float scale = (1000.0f - static_cast<float>(time.count())) / 1000.0f;
+
+        return std::make_optional(
+            Particles::Properties(Eend::Point(x, y, z), Eend::Scale2D(scale)));
     }
     return std::nullopt;
 };
@@ -111,8 +115,7 @@ void Duck::update(float dt, Terrain* terrain) {
 
     if (Eend::InputManager::get().getSpacePress()) {
         Particles::get().create(
-            duckPosition, Eend::Scale2D(2.0f, 2.0f), 5, std::filesystem::path("duck/boards/poo"),
-            particleMovement);
+            duckPosition, 5, std::filesystem::path("duck/boards/poo"), particleMovement);
     }
 
     setPosition(duckPosition);
