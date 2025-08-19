@@ -2,11 +2,14 @@
 
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
+#include <GL/gl.h>
 
 #include "healthBar.hpp"
 #include "terrain.hpp"
 
 namespace Eend = Eendgine;
+
+constexpr float GRAVITY = -1.0f;
 
 class Duck {
         // please make a position, rotation, whatever types already and decouple dependencies or
@@ -31,4 +34,8 @@ class Duck {
         Eend::Point _position;
         float _rotX;
         float _rotY;
+
+        bool _inAir;
+        float _upVelocity;
+        float _height;
 };

@@ -19,10 +19,10 @@ static Particles::Behavior particleMovement =
         float z = static_cast<float>(time.count()) /
                   (8.0f * static_cast<float>((seed >> bits * 2) % max)) * speedScale;
 
-        float scale = (1000.0f - static_cast<float>(time.count())) / 1000.0f;
+        float scale = (3000.0f - static_cast<float>(time.count() * 3)) / 3000.0f;
 
         return std::make_optional(
-            Particles::Properties(Eend::Point(x, y, z), Eend::Scale2D(scale)));
+            Particles::Properties(Eend::Point(x, y, z), Eend::Scale2D(scale * 2.0f)));
     }
     return std::nullopt;
 };
@@ -30,7 +30,8 @@ static Particles::Behavior particleMovement =
 Duck::Duck()
     : _bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
       _headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
-      _position(Eend::Point(0.0f)), _rotX(0.0f), _rotY(0.0f) {
+      _position(Eend::Point(0.0f)), _rotX(0.0f), _rotY(0.0f), _inAir(false), _upVelocity(0.0f),
+      _height(0.0f) {
     Eend::Entities::boards().getRef(_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
 }
 
@@ -111,11 +112,28 @@ void Duck::update(float dt, Terrain* terrain) {
         duckRotation += 100.0f * dt;
     }
 
-    duckPosition.z = terrain->heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+    float heightAtPoint = terrain->heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
 
-    if (Eend::InputManager::get().getSpacePress()) {
+    if (Eend::InputManager::get().getSpacePress() && !_inAir) {
         Particles::get().create(
             duckPosition, 5, std::filesystem::path("duck/boards/poo"), particleMovement);
+        _inAir = true;
+        _upVelocity = -GRAVITY * 20.0f;
+        _height = heightAtPoint + 0.1f;
+    } else if (_inAir) {
+        _upVelocity += GRAVITY;
+        _height += (_upVelocity * dt);
+        if (_height < heightAtPoint) {
+            _inAir = false;
+            _height = heightAtPoint;
+        }
+    } else {
+        _height = heightAtPoint;
+    }
+
+    duckPosition.z = _height;
+
+    if (_inAir) {
     }
 
     setPosition(duckPosition);
