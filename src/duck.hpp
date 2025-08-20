@@ -29,13 +29,13 @@ class Duck {
         HealthBar health;
 
     private:
-        Eend::StatueId _bodyId;
-        Eend::BoardId _headId;
-        Eend::Point _position;
-        float _rotX;
-        float _rotY;
+        Eend::StatueId m_bodyId;
+        Eend::BoardId m_headId;
+        Eend::Point m_position;
+        float m_rotX;
+        float m_rotY;
 
-        bool _inAir;
-        float _upVelocity;
-        float _height;
+        bool m_inAir;
+        float m_upVelocity;
+        float m_height;
 };

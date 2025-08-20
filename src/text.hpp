@@ -22,19 +22,20 @@ class Text {
         void setPosition(Eend::Point position);
         void setScale(float scale);
 
-        Eend::Point getPosition() { return _position; };
-        float getScale() { return _scale; };
+        Eend::Point getPosition() { return m_position; };
+        float getScale() { return m_scale; };
 
     private:
         void updateText();
-        std::string _text;
-        float _width;
-        std::vector<Eend::PanelId> _panelIds;
-        Eend::Point _position;
-        float _scale;
-        std::filesystem::path _fontPath;
-        Eend::Texture _texture;
-        std::array<std::optional<std::tuple<unsigned int, unsigned int>>,
+        std::string m_text;
+        float m_width;
+        std::vector<Eend::PanelId> m_panelIds;
+        Eend::Point m_position;
+        float m_scale;
+        std::filesystem::path m_fontPath;
+        Eend::Texture m_texture;
+        std::array<
+            std::optional<std::tuple<unsigned int, unsigned int>>,
             std::numeric_limits<char>::max() + 1>
-            _charColumns;
+            m_charColumns;
 };

@@ -17,7 +17,7 @@ Particles::Cloud::Cloud(Eend::Point origin, Particles::Behavior movement)
 Particles::Particles() {}
 
 Particles::~Particles() {
-    for (auto const& cloud : _clouds) {
+    for (auto const& cloud : m_clouds) {
         for (auto const& particle : cloud.particles) {
             Eend::Entities::boards().erase(particle.id);
         }
@@ -25,38 +25,38 @@ Particles::~Particles() {
 }
 
 void Particles::construct() {
-    assert(_instance == nullptr);
-    _instance = new Particles();
+    assert(m_instance == nullptr);
+    m_instance = new Particles();
 }
 
 void Particles::destruct() {
-    assert(_instance != nullptr);
-    delete _instance;
-    _instance = nullptr;
+    assert(m_instance != nullptr);
+    delete m_instance;
+    m_instance = nullptr;
 }
 
 Particles& Particles::get() {
-    assert(_instance != nullptr);
-    return *_instance;
+    assert(m_instance != nullptr);
+    return *m_instance;
 }
 
 void Particles::create(
     const Eend::Point& origin, const std::vector<Particle>::size_type count,
     const std::filesystem::path& boardPath, const Particles::Behavior movement) {
 
-    std::vector<Particle>::size_type cloudIdx = _clouds.size();
+    std::vector<Particle>::size_type cloudIdx = m_clouds.size();
 
-    _clouds.emplace_back(origin, movement);
+    m_clouds.emplace_back(origin, movement);
 
     for (std::vector<Particle>::size_type particleIdx = 0; particleIdx < count; ++particleIdx) {
         const Eend::BoardId id = Eend::Entities::boards().insert(boardPath);
         uint32_t seed = Eend::randomIntLimit();
-        _clouds[cloudIdx].particles.emplace_back(seed, id);
+        m_clouds[cloudIdx].particles.emplace_back(seed, id);
     }
 }
 
 void Particles::update(const float dt) {
-    for (auto cloudIter = _clouds.begin(); cloudIter != _clouds.end();) {
+    for (auto cloudIter = m_clouds.begin(); cloudIter != m_clouds.end();) {
         bool cloudIsAlive = false;
 
         for (auto& particle : cloudIter->particles) {
@@ -86,7 +86,7 @@ void Particles::update(const float dt) {
         if (cloudIsAlive) {
             ++cloudIter;
         } else {
-            cloudIter = _clouds.erase(cloudIter);
+            cloudIter = m_clouds.erase(cloudIter);
         }
     }
 }

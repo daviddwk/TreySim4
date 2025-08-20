@@ -2,8 +2,7 @@
 
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
-
-#include "text.hpp"
+namespace Eend = Eendgine;
 
 class HealthBar {
     public:
@@ -16,7 +15,7 @@ class HealthBar {
     private:
         void update();
 
-        Eend::PanelId _background;
-        Eend::PanelId _bar;
-        unsigned int _health;
+        Eend::PanelId m_background;
+        Eend::PanelId m_bar;
+        unsigned int m_health;
 };

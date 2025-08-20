@@ -15,20 +15,20 @@ class Terrain {
         void update();
         bool colliding(Eend::Point2D point);
 
-        int getHeight() { return _height; };
-        int getWidth() { return _width; };
+        int getHeight() { return m_height; };
+        int getWidth() { return m_width; };
 
         float heightAtPoint(Eend::Point2D point);
         Eend::Point positionAtTile(float tileXIdx, float tileYIdx, float heightOffset);
 
     private:
-        int _height;
-        int _width;
-        std::vector<std::vector<float>> _heightMap;
-        Eend::StatueId _statueId;
-        std::vector<Eend::CollisionRectangle> _collisionRectangles;
-        std::vector<std::tuple<Eend::BoardId, float>> _boards;
-        std::vector<Eend::StatueId> _statues;
-        std::vector<std::tuple<Eend::DollId, float>> _dolls;
-        glm::vec3 _scale;
+        int m_height;
+        int m_width;
+        std::vector<std::vector<float>> m_heightMap;
+        Eend::StatueId m_statueId;
+        std::vector<Eend::CollisionRectangle> m_collisionRectangles;
+        std::vector<std::tuple<Eend::BoardId, float>> m_boards;
+        std::vector<Eend::StatueId> m_statues;
+        std::vector<std::tuple<Eend::DollId, float>> m_dolls;
+        glm::vec3 m_scale;
 };

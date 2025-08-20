@@ -28,38 +28,38 @@ static Particles::Behavior particleMovement =
 };
 
 Duck::Duck()
-    : _bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
-      _headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
-      _position(Eend::Point(0.0f)), _rotX(0.0f), _rotY(0.0f), _inAir(false), _upVelocity(0.0f),
-      _height(0.0f) {
-    Eend::Entities::boards().getRef(_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
+    : m_bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
+      m_headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
+      m_position(Eend::Point(0.0f)), m_rotX(0.0f), m_rotY(0.0f), m_inAir(false), m_upVelocity(0.0f),
+      m_height(0.0f) {
+    Eend::Entities::boards().getRef(m_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
 }
 
 Duck::~Duck() {
-    Eend::Entities::statues().erase(_bodyId);
-    Eend::Entities::boards().erase(_headId);
+    Eend::Entities::statues().erase(m_bodyId);
+    Eend::Entities::boards().erase(m_headId);
 }
 
 void Duck::setPosition(Eend::Point position) {
-    if (position.y < _position.y) {
-        Eend::Entities::boards().getRef(_headId)->setStrip("eyesOpen");
-    } else if (position.y > _position.y) {
-        Eend::Entities::boards().getRef(_headId)->setStrip("eyesClose");
+    if (position.y < m_position.y) {
+        Eend::Entities::boards().getRef(m_headId)->setStrip("eyesOpen");
+    } else if (position.y > m_position.y) {
+        Eend::Entities::boards().getRef(m_headId)->setStrip("eyesClose");
     }
-    _position = position;
-    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(_bodyId);
-    Eend::Board* headRef = Eend::Entities::boards().getRef(_headId);
+    m_position = position;
+    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(m_bodyId);
+    Eend::Board* headRef = Eend::Entities::boards().getRef(m_headId);
     bodyRef->setPosition(Eend::Point(position.x - 0.5f, position.y, position.z + 0.08f));
     headRef->setPosition(Eend::Point(position.x, position.y, position.z + 3.00f));
 }
 
 void Duck::setRotation(float x, float y, float z) {
-    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(_bodyId);
+    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(m_bodyId);
     bodyRef->setRotation(x, y, z);
 };
 
-Eend::Point Duck::getPosition() { return _position; };
-Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(_position.x, _position.y); };
+Eend::Point Duck::getPosition() { return m_position; };
+Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
 
 void Duck::update(float dt, Terrain* terrain) {
 
@@ -114,27 +114,24 @@ void Duck::update(float dt, Terrain* terrain) {
 
     float heightAtPoint = terrain->heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
 
-    if (Eend::InputManager::get().getSpacePress() && !_inAir) {
+    if (Eend::InputManager::get().getSpacePress() && !m_inAir) {
         Particles::get().create(
             duckPosition, 5, std::filesystem::path("duck/boards/poo"), particleMovement);
-        _inAir = true;
-        _upVelocity = -GRAVITY * 20.0f;
-        _height = heightAtPoint + 0.1f;
-    } else if (_inAir) {
-        _upVelocity += GRAVITY;
-        _height += (_upVelocity * dt);
-        if (_height < heightAtPoint) {
-            _inAir = false;
-            _height = heightAtPoint;
+        m_inAir = true;
+        m_upVelocity = -GRAVITY * 20.0f;
+        m_height = heightAtPoint + 0.1f;
+    } else if (m_inAir) {
+        m_upVelocity += GRAVITY;
+        m_height += (m_upVelocity * dt);
+        if (m_height < heightAtPoint) {
+            m_inAir = false;
+            m_height = heightAtPoint;
         }
     } else {
-        _height = heightAtPoint;
+        m_height = heightAtPoint;
     }
 
-    duckPosition.z = _height;
-
-    if (_inAir) {
-    }
+    duckPosition.z = m_height;
 
     setPosition(duckPosition);
     setRotation(0.0f, 0.0f, duckRotation);

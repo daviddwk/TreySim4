@@ -2,35 +2,9 @@
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
 #include <chrono>
-#include <print>
 #include <queue>
 
 namespace Eend = Eendgine;
-
-class TextBox {
-    public:
-        TextBox(std::string thumbnail, Font font, std::string text, float seconds,
-            bool clickToContinue);
-        ~TextBox();
-        const float duration;
-        const bool clickToContinue;
-
-        Eend::PanelId _arrow;
-
-    private:
-        Eend::PanelId _background;
-        Eend::PanelId _thumbnail;
-        Font _font;
-        Text _text;
-};
-
-struct TextBoxParams {
-        std::string thumbnail;
-        Font font;
-        std::string text;
-        float duration;
-        bool clickToContinue;
-};
 
 class TextBoxQueue {
     public:
@@ -41,18 +15,45 @@ class TextBoxQueue {
         TextBoxQueue(const TextBoxQueue&) = delete;
         TextBoxQueue& operator=(const TextBoxQueue&) = delete;
 
-        void queue(std::string thumbnail, Font font, std::string text, float seconds,
+        void queue(
+            std::string thumbnail, Font font, std::string text, float seconds,
             bool clickToContinue);
         void update();
 
     private:
+        class TextBox {
+            public:
+                TextBox(
+                    std::string thumbnail, Font font, std::string text, float seconds,
+                    bool clickToContinue);
+                ~TextBox();
+                const float duration;
+                const bool clickToContinue;
+
+                Eend::PanelId arrow;
+
+            private:
+                Eend::PanelId m_background;
+                Eend::PanelId m_thumbnail;
+                Font m_font;
+                Text m_text;
+        };
+
+        struct TextBoxParams {
+                std::string thumbnail;
+                Font font;
+                std::string text;
+                float duration;
+                bool clickToContinue;
+        };
+
         TextBoxQueue() = default;
         ~TextBoxQueue() = default;
 
-        inline static TextBoxQueue* _instance = nullptr;
+        inline static TextBoxQueue* m_instance = nullptr;
 
-        bool _continue = false;
-        std::chrono::steady_clock::time_point _startTime;
-        TextBox* _textBox = NULL;
-        std::queue<TextBoxParams> _textBoxQueue;
+        bool m_continue = false;
+        std::chrono::steady_clock::time_point m_startTime;
+        TextBox* m_textBox = NULL;
+        std::queue<TextBoxParams> m_textBoxQueue;
 };

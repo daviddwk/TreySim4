@@ -20,6 +20,6 @@ class PuppyMill {
         // collision and correct
         //
         // spawn
-        Terrain* _terrain;
-        std::vector<Dog> _dogs;
+        Terrain* m_terrain;
+        std::vector<Dog> m_dogs;
 };

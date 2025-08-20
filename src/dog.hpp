@@ -18,9 +18,9 @@ class Dog {
         void update(float dt, Eend::Point2D approachPoint);
 
     private:
-        Eend::BoardId _bodyId;
-        Eend::Point2D _position;
-        float _speed;
-        Terrain* _terrain;
-        float _time;
+        Eend::BoardId m_bodyId;
+        Eend::Point2D m_position;
+        float m_speed;
+        Terrain* m_terrain;
+        float m_time;
 };

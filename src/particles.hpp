@@ -55,6 +55,6 @@ class Particles {
         ~Particles();
 
     private:
-        std::vector<Cloud> _clouds;
-        inline static Particles* _instance = nullptr;
+        std::vector<Cloud> m_clouds;
+        inline static Particles* m_instance = nullptr;
 };
