@@ -66,7 +66,7 @@ void Duck::update(float dt, Terrain* terrain) {
     Eend::Point duckPosition = getPosition();
     Eend::Point oldDuckPosition = duckPosition;
 
-    float duckRotation = 0.0f;
+    static float duckRotation = 0.0f;
 
     float duckRotationOffset = 0.0f;
     unsigned int numPressed = 0;
