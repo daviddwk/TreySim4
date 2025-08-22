@@ -30,8 +30,8 @@ static Particles::Behavior particleMovement =
 Duck::Duck()
     : m_bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
       m_headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
-      m_position(Eend::Point(0.0f)), m_rotX(0.0f), m_rotY(0.0f), m_inAir(false), m_upVelocity(0.0f),
-      m_height(0.0f) {
+      m_position(Eend::Point(0.0f)), m_rotX(0.0f), m_rotY(0.0f), m_kicking(true), m_inAir(false),
+      m_upVelocity(0.0f), m_height(0.0f) {
     Eend::Entities::boards().getRef(m_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
 }
 
@@ -114,7 +114,9 @@ void Duck::update(float dt, Terrain* terrain) {
 
     float heightAtPoint = terrain->heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
 
+    m_kicking = false;
     if (Eend::InputManager::get().getSpacePress() && !m_inAir) {
+        m_kicking = true;
         Particles::get().create(
             duckPosition, 5, std::filesystem::path("duck/boards/poo"), particleMovement);
         m_inAir = true;
@@ -135,4 +137,11 @@ void Duck::update(float dt, Terrain* terrain) {
 
     setPosition(duckPosition);
     setRotation(0.0f, 0.0f, duckRotation);
+}
+
+std::optional<Eend::CollisionSphere> Duck::isKicking() {
+    if (m_kicking) {
+        return Eend::CollisionSphere(getPosition(), 10.0f);
+    }
+    return std::nullopt;
 }

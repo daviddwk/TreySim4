@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 #include <chrono>
+#include <print>
 
 const int DMG_TICK_MS = 500;
 const unsigned int DOG_DMG = 5;
@@ -25,6 +26,23 @@ void PuppyMill::damage(Duck* duck) {
         for (Dog& dog : m_dogs) {
             if (glm::length(dog.getPosition() - duck->getPosition2D()) < DOG_RADIUS) {
                 duck->health.damage(DOG_DMG);
+            }
+        }
+    }
+
+    std::optional<Eend::CollisionSphere> duckCollision = duck->isKicking();
+    if (duckCollision) {
+        for (Dog& dog : m_dogs) {
+            Eend::Point2D dogPosition2D = dog.getPosition();
+            float dogHeight = m_terrain->heightAtPoint(dogPosition2D);
+            Eend::Point dogPosition = Eend::Point(dogPosition2D.x, dogPosition2D.y, dogHeight);
+            Eend::CollisionSphere dogCollision(dogPosition, DOG_RADIUS);
+            // TODO actually use penetration vector for doggy knockback
+            // also implement a kickback method for doggys
+            Eend::Point knockback3d;
+            if (Eend::colliding(*duckCollision, dogCollision, &knockback3d)) {
+                dog.kick(Eend::Point2D(knockback3d.x, knockback3d.y));
+                std::print("kicked\n");
             }
         }
     }

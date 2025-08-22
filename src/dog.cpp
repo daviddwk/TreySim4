@@ -5,12 +5,15 @@ namespace Eend = Eendgine;
 
 const float DOG_UP_OFFSET = 2.0f;
 const float DOG_SPEED = 20.0f;
-const float DOG_CLOSE_ENOUGH = 1.0f;
+const float DOG_CLOSE_ENOUGH = 2.0f;
 const float DOG_ANIM_INCREMENT_TIME = 0.25f;
+const float DOG_KNOCKBACK_FACTOR = 5.0f;
+const float DOG_KNOCKBACK_DECAY_FACTOR = 1.0f;
 
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
     : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards/walk"))),
-      m_position(position), m_speed(speed), m_terrain(terrain), m_time(0.0f) {
+      m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_terrain(terrain),
+      m_time(0.0f) {
     Eend::Entities::boards().getRef(m_bodyId)->setScale(scale);
     Eend::Entities::boards().getRef(m_bodyId)->setPosition(
         Eend::Point(position.x, terrain->heightAtPoint(position), position.y));
@@ -20,12 +23,20 @@ Dog::~Dog() { Eend::Entities::boards().erase(m_bodyId); }
 
 void Dog::setSpeed(float speed) { m_speed = speed; }
 
-Eend::Point2D Dog::getPosition() { return m_position; };
+Eend::Point2D Dog::getPosition() { return m_position; }
+
+void Dog::kick(Eend::Point2D knockback) { m_knockback = knockback; }
 
 void Dog::update(float dt, Eend::Point2D approachPoint) {
     m_time += dt;
     const glm::vec2 difference = approachPoint - m_position;
     Eend::Entities::boards().getRef(m_bodyId)->setFlip(difference.x < 0.0f);
+
+    if (glm::length(m_knockback) > DOG_CLOSE_ENOUGH) {
+        m_position += m_knockback * dt * DOG_KNOCKBACK_FACTOR;
+        m_knockback = m_knockback / (1 + (dt * DOG_KNOCKBACK_DECAY_FACTOR));
+    }
+
     if (glm::length(difference) > DOG_CLOSE_ENOUGH) {
         m_position += glm::normalize(approachPoint - m_position) * DOG_SPEED * dt;
     }

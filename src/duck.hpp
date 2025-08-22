@@ -24,6 +24,8 @@ class Duck {
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
 
+        std::optional<Eend::CollisionSphere> isKicking();
+
         void update(float dt, Terrain* terrain);
 
         HealthBar health;
@@ -35,6 +37,7 @@ class Duck {
         float m_rotX;
         float m_rotY;
 
+        bool m_kicking;
         bool m_inAir;
         float m_upVelocity;
         float m_height;
