@@ -1,3 +1,4 @@
+#include "Eendgine/collisionGeometry.hpp"
 #include "puppyMill.hpp"
 
 #include <glm/glm.hpp>
@@ -7,7 +8,14 @@
 
 const int DMG_TICK_MS = 500;
 const unsigned int DOG_DMG = 5;
-const float DOG_RADIUS = 3.0f;
+const float DOG_RADIUS = 5.0f;
+const float MIN_KNOCKBACK = 5.0f;
+const float MAX_KNOCKBACK = 10.0f;
+
+float calcKnockback(float depthRatio) {
+    // scale from 0 to 1   or   min to max knockback
+    return pow(depthRatio, 2.0f);
+}
 
 PuppyMill::PuppyMill(Terrain* terrain) : m_terrain(terrain) {
     // SPAWN SOME DOGS
@@ -30,19 +38,16 @@ void PuppyMill::damage(Duck* duck) {
         }
     }
 
-    std::optional<Eend::CollisionSphere> duckCollision = duck->isKicking();
+    // TODO make is kicking just a bool and pull out collision to here
+    const std::optional<Eend::CollisionSphere> duckCollision = duck->isKicking();
     if (duckCollision) {
         for (Dog& dog : m_dogs) {
-            Eend::Point2D dogPosition2D = dog.getPosition();
-            float dogHeight = m_terrain->heightAtPoint(dogPosition2D);
-            Eend::Point dogPosition = Eend::Point(dogPosition2D.x, dogPosition2D.y, dogHeight);
-            Eend::CollisionSphere dogCollision(dogPosition, DOG_RADIUS);
-            // TODO actually use penetration vector for doggy knockback
-            // also implement a kickback method for doggys
-            Eend::Point knockback3d;
-            if (Eend::colliding(*duckCollision, dogCollision, &knockback3d)) {
-                dog.kick(Eend::Point2D(knockback3d.x, knockback3d.y));
-                std::print("kicked\n");
+            // kick is a vector of the direction the dog was kicked with a length of
+            // penetration / radius (between 0 and 1)
+            std::optional<Eend::Point> kick = Eend::colliding(dog.getPosition3d(), *duckCollision);
+            if (kick) {
+                std::print("{}\n", glm::length(*kick));
+                dog.kick(*kick);
             }
         }
     }

@@ -1,13 +1,14 @@
 #include "dog.hpp"
 
 #include <glm/vector_relational.hpp>
+#include <print>
 namespace Eend = Eendgine;
 
 const float DOG_UP_OFFSET = 2.0f;
 const float DOG_SPEED = 20.0f;
-const float DOG_CLOSE_ENOUGH = 2.0f;
 const float DOG_ANIM_INCREMENT_TIME = 0.25f;
-const float DOG_KNOCKBACK_FACTOR = 5.0f;
+const float DOG_KNOCKBACK_MAX = DOG_SPEED * 5.0f;
+const float DOG_KNOCKBACK_MIN = DOG_SPEED;
 const float DOG_KNOCKBACK_DECAY_FACTOR = 1.0f;
 
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
@@ -25,21 +26,28 @@ void Dog::setSpeed(float speed) { m_speed = speed; }
 
 Eend::Point2D Dog::getPosition() { return m_position; }
 
-void Dog::kick(Eend::Point2D knockback) { m_knockback = knockback; }
+Eend::Point Dog::getPosition3d() {
+    return Eend::Point(m_position.x, m_position.y, m_terrain->heightAtPoint(m_position));
+}
+
+void Dog::kick(Eend::Point kick) {
+    // make kick power scale exponentially
+    float kickFactor = glm::pow(glm::length(kick), 2.0f);
+    std::print("expo kick:{}\n", kickFactor);
+    kickFactor = ((DOG_KNOCKBACK_MAX - DOG_KNOCKBACK_MIN) * kickFactor) + (DOG_KNOCKBACK_MIN);
+    std::print("knockback:{}\n", kickFactor);
+    m_knockback = glm::normalize(kick) * kickFactor;
+}
 
 void Dog::update(float dt, Eend::Point2D approachPoint) {
     m_time += dt;
     const glm::vec2 difference = approachPoint - m_position;
     Eend::Entities::boards().getRef(m_bodyId)->setFlip(difference.x < 0.0f);
 
-    if (glm::length(m_knockback) > DOG_CLOSE_ENOUGH) {
-        m_position += m_knockback * dt * DOG_KNOCKBACK_FACTOR;
-        m_knockback = m_knockback / (1 + (dt * DOG_KNOCKBACK_DECAY_FACTOR));
-    }
+    m_position += m_knockback * dt;
+    m_position += glm::normalize(approachPoint - m_position) * DOG_SPEED * dt;
+    m_knockback = m_knockback / (1 + (dt * DOG_KNOCKBACK_DECAY_FACTOR));
 
-    if (glm::length(difference) > DOG_CLOSE_ENOUGH) {
-        m_position += glm::normalize(approachPoint - m_position) * DOG_SPEED * dt;
-    }
     // add some offsets for the dog visually here
     Eend::Entities::boards().getRef(m_bodyId)->setPosition(
         Eend::Point(

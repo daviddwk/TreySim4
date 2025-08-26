@@ -4,6 +4,8 @@
 #include "duck.hpp"
 #include "particles.hpp"
 
+const float DUCK_KICK_RADIUS = 15.0f;
+
 static Particles::Behavior particleMovement =
     [](int seed, std::chrono::milliseconds time) -> std::optional<Particles::Properties> {
     if (time.count() < 1000) {
@@ -141,7 +143,7 @@ void Duck::update(float dt, Terrain* terrain) {
 
 std::optional<Eend::CollisionSphere> Duck::isKicking() {
     if (m_kicking) {
-        return Eend::CollisionSphere(getPosition(), 10.0f);
+        return Eend::CollisionSphere(getPosition(), DUCK_KICK_RADIUS);
     }
     return std::nullopt;
 }

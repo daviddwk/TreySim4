@@ -3,6 +3,7 @@
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
 
+#include "Eendgine/collisionGeometry.hpp"
 #include "terrain.hpp"
 
 namespace Eend = Eendgine;
@@ -14,8 +15,9 @@ class Dog {
 
         void setSpeed(float speed);
         Eend::Point2D getPosition();
+        Eend::Point getPosition3d();
 
-        void kick(Eend::Point2D knockback);
+        void kick(Eend::Point kick);
 
         void update(float dt, Eend::Point2D approachPoint);
 
