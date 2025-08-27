@@ -13,6 +13,9 @@ class HealthBar {
         void heal(unsigned int heal);
 
     private:
+        const unsigned int M_HEALTH_MAX = 100;
+        const float M_BAR_SCALE_MAX = 500.0f;
+
         void update();
 
         Eend::PanelId m_background;

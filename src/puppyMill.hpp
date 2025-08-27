@@ -11,15 +11,7 @@ class PuppyMill {
         void update(float dt, Duck* duck);
 
     private:
-        // DAMAGE (probably don't do every frame)
-        // void takeDamage();
-        // void dealDamage();
-
-        // UPDATE
-        // move
-        // collision and correct
-        //
-        // spawn
+        static constexpr int M_DMG_TICK_MS = 200;
         Terrain* m_terrain;
         std::vector<Dog> m_dogs;
 };

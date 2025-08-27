@@ -4,8 +4,6 @@
 #include "duck.hpp"
 #include "particles.hpp"
 
-const float DUCK_KICK_RADIUS = 15.0f;
-
 static Particles::Behavior particleMovement =
     [](int seed, std::chrono::milliseconds time) -> std::optional<Particles::Properties> {
     if (time.count() < 1000) {
@@ -62,6 +60,7 @@ void Duck::setRotation(float x, float y, float z) {
 
 Eend::Point Duck::getPosition() { return m_position; };
 Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
+float Duck::getRadius() { return M_DUCK_RADIUS; }
 
 void Duck::update(float dt, Terrain* terrain) {
 
@@ -122,10 +121,10 @@ void Duck::update(float dt, Terrain* terrain) {
         Particles::get().create(
             duckPosition, 5, std::filesystem::path("duck/boards/poo"), particleMovement);
         m_inAir = true;
-        m_upVelocity = -GRAVITY * 20.0f;
+        m_upVelocity = -M_GRAVITY * 20.0f;
         m_height = heightAtPoint + 0.1f;
     } else if (m_inAir) {
-        m_upVelocity += GRAVITY;
+        m_upVelocity += M_GRAVITY;
         m_height += (m_upVelocity * dt);
         if (m_height < heightAtPoint) {
             m_inAir = false;
@@ -143,7 +142,7 @@ void Duck::update(float dt, Terrain* terrain) {
 
 std::optional<Eend::Sphere> Duck::isKicking() {
     if (m_kicking) {
-        return Eend::Sphere(getPosition(), DUCK_KICK_RADIUS);
+        return Eend::Sphere(getPosition(), M_KICK_RADIUS);
     }
     return std::nullopt;
 }

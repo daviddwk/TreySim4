@@ -4,13 +4,6 @@
 #include <print>
 namespace Eend = Eendgine;
 
-const float DOG_UP_OFFSET = 2.0f;
-const float DOG_SPEED = 20.0f;
-const float DOG_ANIM_INCREMENT_TIME = 0.25f;
-const float DOG_KNOCKBACK_MAX = DOG_SPEED * 5.0f;
-const float DOG_KNOCKBACK_MIN = DOG_SPEED;
-const float DOG_KNOCKBACK_DECAY_FACTOR = 1.0f;
-
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
     : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards/walk"))),
       m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_terrain(terrain),
@@ -30,11 +23,13 @@ Eend::Point Dog::getPosition3d() {
     return Eend::Point(m_position.x, m_position.y, m_terrain->heightAtPoint(m_position));
 }
 
+unsigned int Dog::getDamage() { return M_DAMAGE; }
+
 void Dog::kick(Eend::Point kick) {
     // make kick power scale exponentially
     float kickFactor = glm::pow(glm::length(kick), 2.0f);
     std::print("expo kick:{}\n", kickFactor);
-    kickFactor = ((DOG_KNOCKBACK_MAX - DOG_KNOCKBACK_MIN) * kickFactor) + (DOG_KNOCKBACK_MIN);
+    kickFactor = ((M_KNOCKBACK_MAX - M_KNOCKBACK_MIN) * kickFactor) + (M_KNOCKBACK_MIN);
     std::print("knockback:{}\n", kickFactor);
     m_knockback = glm::normalize(kick) * kickFactor;
 }
@@ -45,17 +40,15 @@ void Dog::update(float dt, Eend::Point2D approachPoint) {
     Eend::Entities::boards().getRef(m_bodyId)->setFlip(difference.x < 0.0f);
 
     m_position += m_knockback * dt;
-    m_position += glm::normalize(approachPoint - m_position) * DOG_SPEED * dt;
-    m_knockback = m_knockback / (1 + (dt * DOG_KNOCKBACK_DECAY_FACTOR));
+    m_position += glm::normalize(approachPoint - m_position) * M_SPEED * dt;
+    m_knockback = m_knockback / (1 + (dt * M_KNOCKBACK_DECAY_FACTOR));
 
     // add some offsets for the dog visually here
     Eend::Entities::boards().getRef(m_bodyId)->setPosition(
         Eend::Point(
-            m_position.x, m_position.y, m_terrain->heightAtPoint(m_position) + DOG_UP_OFFSET));
-    if (m_time > DOG_ANIM_INCREMENT_TIME) {
+            m_position.x, m_position.y, m_terrain->heightAtPoint(m_position) + M_UP_OFFSET));
+    if (m_time > M_ANIM_INCREMENT_TIME) {
         m_time = 0;
         Eend::Entities::boards().getRef(m_bodyId)->nextStripIdx();
     }
-
-    // terrain->heightAtPoint(_position)
 }

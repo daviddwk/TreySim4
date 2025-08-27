@@ -6,10 +6,6 @@
 #include <chrono>
 #include <print>
 
-const int DMG_TICK_MS = 500;
-const unsigned int DOG_DMG = 5;
-const float DOG_RADIUS = 5.0f;
-
 float calcKnockback(float depthRatio) {
     // scale from 0 to 1   or   min to max knockback
     return pow(depthRatio, 2.0f);
@@ -27,11 +23,11 @@ void PuppyMill::damage(Duck* duck) {
     auto now = std::chrono::steady_clock::now();
     auto tickMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - tickLast).count();
     // 500 ms per tick
-    if (tickMs >= DMG_TICK_MS) {
+    if (tickMs >= M_DMG_TICK_MS) {
         tickLast = now;
         for (Dog& dog : m_dogs) {
-            if (glm::length(dog.getPosition() - duck->getPosition2D()) < DOG_RADIUS) {
-                duck->health.damage(DOG_DMG);
+            if (glm::length(dog.getPosition() - duck->getPosition2D()) < duck->getRadius()) {
+                duck->health.damage(dog.getDamage());
             }
         }
     }

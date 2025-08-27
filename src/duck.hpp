@@ -9,11 +9,7 @@
 
 namespace Eend = Eendgine;
 
-constexpr float GRAVITY = -1.0f;
-
 class Duck {
-        // please make a position, rotation, whatever types already and decouple dependencies or
-        // whatever
     public:
         Duck();
         ~Duck();
@@ -23,6 +19,7 @@ class Duck {
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
+        float getRadius();
 
         std::optional<Eend::Sphere> isKicking();
 
@@ -31,6 +28,10 @@ class Duck {
         HealthBar health;
 
     private:
+        static constexpr float M_KICK_RADIUS = 15.0f;
+        static constexpr float M_DUCK_RADIUS = 5.0f;
+        static constexpr float M_GRAVITY = -1.0f; // only ducks believe in gravity
+
         Eend::StatueId m_bodyId;
         Eend::BoardId m_headId;
         Eend::Point m_position;
