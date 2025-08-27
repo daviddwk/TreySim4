@@ -19,8 +19,6 @@
 
 namespace Eend = Eendgine;
 
-float pointHeightOnTri(const Eend::Triangle& tri, const Eend::Point2D& point);
-
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : m_height(0), m_width(0), m_statueId(0), m_scale(scale) {
     // height map from image
@@ -298,7 +296,7 @@ void Terrain::update() {
 
 bool Terrain::colliding(const Eend::Point2D point) {
     for (auto& rectangle : m_collisionRectangles) {
-        if (Eend::colliding(point, rectangle))
+        if (Eend::pointOnRectangle(point, rectangle))
             return true;
     }
     return false;
@@ -364,7 +362,7 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const Eend::Triangle triangle = {
             .p1 = topLeftPoint, .p2 = topRightPoint, .p3 = bottomRightPoint};
 
-        return pointHeightOnTri(triangle, point);
+        return Eend::pointHeightOnTri(triangle, point);
     } else {
         // lower tri
         const size_t topLeftXIdx = (size_t)floor(scaledX);
@@ -386,21 +384,7 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
             (float)bottomRightXIdx * m_scale.x, (float)bottomRightYIdx * -m_scale.y,
             m_heightMap[bottomRightYIdx][bottomRightXIdx]);
 
-        return pointHeightOnTri(
+        return Eend::pointHeightOnTri(
             (Eend::Triangle){topLeftPoint, bottomLeftPoint, bottomRightPoint}, point);
     }
-}
-
-inline float pointHeightOnTri(const Eend::Triangle& tri, const Eend::Point2D& point) {
-    // could use a tri construct here instead of 3 points
-
-    // calc tri normal
-    // https://www.khronos.org/opengl/wiki/Calculating_a_Surface_Normal
-    const Eend::Point u = tri.p2 - tri.p1;
-    const Eend::Point v = tri.p3 - tri.p1;
-    const Eend::Point normal = glm::cross(u, v);
-    // calc d for point normal plane
-    const float d = -((normal.x * tri.p1.x) + (normal.y * tri.p1.y) + (normal.z * tri.p1.z));
-    // solve for point.z
-    return -((normal.x * point.x) + (normal.y * point.y) + d) / normal.z;
 }

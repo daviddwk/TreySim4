@@ -38,15 +38,15 @@ void PuppyMill::damage(Duck* duck) {
         }
     }
 
-    // TODO make is kicking just a bool and pull out collision to here
     const std::optional<Eend::CollisionSphere> duckCollision = duck->isKicking();
     if (duckCollision) {
         for (Dog& dog : m_dogs) {
             // kick is a vector of the direction the dog was kicked with a length of
             // penetration / radius (between 0 and 1)
-            std::optional<Eend::Point> kick = Eend::colliding(dog.getPosition3d(), *duckCollision);
+            std::optional<Eend::Point> kick =
+                Eend::pointToSphereEdgeRelative(dog.getPosition3d(), *duckCollision);
             if (kick) {
-                std::print("{}\n", glm::length(*kick));
+                std::print("kick:{}\n", glm::length(*kick));
                 dog.kick(*kick);
             }
         }
