@@ -141,9 +141,9 @@ void Duck::update(float dt, Terrain* terrain) {
     setRotation(0.0f, 0.0f, duckRotation);
 }
 
-std::optional<Eend::CollisionSphere> Duck::isKicking() {
+std::optional<Eend::Sphere> Duck::isKicking() {
     if (m_kicking) {
-        return Eend::CollisionSphere(getPosition(), DUCK_KICK_RADIUS);
+        return Eend::Sphere(getPosition(), DUCK_KICK_RADIUS);
     }
     return std::nullopt;
 }

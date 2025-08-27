@@ -359,8 +359,8 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const Eend::Point bottomRightPoint = Eend::Point(
             (float)bottomRightXIdx * m_scale.x, (float)bottomRightYIdx * -m_scale.y,
             m_heightMap[bottomRightYIdx][bottomRightXIdx]);
-        const Eend::Triangle triangle = {
-            .p1 = topLeftPoint, .p2 = topRightPoint, .p3 = bottomRightPoint};
+
+        const Eend::Triangle triangle(topLeftPoint, topRightPoint, bottomRightPoint);
 
         return Eend::pointHeightOnTri(triangle, point);
     } else {
@@ -384,7 +384,8 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
             (float)bottomRightXIdx * m_scale.x, (float)bottomRightYIdx * -m_scale.y,
             m_heightMap[bottomRightYIdx][bottomRightXIdx]);
 
-        return Eend::pointHeightOnTri(
-            (Eend::Triangle){topLeftPoint, bottomLeftPoint, bottomRightPoint}, point);
+        const Eend::Triangle triangle(topLeftPoint, bottomLeftPoint, bottomRightPoint);
+
+        return Eend::pointHeightOnTri(triangle, point);
     }
 }

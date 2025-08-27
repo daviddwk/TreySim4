@@ -24,7 +24,7 @@ class Duck {
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
 
-        std::optional<Eend::CollisionSphere> isKicking();
+        std::optional<Eend::Sphere> isKicking();
 
         void update(float dt, Terrain* terrain);
 

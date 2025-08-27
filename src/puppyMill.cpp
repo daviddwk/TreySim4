@@ -9,8 +9,6 @@
 const int DMG_TICK_MS = 500;
 const unsigned int DOG_DMG = 5;
 const float DOG_RADIUS = 5.0f;
-const float MIN_KNOCKBACK = 5.0f;
-const float MAX_KNOCKBACK = 10.0f;
 
 float calcKnockback(float depthRatio) {
     // scale from 0 to 1   or   min to max knockback
@@ -38,7 +36,7 @@ void PuppyMill::damage(Duck* duck) {
         }
     }
 
-    const std::optional<Eend::CollisionSphere> duckCollision = duck->isKicking();
+    const std::optional<Eend::Sphere> duckCollision = duck->isKicking();
     if (duckCollision) {
         for (Dog& dog : m_dogs) {
             // kick is a vector of the direction the dog was kicked with a length of

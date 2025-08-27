@@ -26,7 +26,7 @@ class Terrain {
         int m_width;
         std::vector<std::vector<float>> m_heightMap;
         Eend::StatueId m_statueId;
-        std::vector<Eend::CollisionRectangle> m_collisionRectangles;
+        std::vector<Eend::Rectangle> m_collisionRectangles;
         std::vector<std::tuple<Eend::BoardId, float>> m_boards;
         std::vector<Eend::StatueId> m_statues;
         std::vector<std::tuple<Eend::DollId, float>> m_dolls;
