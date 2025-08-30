@@ -30,6 +30,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     int channels = 0;
 
     unsigned char* imageData = stbi_load(pngHeightMap.c_str(), &m_width, &m_height, &channels, 0);
+    float IMAGE_DATA_MAX_VALUE = 256.0f;
+
     if (imageData == NULL) {
         Eend::fatalError(
             "unable to load image " + pngHeightMap.generic_string() + " for terrain generation");
@@ -43,47 +45,60 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         if (h == (m_height - 2))
             m_heightMap.emplace_back();
         for (int w = 0; w < (m_width - 1); ++w) {
-            unsigned int avg = 0;
+            unsigned int averageHeight = 0;
+
             const size_t currentIdx = w + (h * m_width);
             const size_t rightIdx = (w + 1) + (h * m_width);
             const size_t downIdx = w + ((h + 1) * m_width);
             const size_t rightDownIdx = downIdx + 1;
-            if (h == 0) {
-                if (w == 0) {
-                    avg = imageData[currentIdx];
-                    m_heightMap[h].push_back(((float)avg / 256.0f) * m_scale.z);
+
+            const bool isEdgeXLeft = (w == 0);
+            const bool isEdgeXRight = (w == (m_width - 2));
+            const bool isEdgeYTop = (h == 0);
+            const bool isEdgeYBottom = (h == (m_height - 2));
+
+            const unsigned char currentHeight = imageData[currentIdx];
+            const unsigned char rightHeight = imageData[rightIdx];
+            const unsigned char downHeight = imageData[downIdx];
+            const unsigned char rightDownHeight = imageData[rightDownIdx];
+
+            auto scaleHeight = [&](unsigned int height) {
+                return (height / IMAGE_DATA_MAX_VALUE) * m_scale.z;
+            };
+
+            if (isEdgeYTop) {
+                if (isEdgeXLeft) {
+                    averageHeight = currentHeight;
+                    m_heightMap[h].push_back(scaleHeight(averageHeight));
                 }
-                avg = (imageData[currentIdx] + imageData[rightIdx]) / 2;
-                m_heightMap[h].push_back(((float)avg / 256.0f) * m_scale.z);
-                if (w == (m_width - 2)) {
-                    avg = imageData[currentIdx];
-                    m_heightMap[h].push_back(((float)avg / 256.0f) * m_scale.z);
+                averageHeight = (currentHeight + rightHeight) / 2;
+                m_heightMap[h].push_back(scaleHeight(averageHeight));
+                if (isEdgeXRight) {
+                    averageHeight = currentHeight;
+                    m_heightMap[h].push_back(scaleHeight(averageHeight));
                 }
             }
-            if (h == (m_height - 2)) {
-                if (w == 0) {
-                    avg = imageData[downIdx];
-                    m_heightMap[h + 2].push_back(((float)avg / 256.0f) * m_scale.z);
+            if (isEdgeYBottom) {
+                if (isEdgeXLeft) {
+                    averageHeight = downHeight;
+                    m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
                 }
-                avg = (imageData[downIdx] + imageData[rightDownIdx]) / 2;
-                m_heightMap[h + 2].push_back(((float)avg / 256.0f) * m_scale.z);
-                if (w == (m_width - 2)) {
-                    avg = imageData[downIdx];
-                    m_heightMap[h + 2].push_back(((float)avg / 256.0f) * m_scale.z);
+                averageHeight = (downHeight + rightDownHeight) / 2;
+                m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
+                if (isEdgeXRight) {
+                    averageHeight = downHeight;
+                    m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
                 }
             }
-            if (w == 0) {
-                avg = (imageData[currentIdx] + imageData[downIdx]) / 2;
-                m_heightMap[h + 1].push_back(((float)avg / 256.0f) * m_scale.z);
+            if (isEdgeXLeft) {
+                averageHeight = (currentHeight + downHeight) / 2;
+                m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
             }
-            avg =
-                ((imageData[currentIdx] + imageData[rightIdx] + imageData[downIdx] +
-                  imageData[rightDownIdx]) /
-                 4);
-            m_heightMap[h + 1].push_back(((float)avg / 256.0f) * m_scale.z);
-            if (w == (m_width - 2)) {
-                avg = (imageData[currentIdx] + imageData[downIdx]) / 2;
-                m_heightMap[h + 1].push_back(((float)avg / 256.0f) * m_scale.z);
+            averageHeight = ((currentHeight + rightHeight + downHeight + rightDownHeight) / 4);
+            m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
+            if (isEdgeXRight) {
+                averageHeight = (currentHeight + downHeight) / 2;
+                m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
             }
         }
     }
@@ -98,8 +113,15 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         for (int w = 0; w < collisionWidth; ++w) {
             const size_t currentIdx = w + (h * collisionWidth);
             if (imageData[currentIdx] == 0) {
-                const Eend::Point2D upperLeft((w * m_scale.x) + 1, -(((h + 1) * m_scale.y) + 1));
-                const Eend::Point2D lowerRight(((w + 1) * m_scale.x) + 1, -((h * m_scale.y) + 1));
+
+                const float upperLeftX = (w * m_scale.x) + 1;
+                const float upperLeftY = -(((h + 1) * m_scale.y) + 1);
+                const float lowerRightX = ((w + 1) * m_scale.x) + 1;
+                const float lowerRightY = -((h * m_scale.y) + 1);
+
+                const Eend::Point2D upperLeft(upperLeftX, upperLeftY);
+                const Eend::Point2D lowerRight(lowerRightX, lowerRightY);
+
                 m_collisionRectangles.emplace_back(upperLeft, lowerRight);
             }
         }
