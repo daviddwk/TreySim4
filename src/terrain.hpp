@@ -1,10 +1,11 @@
 #pragma once
-#include <Eendgine/collisionGeometry.hpp>
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
 #include <filesystem>
 #include <tuple>
 #include <vector>
+
+#include "collision.hpp"
 namespace Eend = Eendgine;
 
 class Terrain {

@@ -1,5 +1,6 @@
-#include "Eendgine/collisionGeometry.hpp"
 #include "puppyMill.hpp"
+
+#include "collision.hpp"
 
 #include <glm/glm.hpp>
 
@@ -38,7 +39,7 @@ void PuppyMill::damage(Duck* duck) {
             // kick is a vector of the direction the dog was kicked with a length of
             // penetration / radius (between 0 and 1)
             std::optional<Eend::Point> kick =
-                Eend::pointToSphereEdgeRelative(dog.getPosition3d(), *duckCollision);
+                pointToSphereEdgeRelative(dog.getPosition3d(), *duckCollision);
             if (kick) {
                 std::print("kick:{}\n", glm::length(*kick));
                 dog.kick(*kick);

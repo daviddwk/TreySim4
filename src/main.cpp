@@ -1,5 +1,4 @@
 #include <Eendgine/camera.hpp>
-#include <Eendgine/collisionGeometry.hpp>
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/inputManager.hpp>

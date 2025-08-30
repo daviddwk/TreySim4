@@ -1,7 +1,8 @@
-#include "Eendgine/board.hpp"
 #include "terrain.hpp"
 
-#include <Eendgine/collisionGeometry.hpp>
+#include "collision.hpp"
+
+#include <Eendgine/board.hpp>
 #include <Eendgine/doll.hpp>
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/fatalError.hpp>
@@ -296,7 +297,7 @@ void Terrain::update() {
 
 bool Terrain::colliding(const Eend::Point2D point) {
     for (auto& rectangle : m_collisionRectangles) {
-        if (Eend::pointOnRectangle(point, rectangle))
+        if (pointOnRectangle(point, rectangle))
             return true;
     }
     return false;
@@ -336,56 +337,47 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         return 0.0f;
     }
 
+    Eend::Triangle triangle(Eend::Point(0.0f), Eend::Point(0.0f), Eend::Point(0.0f));
+
     const float relativeX = scaledX - (float)floor(scaledX);
     const float relativeY = -scaledY - (float)floor(-scaledY);
     const bool upperTri = (relativeX - relativeY) > 0;
 
+    const size_t topLeftXIdx = (size_t)floor(scaledX);
+    const size_t topLeftYIdx = (size_t)floor(-scaledY);
+
+    const size_t bottomRightXIdx = (size_t)floor(scaledX + 1);
+    const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
+
+    const Eend::Point topLeftPoint = Eend::Point(
+        (float)topLeftXIdx * m_scale.x, (float)topLeftYIdx * -m_scale.y,
+        m_heightMap[topLeftYIdx][topLeftXIdx]);
+
+    const Eend::Point bottomRightPoint = Eend::Point(
+        (float)bottomRightXIdx * m_scale.x, (float)bottomRightYIdx * -m_scale.y,
+        m_heightMap[bottomRightYIdx][bottomRightXIdx]);
+
     if (upperTri) {
-        const size_t topLeftXIdx = (size_t)floor(scaledX);
-        const size_t topLeftYIdx = (size_t)floor(-scaledY);
 
         const size_t topRightXIdx = (size_t)floor(scaledX + 1);
         const size_t topRightYIdx = (size_t)floor(-scaledY);
 
-        const size_t bottomRightXIdx = (size_t)floor(scaledX + 1);
-        const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
-
-        const Eend::Point topLeftPoint = Eend::Point(
-            (float)topLeftXIdx * m_scale.x, (float)topLeftYIdx * -m_scale.y,
-            m_heightMap[topLeftYIdx][topLeftXIdx]);
         const Eend::Point topRightPoint = Eend::Point(
             (float)topRightXIdx * m_scale.x, (float)topRightYIdx * -m_scale.y,
             m_heightMap[topRightYIdx][topRightXIdx]);
-        const Eend::Point bottomRightPoint = Eend::Point(
-            (float)bottomRightXIdx * m_scale.x, (float)bottomRightYIdx * -m_scale.y,
-            m_heightMap[bottomRightYIdx][bottomRightXIdx]);
 
-        const Eend::Triangle triangle(topLeftPoint, topRightPoint, bottomRightPoint);
+        triangle = Eend::Triangle(topLeftPoint, topRightPoint, bottomRightPoint);
 
-        return Eend::pointHeightOnTri(triangle, point);
     } else {
-        // lower tri
-        const size_t topLeftXIdx = (size_t)floor(scaledX);
-        const size_t topLeftYIdx = (size_t)floor(-scaledY);
 
         const size_t bottomLeftXIdx = (size_t)floor(scaledX);
         const size_t bottomLeftYIdx = (size_t)floor(-scaledY + 1);
 
-        const size_t bottomRightXIdx = (size_t)floor(scaledX + 1);
-        const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
-
-        const Eend::Point topLeftPoint = Eend::Point(
-            (float)topLeftXIdx * m_scale.x, (float)topLeftYIdx * -m_scale.y,
-            m_heightMap[topLeftYIdx][topLeftXIdx]);
         const Eend::Point bottomLeftPoint = Eend::Point(
             (float)bottomLeftXIdx * m_scale.x, (float)bottomLeftYIdx * -m_scale.y,
             m_heightMap[bottomLeftYIdx][bottomLeftXIdx]);
-        const Eend::Point bottomRightPoint = Eend::Point(
-            (float)bottomRightXIdx * m_scale.x, (float)bottomRightYIdx * -m_scale.y,
-            m_heightMap[bottomRightYIdx][bottomRightXIdx]);
 
-        const Eend::Triangle triangle(topLeftPoint, bottomLeftPoint, bottomRightPoint);
-
-        return Eend::pointHeightOnTri(triangle, point);
+        triangle = Eend::Triangle(topLeftPoint, bottomLeftPoint, bottomRightPoint);
     }
+    return pointHeightOnTri(triangle, point);
 }
