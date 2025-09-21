@@ -5,7 +5,6 @@
 #include <tuple>
 #include <vector>
 
-#include "collision.hpp"
 namespace Eend = Eendgine;
 
 class Terrain {

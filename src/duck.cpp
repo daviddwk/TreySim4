@@ -1,8 +1,13 @@
 #include <Eendgine/inputManager.hpp>
+
 #include <cmath>
+#include <optional>
 
 #include "duck.hpp"
 #include "particles.hpp"
+
+// have static last direction in update function
+// use this to get new diruction if there is one, and know that keys are actually being pressed
 
 static Particles::Behavior particleMovement =
     [](int seed, std::chrono::milliseconds time) -> std::optional<Particles::Properties> {
@@ -31,7 +36,7 @@ Duck::Duck()
     : m_bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
       m_headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
       m_position(Eend::Point(0.0f)), m_rotX(0.0f), m_rotY(0.0f), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_height(0.0f) {
+      m_upVelocity(0.0f), m_height(0.0f), m_direction(UP) {
     Eend::Entities::boards().getRef(m_headId)->setScale(Eend::Scale2D(3.5f, 3.5f));
 }
 
@@ -64,54 +69,18 @@ float Duck::getRadius() { return M_DUCK_RADIUS; }
 
 void Duck::update(float dt, Terrain* terrain) {
 
+    static Direction lastDirection = UP;
+
     Eend::Point duckPosition = getPosition();
     Eend::Point oldDuckPosition = duckPosition;
 
     static float duckRotation = 0.0f;
 
-    float duckRotationOffset = 0.0f;
-    unsigned int numPressed = 0;
-    if (Eend::InputManager::get().getUpPress()) {
-        duckPosition.y += 25.0f * dt;
-        // stupid hack because my trig is mid
-        if (Eend::InputManager::get().getRightPress()) {
-            duckRotationOffset = -180.0f;
-        } else {
-            duckRotationOffset += 180.0f;
-        }
-        numPressed++;
-    }
-    if (Eend::InputManager::get().getDownPress()) {
-        duckPosition.y -= 25.0f * dt;
-        duckRotationOffset += 0.0f;
-        numPressed++;
-    }
-    if (Eend::InputManager::get().getLeftPress()) {
-        duckPosition.x -= 25.0f * dt;
-        duckRotationOffset += 90.0f;
-        numPressed++;
-    }
-    if (Eend::InputManager::get().getRightPress()) {
-        duckPosition.x += 25.0f * dt;
-        duckRotationOffset -= 90.0f;
-        numPressed++;
-    }
+    std::optional<Direction> currentDirection = getDirection();
+    lastDirection = currentDirection ? *currentDirection : lastDirection;
 
-    if (!terrain->colliding(Eend::Point2D(duckPosition.x, duckPosition.y))) {
-    } else if (!terrain->colliding(Eend::Point2D(oldDuckPosition.x, duckPosition.y))) {
-        duckPosition.x = oldDuckPosition.x;
-    } else if (!terrain->colliding(Eend::Point2D(duckPosition.x, oldDuckPosition.y))) {
-        duckPosition.y = oldDuckPosition.y;
-    } else {
-        duckPosition.x = oldDuckPosition.x;
-        duckPosition.y = oldDuckPosition.y;
-    }
-
-    if (numPressed) {
-        duckRotation = (duckRotationOffset / (float)numPressed);
-    } else {
-        duckRotation += 100.0f * dt;
-    }
+    handleDirection(dt, currentDirection, duckPosition, duckRotation);
+    handleCollision(terrain, oldDuckPosition, duckPosition);
 
     float heightAtPoint = terrain->heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
 
@@ -145,4 +114,95 @@ std::optional<Eend::Sphere> Duck::isKicking() {
         return Eend::Sphere(getPosition(), M_KICK_RADIUS);
     }
     return std::nullopt;
+}
+
+std::optional<Duck::Direction> Duck::getDirection() {
+    const bool upPress = Eend::InputManager::get().getUpPress();
+    const bool rightPress = Eend::InputManager::get().getRightPress();
+    const bool downPress = Eend::InputManager::get().getDownPress();
+    const bool leftPress = Eend::InputManager::get().getLeftPress();
+
+    if (upPress) {
+        if (rightPress) {
+            return UP_RIGHT;
+        }
+        if (leftPress) {
+            return UP_LEFT;
+        }
+        return UP;
+    }
+    if (downPress) {
+        if (rightPress) {
+            return DOWN_RIGHT;
+        }
+        if (leftPress) {
+            return DOWN_LEFT;
+        }
+        return DOWN;
+    }
+    if (rightPress) {
+        return RIGHT;
+    } else if (leftPress) {
+        return LEFT;
+    }
+    return std::nullopt;
+}
+
+void Duck::handleDirection(
+    float dt, std::optional<Duck::Direction> direction, Eend::Point& position, float& rotation) {
+
+    if (direction) {
+        switch (*direction) {
+        case UP:
+            position.y += 25.0f * dt;
+            rotation = 180;
+            break;
+        case UP_RIGHT:
+            position.y += 17.7f * dt;
+            position.x += 17.7f * dt;
+            rotation = 225;
+            break;
+        case RIGHT:
+            position.x += 25.0f * dt;
+            rotation = 270;
+            break;
+        case DOWN_RIGHT:
+            position.y -= 17.7f * dt;
+            position.x += 17.7f * dt;
+            rotation = 315;
+            break;
+        case DOWN:
+            position.y -= 25.0f * dt;
+            rotation = 0;
+            break;
+        case DOWN_LEFT:
+            position.y -= 17.7f * dt;
+            position.x -= 17.7f * dt;
+            rotation = 45;
+            break;
+        case LEFT:
+            position.x -= 25.0f * dt;
+            rotation = 90;
+            break;
+        case UP_LEFT:
+            position.y += 17.7f * dt;
+            position.x -= 17.7f * dt;
+            rotation = 135;
+            break;
+        }
+    } else {
+        rotation += 100.0f * dt;
+    }
+}
+
+void Duck::handleCollision(Terrain* terrain, Eend::Point oldPosition, Eend::Point& newPosition) {
+    if (!terrain->colliding(Eend::Point2D(newPosition.x, newPosition.y))) {
+    } else if (!terrain->colliding(Eend::Point2D(oldPosition.x, newPosition.y))) {
+        newPosition.x = oldPosition.x;
+    } else if (!terrain->colliding(Eend::Point2D(newPosition.x, oldPosition.y))) {
+        newPosition.y = oldPosition.y;
+    } else {
+        newPosition.x = oldPosition.x;
+        newPosition.y = oldPosition.y;
+    }
 }

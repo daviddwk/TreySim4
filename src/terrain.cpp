@@ -71,8 +71,10 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
                     averageHeight = currentHeight;
                     m_heightMap[h].push_back(scaleHeight(averageHeight));
                 }
+
                 averageHeight = (currentHeight + rightHeight) / 2;
                 m_heightMap[h].push_back(scaleHeight(averageHeight));
+
                 if (isEdgeXRight) {
                     averageHeight = currentHeight;
                     m_heightMap[h].push_back(scaleHeight(averageHeight));
@@ -83,8 +85,10 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
                     averageHeight = downHeight;
                     m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
                 }
+
                 averageHeight = (downHeight + rightDownHeight) / 2;
                 m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
+
                 if (isEdgeXRight) {
                     averageHeight = downHeight;
                     m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
@@ -94,8 +98,10 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
                 averageHeight = (currentHeight + downHeight) / 2;
                 m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
             }
+
             averageHeight = ((currentHeight + rightHeight + downHeight + rightDownHeight) / 4);
             m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
+
             if (isEdgeXRight) {
                 averageHeight = (currentHeight + downHeight) / 2;
                 m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
