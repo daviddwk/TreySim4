@@ -69,15 +69,13 @@ float Duck::getRadius() { return M_DUCK_RADIUS; }
 
 void Duck::update(float dt, Terrain* terrain) {
 
-    static Direction lastDirection = UP;
-
     Eend::Point duckPosition = getPosition();
     Eend::Point oldDuckPosition = duckPosition;
 
     static float duckRotation = 0.0f;
 
     std::optional<Direction> currentDirection = getDirection();
-    lastDirection = currentDirection ? *currentDirection : lastDirection;
+    m_direction = currentDirection ? *currentDirection : m_direction;
 
     handleDirection(dt, currentDirection, duckPosition, duckRotation);
     handleCollision(terrain, oldDuckPosition, duckPosition);
@@ -111,7 +109,38 @@ void Duck::update(float dt, Terrain* terrain) {
 
 std::optional<Eend::Sphere> Duck::isKicking() {
     if (m_kicking) {
-        return Eend::Sphere(getPosition(), M_KICK_RADIUS);
+        Eend::Point offsetPosition = m_position;
+        switch (m_direction) {
+        case UP:
+            offsetPosition.y += M_KICK_OFFSET;
+            break;
+        case UP_RIGHT:
+            offsetPosition.y += M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            offsetPosition.x += M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            break;
+        case RIGHT:
+            offsetPosition.x += M_KICK_OFFSET;
+            break;
+        case DOWN_RIGHT:
+            offsetPosition.y -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            offsetPosition.x += M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            break;
+        case DOWN:
+            offsetPosition.y -= M_KICK_OFFSET;
+            break;
+        case DOWN_LEFT:
+            offsetPosition.y -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            offsetPosition.x -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            break;
+        case LEFT:
+            offsetPosition.x -= M_KICK_OFFSET;
+            break;
+        case UP_LEFT:
+            offsetPosition.y += M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            offsetPosition.x -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            break;
+        }
+        return (Eend::Sphere(offsetPosition, M_KICK_RADIUS));
     }
     return std::nullopt;
 }
@@ -154,39 +183,39 @@ void Duck::handleDirection(
     if (direction) {
         switch (*direction) {
         case UP:
-            position.y += 25.0f * dt;
+            position.y += M_MOVE_SPEED * dt;
             rotation = 180;
             break;
         case UP_RIGHT:
-            position.y += 17.7f * dt;
-            position.x += 17.7f * dt;
+            position.y += M_MOVE_SPEED * (1 / (std::sqrt(2))) * dt;
+            position.x += M_MOVE_SPEED * (1 / (std::sqrt(2))) * dt;
             rotation = 225;
             break;
         case RIGHT:
-            position.x += 25.0f * dt;
+            position.x += M_MOVE_SPEED * dt;
             rotation = 270;
             break;
         case DOWN_RIGHT:
-            position.y -= 17.7f * dt;
-            position.x += 17.7f * dt;
+            position.y -= M_MOVE_SPEED * (1 / (std::sqrt(2))) * dt;
+            position.x += M_MOVE_SPEED * (1 / (std::sqrt(2))) * dt;
             rotation = 315;
             break;
         case DOWN:
-            position.y -= 25.0f * dt;
+            position.y -= M_MOVE_SPEED * dt;
             rotation = 0;
             break;
         case DOWN_LEFT:
-            position.y -= 17.7f * dt;
-            position.x -= 17.7f * dt;
+            position.y -= M_MOVE_SPEED * (1 / (std::sqrt(2))) * dt;
+            position.x -= M_MOVE_SPEED * (1 / (std::sqrt(2))) * dt;
             rotation = 45;
             break;
         case LEFT:
-            position.x -= 25.0f * dt;
+            position.x -= M_MOVE_SPEED * dt;
             rotation = 90;
             break;
         case UP_LEFT:
-            position.y += 17.7f * dt;
-            position.x -= 17.7f * dt;
+            position.y += M_MOVE_SPEED * (1 / (std::sqrt(2))) * dt;
+            position.x -= M_MOVE_SPEED * (1 / (std::sqrt(2))) * dt;
             rotation = 135;
             break;
         }
