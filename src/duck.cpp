@@ -9,7 +9,7 @@
 // have static last direction in update function
 // use this to get new diruction if there is one, and know that keys are actually being pressed
 
-static Particles::Behavior particleMovement =
+static Particles::Behavior jumpParticleMovement =
     [](int seed, std::chrono::milliseconds time) -> std::optional<Particles::Properties> {
     if (time.count() < 1000) {
         const unsigned int bits = 8;
@@ -28,6 +28,14 @@ static Particles::Behavior particleMovement =
 
         return std::make_optional(
             Particles::Properties(Eend::Point(x, y, z), Eend::Scale2D(scale * 2.0f)));
+    }
+    return std::nullopt;
+};
+
+static Particles::Behavior kickParticleMovement =
+    [](int seed, std::chrono::milliseconds time) -> std::optional<Particles::Properties> {
+    if (time.count() < 500) {
+        return std::make_optional(Particles::Properties(Eend::Point(0.0f), Eend::Scale2D(5.0f)));
     }
     return std::nullopt;
 };
@@ -86,7 +94,7 @@ void Duck::update(float dt, Terrain* terrain) {
     if (Eend::InputManager::get().getSpacePress() && !m_inAir) {
         m_kicking = true;
         Particles::get().create(
-            duckPosition, 5, std::filesystem::path("duck/boards/poo"), particleMovement);
+            duckPosition, 5, std::filesystem::path("duck/boards/poo"), jumpParticleMovement);
         m_inAir = true;
         m_upVelocity = -M_GRAVITY * 20.0f;
         m_height = heightAtPoint + 0.1f;
@@ -109,38 +117,40 @@ void Duck::update(float dt, Terrain* terrain) {
 
 std::optional<Eend::Sphere> Duck::isKicking() {
     if (m_kicking) {
-        Eend::Point offsetPosition = m_position;
+        Eend::Point kickPosition = m_position;
         switch (m_direction) {
         case UP:
-            offsetPosition.y += M_KICK_OFFSET;
+            kickPosition.y += M_KICK_OFFSET;
             break;
         case UP_RIGHT:
-            offsetPosition.y += M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            offsetPosition.x += M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            kickPosition.y += M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            kickPosition.x += M_KICK_OFFSET * (1.0f / std::sqrt(2));
             break;
         case RIGHT:
-            offsetPosition.x += M_KICK_OFFSET;
+            kickPosition.x += M_KICK_OFFSET;
             break;
         case DOWN_RIGHT:
-            offsetPosition.y -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            offsetPosition.x += M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            kickPosition.y -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            kickPosition.x += M_KICK_OFFSET * (1.0f / std::sqrt(2));
             break;
         case DOWN:
-            offsetPosition.y -= M_KICK_OFFSET;
+            kickPosition.y -= M_KICK_OFFSET;
             break;
         case DOWN_LEFT:
-            offsetPosition.y -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            offsetPosition.x -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            kickPosition.y -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            kickPosition.x -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
             break;
         case LEFT:
-            offsetPosition.x -= M_KICK_OFFSET;
+            kickPosition.x -= M_KICK_OFFSET;
             break;
         case UP_LEFT:
-            offsetPosition.y += M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            offsetPosition.x -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            kickPosition.y += M_KICK_OFFSET * (1.0f / std::sqrt(2));
+            kickPosition.x -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
             break;
         }
-        return (Eend::Sphere(offsetPosition, M_KICK_RADIUS));
+        Particles::get().create(
+            kickPosition, 5, std::filesystem::path("duck/boards/poo"), kickParticleMovement);
+        return (Eend::Sphere(kickPosition, M_KICK_RADIUS));
     }
     return std::nullopt;
 }
