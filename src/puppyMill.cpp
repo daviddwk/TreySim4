@@ -1,11 +1,8 @@
 #include "puppyMill.hpp"
 
-#include "collision.hpp"
-
 #include <glm/glm.hpp>
 
 #include <chrono>
-#include <print>
 
 float calcKnockback(float depthRatio) {
     // scale from 0 to 1   or   min to max knockback
@@ -27,13 +24,14 @@ void PuppyMill::damage(Duck* duck) {
     if (tickMs >= M_DMG_TICK_MS) {
         tickLast = now;
         for (Dog& dog : m_dogs) {
-            if (glm::length(dog.getPosition() - duck->getPosition2D()) < duck->getRadius()) {
+            const float distance = glm::length(dog.getPosition() - duck->getPosition2D());
+            const bool colliding = distance < duck->getRadius();
+            if (colliding) {
                 duck->health.damage(dog.getDamage());
             }
         }
     }
 
-    // TODO idk this is just structured bad
     if (duck->isKicking()) {
         for (Dog& dog : m_dogs) {
             duck->kick(dog);

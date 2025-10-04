@@ -4,8 +4,6 @@
 #define GLM_ENABLE_EXPERIMENTAL 1
 #include <glm/gtx/vector_angle.hpp>
 
-#include <print>
-
 bool pointOnRectangle(Eend::Point2D point, Eend::Rectangle rectangle) {
     float behindLeft = point.x - rectangle.upperLeft.x; // negative means in front
     float behindTop = point.y - rectangle.upperLeft.y;
@@ -27,37 +25,26 @@ std::optional<Eend::Vector> pointToSphereEdgeRelative(Eend::Point point, Eend::S
     return std::nullopt;
 }
 
-std::optional<Eend::Vector>
-pointToSphereSliceEdgeRelative(Eend::Point point, Eend::Sphere sphere, float angle, float spread) {
-
-    assert(spread < 360.0f);
-    assert(spread >= 0.0f);
-
-    assert(angle < 360);
-    assert(angle >= 0);
+std::optional<Eend::Vector> pointToSphereSliceEdgeRelative(
+    Eend::Point point, Eend::Sphere sphere, Eend::Angle angle, Eend::Angle spread) {
 
     const std::optional<Eend::Vector> pointToEdge = pointToSphereEdgeRelative(point, sphere);
 
     if (pointToEdge) {
         Eend::Vector2D pointToEdge2D = Eend::Vector2D(pointToEdge->x, pointToEdge->y);
         // angle always between 0 and 180
-        float toEdgeAngle = glm::degrees(glm::angle(Eend::Vector2D(0.0f, 1.0f), pointToEdge2D));
-        std::print("toEdgeAngle {}\n", toEdgeAngle);
+        Eend::Angle toEdgeAngle =
+            Eend::Angle(glm::degrees(glm::angle(Eend::Vector2D(0.0f, 1.0f), pointToEdge2D)));
         // fixing that so its >= 0 and < 360
         if (pointToEdge2D.x < 0.0f) {
-            toEdgeAngle = (180 - toEdgeAngle) + 180;
+            toEdgeAngle = (Eend::Angle(180) - toEdgeAngle) + Eend::Angle(180);
         }
-        std::print("toEdgeAngle360 {}\n", toEdgeAngle);
 
-        float maxAngle = angle + (spread / 2.0);
-        float minAngle = angle - (spread / 2.0);
-        maxAngle = (maxAngle >= 360.0f) ? (maxAngle - 360.0f) : maxAngle;
-        minAngle = (minAngle < 0.0f) ? (minAngle + 360.0f) : minAngle;
-        std::print("min max {} {}\n", minAngle, maxAngle);
+        Eend::Angle maxAngle = angle + (spread / 2.0);
+        Eend::Angle minAngle = angle - (spread / 2.0);
 
         // if it doesn't wray around 0
         if (maxAngle > minAngle) {
-            std::print("no wrap\n", toEdgeAngle);
             if ((toEdgeAngle < maxAngle) && (toEdgeAngle > minAngle)) {
                 return pointToEdge;
             }
