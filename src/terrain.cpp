@@ -359,7 +359,7 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
 
     const bool outsideTerrain = scaledX < 0 || scaledY > 0 ||
                                 scaledX > ((float)m_heightMap[0].size() - 1.0f) ||
-                                scaledY < (-(float)m_heightMap.size() - 1.0f);
+                                scaledY < (-(float)m_heightMap.size() + 1.0f);
     // could make this an optional
     if (outsideTerrain) {
         return 0.0f;
@@ -400,7 +400,6 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
 
         const size_t bottomLeftXIdx = (size_t)floor(scaledX);
         const size_t bottomLeftYIdx = (size_t)floor(-scaledY + 1);
-
         const Eend::Point bottomLeftPoint = Eend::Point(
             (float)bottomLeftXIdx * m_scale.x, (float)bottomLeftYIdx * -m_scale.y,
             m_heightMap[bottomLeftYIdx][bottomLeftXIdx]);

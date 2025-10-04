@@ -40,7 +40,9 @@ void Dog::update(float dt, Eend::Point2D approachPoint) {
     Eend::Entities::boards().getRef(m_bodyId)->setFlip(difference.x < 0.0f);
 
     m_position += m_knockback * dt;
-    m_position += glm::normalize(approachPoint - m_position) * M_SPEED * dt;
+    if (glm::length(difference) > 1.0f) {
+        m_position += glm::normalize(approachPoint - m_position) * M_SPEED * dt;
+    }
     m_knockback = m_knockback / (1 + (dt * M_KNOCKBACK_DECAY_FACTOR));
 
     // add some offsets for the dog visually here
