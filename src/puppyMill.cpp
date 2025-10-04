@@ -33,17 +33,10 @@ void PuppyMill::damage(Duck* duck) {
         }
     }
 
-    const std::optional<Eend::Sphere> duckCollision = duck->isKicking();
-    if (duckCollision) {
+    // TODO idk this is just structured bad
+    if (duck->isKicking()) {
         for (Dog& dog : m_dogs) {
-            // kick is a vector of the direction the dog was kicked with a length of
-            // penetration / radius (between 0 and 1)
-            std::optional<Eend::Point> kick =
-                pointToSphereEdgeRelative(dog.getPosition3d(), *duckCollision);
-            if (kick) {
-                std::print("kick:{}\n", glm::length(*kick));
-                dog.kick(*kick);
-            }
+            duck->kick(dog);
         }
     }
 }

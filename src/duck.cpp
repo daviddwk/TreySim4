@@ -3,6 +3,7 @@
 #include <cmath>
 #include <optional>
 
+#include "collision.hpp"
 #include "duck.hpp"
 #include "particles.hpp"
 
@@ -115,45 +116,7 @@ void Duck::update(float dt, Terrain* terrain) {
     setRotation(0.0f, 0.0f, duckRotation);
 }
 
-std::optional<Eend::Sphere> Duck::isKicking() {
-    if (m_kicking) {
-        Eend::Point kickPosition = m_position;
-        switch (m_direction) {
-        case UP:
-            kickPosition.y += M_KICK_OFFSET;
-            break;
-        case UP_RIGHT:
-            kickPosition.y += M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            kickPosition.x += M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            break;
-        case RIGHT:
-            kickPosition.x += M_KICK_OFFSET;
-            break;
-        case DOWN_RIGHT:
-            kickPosition.y -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            kickPosition.x += M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            break;
-        case DOWN:
-            kickPosition.y -= M_KICK_OFFSET;
-            break;
-        case DOWN_LEFT:
-            kickPosition.y -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            kickPosition.x -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            break;
-        case LEFT:
-            kickPosition.x -= M_KICK_OFFSET;
-            break;
-        case UP_LEFT:
-            kickPosition.y += M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            kickPosition.x -= M_KICK_OFFSET * (1.0f / std::sqrt(2));
-            break;
-        }
-        Particles::get().create(
-            kickPosition, 5, std::filesystem::path("duck/boards/poo"), kickParticleMovement);
-        return (Eend::Sphere(kickPosition, M_KICK_RADIUS));
-    }
-    return std::nullopt;
-}
+bool Duck::isKicking() { return m_kicking; }
 
 std::optional<Duck::Direction> Duck::getDirection() {
     const bool upPress = Eend::InputManager::get().getUpPress();
@@ -243,5 +206,34 @@ void Duck::handleCollision(Terrain* terrain, Eend::Point oldPosition, Eend::Poin
     } else {
         newPosition.x = oldPosition.x;
         newPosition.y = oldPosition.y;
+    }
+}
+
+float Duck::getAngle() {
+    switch (m_direction) {
+    case UP:
+        return 45.0f * 0.0f;
+    case UP_RIGHT:
+        return 45.0f * 1.0f;
+    case RIGHT:
+        return 45.0f * 2.0f;
+    case DOWN_RIGHT:
+        return 45.0f * 3.0f;
+    case DOWN:
+        return 45.0f * 4.0f;
+    case DOWN_LEFT:
+        return 45.0f * 5.0f;
+    case LEFT:
+        return 45.0f * 6.0f;
+    case UP_LEFT:
+        return 45.0f * 7.0f;
+    }
+}
+
+void Duck::kick(Dog& dog) {
+    std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
+        dog.getPosition3d(), Eend::Sphere(getPosition(), M_KICK_RADIUS), getAngle(), M_KICK_SPREAD);
+    if (kick) {
+        dog.kick(*kick);
     }
 }

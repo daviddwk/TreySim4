@@ -4,6 +4,7 @@
 #include <Eendgine/types.hpp>
 #include <GL/gl.h>
 
+#include "dog.hpp"
 #include "healthBar.hpp"
 #include "terrain.hpp"
 
@@ -20,8 +21,10 @@ class Duck {
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
         float getRadius();
+        float getAngle();
 
-        std::optional<Eend::Sphere> isKicking();
+        bool isKicking();
+        void kick(Dog& dog);
 
         void update(float dt, Terrain* terrain);
 
@@ -31,6 +34,7 @@ class Duck {
         static constexpr float M_MOVE_SPEED = 25.0f;
         static constexpr float M_KICK_RADIUS = 10.0f;
         static constexpr float M_KICK_OFFSET = 5.0f;
+        static constexpr float M_KICK_SPREAD = 120.0f;
         static constexpr float M_DUCK_RADIUS = 5.0f;
         static constexpr float M_GRAVITY = -1.0f; // only ducks believe in gravity
 
