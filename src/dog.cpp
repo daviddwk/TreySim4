@@ -13,7 +13,7 @@ Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terr
     boardRef->setPosition(Eend::Point(position.x, terrain->heightAtPoint(position), position.y));
 }
 
-Dog::~Dog() { Eend::Entities::boards().erase(m_bodyId); }
+void Dog::eraseEntities() { Eend::Entities::boards().erase(m_bodyId); }
 
 void Dog::setSpeed(float speed) { m_speed = speed; }
 

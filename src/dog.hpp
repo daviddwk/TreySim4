@@ -10,7 +10,7 @@ namespace Eend = Eendgine;
 class Dog {
     public:
         Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain);
-        ~Dog();
+        void eraseEntities();
 
         void setSpeed(float speed);
         Eend::Point2D getPosition();

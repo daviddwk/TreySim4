@@ -11,13 +11,17 @@ float calcKnockback(float depthRatio) {
 }
 
 PuppyMill::PuppyMill(Terrain* terrain) : m_terrain(terrain) {
-    // SPAWN SOME DOGS
+    m_dogs.reserve(10);
     m_dogs.emplace_back(Eend::Point2D(0.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
-    // m_dogs.emplace_back(Eend::Point2D(10.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
-    // m_dogs.emplace_back(Eend::Point2D(0.0f, 10.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
+    m_dogs.emplace_back(Eend::Point2D(10.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
+    m_dogs.emplace_back(Eend::Point2D(0.0f, 10.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
 }
 
-PuppyMill::~PuppyMill() {}
+PuppyMill::~PuppyMill() {
+    for (Dog& dog : m_dogs) {
+        dog.eraseEntities();
+    }
+}
 
 void PuppyMill::damage(Duck* duck) {
     static auto tickLast = std::chrono::steady_clock::now();
@@ -42,6 +46,7 @@ void PuppyMill::damage(Duck* duck) {
     }
     for (Dog& dog : m_dogs) {
         if (dog.getHealth() == 0) {
+            // use kill method to make dog ded, but still use puppymill to delete when time
             // std::print("KILL\n");
             // kill
         }
