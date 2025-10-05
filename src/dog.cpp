@@ -5,10 +5,11 @@
 namespace Eend = Eendgine;
 
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
-    : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards/walk"))),
+    : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards"))),
       m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_terrain(terrain),
       m_time(0.0f), m_health(1) {
     Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
+    boardRef->setStrip("walk");
     boardRef->setScale(scale);
     boardRef->setPosition(Eend::Point(position.x, terrain->heightAtPoint(position), position.y));
 }
@@ -26,8 +27,9 @@ Eend::Point Dog::getPosition3d() {
 unsigned int Dog::getDamage() { return M_DAMAGE; }
 
 void Dog::giveDamage(unsigned int damage) {
-    if (damage > m_health) {
+    if (damage >= m_health) {
         m_health = 0;
+        Eend::Entities::boards().getRef(m_bodyId)->setStrip("dead");
     } else {
         m_health -= damage;
     }
@@ -44,14 +46,18 @@ void Dog::kick(Eend::Point kick) {
 
 void Dog::update(float dt, Eend::Point2D approachPoint) {
     m_time += dt;
-    const glm::vec2 difference = approachPoint - m_position;
     Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
-    boardRef->setFlip(difference.x < 0.0f);
 
     m_position += m_knockback * dt;
-    if (glm::length(difference) > M_STOP_DISTANCE) {
-        m_position += glm::normalize(approachPoint - m_position) * M_SPEED * dt;
+
+    if (m_health != 0) {
+        const glm::vec2 difference = approachPoint - m_position;
+        boardRef->setFlip(difference.x < 0.0f);
+        if (glm::length(difference) > M_STOP_DISTANCE) {
+            m_position += glm::normalize(approachPoint - m_position) * M_SPEED * dt;
+        }
     }
+
     m_knockback = m_knockback / (1 + (dt * M_KNOCKBACK_DECAY_FACTOR));
 
     // add some offsets for the dog visually here
