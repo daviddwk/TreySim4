@@ -17,6 +17,9 @@ class Dog {
         Eend::Point getPosition3d();
 
         unsigned int getDamage();
+        void giveDamage(unsigned int damage);
+
+        unsigned int getHealth();
 
         void kick(Eend::Point kick);
 
@@ -30,11 +33,13 @@ class Dog {
         static constexpr float M_KNOCKBACK_MIN = M_SPEED;
         static constexpr float M_KNOCKBACK_DECAY_FACTOR = 1.0f;
         static constexpr float M_UP_OFFSET = 2.0f;
+        static constexpr float M_STOP_DISTANCE = 3.0f;
 
-        Eend::BoardId m_bodyId;
+        const Eend::BoardId m_bodyId;
         Eend::Point2D m_position;
         float m_speed;
         Eend::Point2D m_knockback;
         Terrain* m_terrain;
         float m_time;
+        unsigned int m_health;
 };

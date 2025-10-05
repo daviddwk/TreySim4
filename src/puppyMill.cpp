@@ -1,6 +1,7 @@
 #include "puppyMill.hpp"
 
 #include <glm/glm.hpp>
+#include <print>
 
 #include <chrono>
 
@@ -12,6 +13,8 @@ float calcKnockback(float depthRatio) {
 PuppyMill::PuppyMill(Terrain* terrain) : m_terrain(terrain) {
     // SPAWN SOME DOGS
     m_dogs.emplace_back(Eend::Point2D(0.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
+    // m_dogs.emplace_back(Eend::Point2D(10.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
+    // m_dogs.emplace_back(Eend::Point2D(0.0f, 10.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
 }
 
 PuppyMill::~PuppyMill() {}
@@ -35,6 +38,12 @@ void PuppyMill::damage(Duck* duck) {
     if (duck->isKicking()) {
         for (Dog& dog : m_dogs) {
             duck->kick(dog);
+        }
+    }
+    for (Dog& dog : m_dogs) {
+        if (dog.getHealth() == 0) {
+            // std::print("KILL\n");
+            // kill
         }
     }
 }

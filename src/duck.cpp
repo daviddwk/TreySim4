@@ -235,5 +235,6 @@ void Duck::kick(Dog& dog) {
         dog.getPosition3d(), Eend::Sphere(getPosition(), M_KICK_RADIUS), getAngle(), M_KICK_SPREAD);
     if (kick) {
         dog.kick(*kick);
+        dog.giveDamage(1);
     }
 }
