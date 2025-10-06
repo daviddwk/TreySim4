@@ -1,3 +1,4 @@
+#include "Eendgine/types.hpp"
 #include "dog.hpp"
 
 #include <glm/vector_relational.hpp>
@@ -7,7 +8,7 @@ namespace Eend = Eendgine;
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
     : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards"))),
       m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_terrain(terrain),
-      m_time(0.0f), m_health(1) {
+      m_time(0.0f), m_health(1), m_deadTime(0.0f), m_delete(false) {
     Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
     boardRef->setStrip("walk");
     boardRef->setScale(scale);
@@ -37,6 +38,8 @@ void Dog::giveDamage(unsigned int damage) {
 
 unsigned int Dog::getHealth() { return m_health; }
 
+bool Dog::shouldDelete() { return m_delete; }
+
 void Dog::kick(Eend::Point kick) {
     // make kick power scale exponentially
     float kickFactor = glm::pow(glm::length(kick), 2.0f);
@@ -46,6 +49,9 @@ void Dog::kick(Eend::Point kick) {
 
 void Dog::update(float dt, Eend::Point2D approachPoint) {
     m_time += dt;
+    if (m_health == 0) {
+        m_deadTime += dt;
+    }
     Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
 
     m_position += m_knockback * dt;
@@ -59,6 +65,14 @@ void Dog::update(float dt, Eend::Point2D approachPoint) {
     }
 
     m_knockback = m_knockback / (1 + (dt * M_KNOCKBACK_DECAY_FACTOR));
+
+    if (m_health == 0 && (glm::length(m_knockback) < M_KNOCKBACK_STOP)) {
+        m_knockback = Eend::Vector2D(0.0f);
+    }
+
+    if (m_deadTime > M_DELETE_AFTER_DEATH_TIME) {
+        m_delete = true;
+    }
 
     // add some offsets for the dog visually here
     boardRef->setPosition(

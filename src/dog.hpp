@@ -20,6 +20,7 @@ class Dog {
         void giveDamage(unsigned int damage);
 
         unsigned int getHealth();
+        bool shouldDelete();
 
         void kick(Eend::Point kick);
 
@@ -32,14 +33,18 @@ class Dog {
         static constexpr float M_KNOCKBACK_MAX = M_SPEED * 5.0f;
         static constexpr float M_KNOCKBACK_MIN = M_SPEED;
         static constexpr float M_KNOCKBACK_DECAY_FACTOR = 1.0f;
+        static constexpr float M_KNOCKBACK_STOP = 5.0;
         static constexpr float M_UP_OFFSET = 2.0f;
         static constexpr float M_STOP_DISTANCE = 3.0f;
+        static constexpr float M_DELETE_AFTER_DEATH_TIME = 10.0f;
 
-        const Eend::BoardId m_bodyId;
+        Eend::BoardId m_bodyId;
         Eend::Point2D m_position;
         float m_speed;
-        Eend::Point2D m_knockback;
+        Eend::Vector2D m_knockback;
         Terrain* m_terrain;
         float m_time;
         unsigned int m_health;
+        float m_deadTime;
+        bool m_delete;
 };

@@ -11,7 +11,6 @@ float calcKnockback(float depthRatio) {
 }
 
 PuppyMill::PuppyMill(Terrain* terrain) : m_terrain(terrain) {
-    m_dogs.reserve(10);
     m_dogs.emplace_back(Eend::Point2D(0.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
     m_dogs.emplace_back(Eend::Point2D(10.0f, 0.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
     m_dogs.emplace_back(Eend::Point2D(0.0f, 10.0f), Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
@@ -33,7 +32,7 @@ void PuppyMill::damage(Duck* duck) {
         for (Dog& dog : m_dogs) {
             const float distance = glm::length(dog.getPosition() - duck->getPosition2D());
             const bool colliding = distance < duck->getRadius();
-            if (colliding) {
+            if (colliding && (dog.getHealth() > 0)) {
                 duck->health.damage(dog.getDamage());
             }
         }
@@ -44,11 +43,11 @@ void PuppyMill::damage(Duck* duck) {
             duck->kick(dog);
         }
     }
-    for (Dog& dog : m_dogs) {
-        if (dog.getHealth() == 0) {
-            // use kill method to make dog ded, but still use puppymill to delete when time
-            // std::print("KILL\n");
-            // kill
+    for (std::vector<Dog>::size_type dogIdx = m_dogs.size() - 1; dogIdx < m_dogs.size(); --dogIdx) {
+        if (m_dogs[dogIdx].shouldDelete()) {
+            m_dogs[dogIdx].eraseEntities();
+            m_dogs.erase(m_dogs.begin() + dogIdx);
+            break;
         }
     }
 }
