@@ -1,3 +1,4 @@
+#include "Eendgine/board.hpp"
 #include "Eendgine/types.hpp"
 #include "dog.hpp"
 
@@ -8,7 +9,7 @@ namespace Eend = Eendgine;
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
     : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards"))),
       m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_terrain(terrain),
-      m_time(0.0f), m_health(1), m_deadTime(0.0f), m_delete(false) {
+      m_animTime(0.0f), m_health(1), m_deadTime(0.0f), m_delete(false) {
     Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
     boardRef->setStrip("walk");
     boardRef->setScale(scale);
@@ -30,7 +31,9 @@ unsigned int Dog::getDamage() { return M_DAMAGE; }
 void Dog::giveDamage(unsigned int damage) {
     if (damage >= m_health) {
         m_health = 0;
-        Eend::Entities::boards().getRef(m_bodyId)->setStrip("dead");
+        Eendgine::Board* board = Eend::Entities::boards().getRef(m_bodyId);
+        board->setStrip("dead");
+        board->setStripIdx(0);
     } else {
         m_health -= damage;
     }
@@ -48,11 +51,24 @@ void Dog::kick(Eend::Point kick) {
 }
 
 void Dog::update(float dt, Eend::Point2D approachPoint) {
-    m_time += dt;
+
+    Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
+
+    m_animTime += dt;
     if (m_health == 0) {
         m_deadTime += dt;
     }
-    Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
+    if (m_health > 0) {
+        if (m_animTime > M_ANIM_INCREMENT_TIME) {
+            m_animTime = 0;
+            boardRef->nextStripIdx();
+        }
+    } else {
+        if ((m_deadTime > M_BLINK_AFTER_DEATH_TIME) && (m_animTime > M_ANIM_INCREMENT_TIME)) {
+            m_animTime = 0;
+            boardRef->nextStripIdx();
+        }
+    }
 
     m_position += m_knockback * dt;
 
@@ -78,8 +94,4 @@ void Dog::update(float dt, Eend::Point2D approachPoint) {
     boardRef->setPosition(
         Eend::Point(
             m_position.x, m_position.y, m_terrain->heightAtPoint(m_position) + M_UP_OFFSET));
-    if (m_time > M_ANIM_INCREMENT_TIME) {
-        m_time = 0;
-        boardRef->nextStripIdx();
-    }
 }
