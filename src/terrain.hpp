@@ -15,8 +15,8 @@ class Terrain {
         void update();
         bool colliding(Eend::Point2D point);
 
-        int getHeight() { return m_height; };
-        int getWidth() { return m_width; };
+        float getHeight() { return static_cast<float>(m_height) * m_scale.x; }
+        float getWidth() { return static_cast<float>(m_width) * m_scale.y; }
 
         float heightAtPoint(Eend::Point2D point);
         Eend::Point positionAtTile(float tileXIdx, float tileYIdx, float heightOffset);

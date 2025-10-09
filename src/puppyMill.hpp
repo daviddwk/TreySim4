@@ -12,6 +12,9 @@ class PuppyMill {
 
     private:
         static constexpr int M_DMG_TICK_MS = 200;
+        static constexpr float M_SPAWN_TIME = 1.0f;
+
         Terrain* m_terrain;
         std::vector<Dog> m_dogs;
+        float m_time;
 };
