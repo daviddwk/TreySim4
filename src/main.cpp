@@ -130,8 +130,6 @@ int main() {
         duck.update(dt, &testTerrain);
         testTerrain.update();
 
-        puppyMill.damage(&duck);
-
         puppyMill.update(dt, &duck);
         TextBoxQueue::get().update();
 

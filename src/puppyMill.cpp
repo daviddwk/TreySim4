@@ -19,6 +19,31 @@ PuppyMill::~PuppyMill() {
     }
 }
 
+void PuppyMill::update(float dt, Duck* duck) {
+    for (Dog& dog : m_dogs) {
+        dog.update(dt, duck->getPosition());
+    }
+    damage(duck);
+    spawn();
+}
+
+void PuppyMill::spawn() {
+    static auto tickLast = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now();
+    auto tickMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - tickLast).count();
+    if (tickMs >= M_SPAWN_TIME_MS) {
+        tickLast = now;
+        Eend::Point2D spawnPosition = Eend::Point2D(0.0f);
+        if (Eend::randomRange(0, 1)) {
+            spawnPosition.x = m_terrain->getWidth();
+        }
+        if (Eend::randomRange(0, 1)) {
+            spawnPosition.y = -m_terrain->getHeight();
+        }
+        m_dogs.emplace_back(spawnPosition, Eend::Scale2D(5.0f, 5.0f), 0.0f, m_terrain);
+    }
+}
+
 void PuppyMill::damage(Duck* duck) {
     static auto tickLast = std::chrono::steady_clock::now();
     auto now = std::chrono::steady_clock::now();
@@ -46,23 +71,5 @@ void PuppyMill::damage(Duck* duck) {
             m_dogs.erase(m_dogs.begin() + dogIdx);
             break;
         }
-    }
-}
-
-void PuppyMill::update(float dt, Duck* duck) {
-    m_time += dt;
-    for (Dog& dog : m_dogs) {
-        dog.update(dt, duck->getPosition());
-    }
-    if (m_time >= M_SPAWN_TIME) {
-        Eend::Point2D spawnPosition = Eend::Point2D(0.0f);
-        if (Eend::randomRange(0, 1)) {
-            spawnPosition.x = m_terrain->getWidth();
-        }
-        if (Eend::randomRange(0, 1)) {
-            spawnPosition.y = -m_terrain->getHeight();
-        }
-        m_dogs.emplace_back(spawnPosition, Eend::Scale2D(5.0f, 5.0f), 0.0f, m_terrain);
-        m_time = 0;
     }
 }

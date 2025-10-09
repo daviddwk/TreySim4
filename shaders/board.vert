@@ -9,7 +9,7 @@ uniform mat4 projection;
 uniform mat4 transform;
 uniform uint frameIdx;
 uniform uint frameLen;
-uniform float flip;
+uniform bool flip; // bool really
 
 out vec2 vertUV;
 out vec4 vertColor;
@@ -17,5 +17,9 @@ out vec4 vertColor;
 void main() {
     gl_Position = projection * view * transform * vec4(aPos, 1.0f);
     vertColor = aColor;
-    vertUV = vec2(flip * ((1.0f / float(frameLen)) * (float(frameIdx) + aUV.x)), -aUV.y);
+    if (!flip) {
+        vertUV = vec2((1.0f / float(frameLen)) * (float(frameIdx) + aUV.x), -aUV.y);
+    } else {
+        vertUV = vec2((1.0f / float(frameLen)) * (float(frameIdx) - aUV.x + 1), -aUV.y);
+    }
 }

@@ -7,14 +7,15 @@ class PuppyMill {
         PuppyMill(Terrain* terrain);
         ~PuppyMill();
 
-        void damage(Duck* duck); // should take in player class
         void update(float dt, Duck* duck);
 
     private:
+        void damage(Duck* duck);
+        void spawn();
+
         static constexpr int M_DMG_TICK_MS = 200;
-        static constexpr float M_SPAWN_TIME = 1.0f;
+        static constexpr float M_SPAWN_TIME_MS = 1000;
 
         Terrain* m_terrain;
         std::vector<Dog> m_dogs;
-        float m_time;
 };
