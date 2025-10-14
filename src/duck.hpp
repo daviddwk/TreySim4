@@ -6,6 +6,7 @@
 
 #include "dog.hpp"
 #include "healthBar.hpp"
+#include "particles.hpp"
 #include "terrain.hpp"
 
 namespace Eend = Eendgine;
@@ -46,6 +47,7 @@ class Duck {
             float dt, std::optional<Duck::Direction> direction, Eend::Point& position,
             float& rotation);
         void handleCollision(Terrain* terrain, Eend::Point oldPosition, Eend::Point& newPosition);
+        Particles::Behavior getKickParticleMovement(Duck::Direction direction);
 
         Eend::StatueId m_bodyId;
         Eend::BoardId m_headId;

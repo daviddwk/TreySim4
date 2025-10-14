@@ -14,10 +14,11 @@ class Particles {
     public:
         class Properties {
             public:
-                Properties(Eend::Point relativePosition, Eend::Scale2D scale)
-                    : relativePosition(relativePosition), scale(scale) {}
+                Properties(Eend::Point relativePosition, Eend::Scale2D scale, unsigned int stripIdx)
+                    : relativePosition(relativePosition), scale(scale), stripIdx(stripIdx) {}
                 Eend::Point relativePosition;
                 Eend::Scale2D scale;
+                unsigned int stripIdx;
         };
         using Behavior =
             std::function<std::optional<Properties>(int32_t, std::chrono::milliseconds)>;

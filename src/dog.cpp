@@ -9,7 +9,7 @@ namespace Eend = Eendgine;
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
     : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards"))),
       m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_terrain(terrain),
-      m_animTime(0.0f), m_health(1), m_deadTime(0.0f), m_delete(false) {
+      m_animTime(0.0f), m_health(M_HEALTH), m_deadTime(0.0f), m_delete(false) {
     Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
     boardRef->setStrip("walk");
     boardRef->setScale(scale);
@@ -34,6 +34,7 @@ void Dog::giveDamage(unsigned int damage) {
         Eendgine::Board* board = Eend::Entities::boards().getRef(m_bodyId);
         board->setStrip("dead");
         board->setStripIdx(0);
+        m_knockback *= M_KNOCKBACK_DEAD_MULTIPLIER;
     } else {
         m_health -= damage;
     }

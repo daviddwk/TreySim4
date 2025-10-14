@@ -27,14 +27,19 @@ class Dog {
         void update(float dt, Eend::Point2D approachPoint);
 
     private:
-        static constexpr float M_SPEED = 20.0f;
+        static constexpr float M_SPEED = 15.0f;
         static constexpr unsigned int M_DAMAGE = 2;
-        static constexpr float M_ANIM_INCREMENT_TIME = 0.25f;
-        static constexpr float M_QUICK_INCREMENT_TIME = 0.125f;
-        static constexpr float M_KNOCKBACK_MAX = M_SPEED * 2.0f;
+        static constexpr unsigned int M_HEALTH = 3;
+
+        static constexpr float M_KNOCKBACK_MAX = M_SPEED * 4.0f;
         static constexpr float M_KNOCKBACK_MIN = M_SPEED;
         static constexpr float M_KNOCKBACK_DECAY_FACTOR = 1.0f;
         static constexpr float M_KNOCKBACK_STOP = 5.0;
+        static constexpr float M_KNOCKBACK_DEAD_MULTIPLIER = 1.5f;
+
+        static constexpr float M_ANIM_INCREMENT_TIME = 0.25f;
+        static constexpr float M_QUICK_INCREMENT_TIME = 0.125f;
+
         static constexpr float M_UP_OFFSET = 2.0f;
         static constexpr float M_STOP_DISTANCE = 3.0f;
 

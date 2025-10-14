@@ -73,10 +73,11 @@ void Particles::update(const float dt) {
                     cloudIsAlive = true;
                     Eend::Board* boardRef = Eend::Entities::boards().getRef(particle.id);
 
-                    Eend::Point position = properties->relativePosition + cloudIter->origin;
+                    const Eend::Point position = properties->relativePosition + cloudIter->origin;
 
                     boardRef->setPosition(position);
                     boardRef->setScale(properties->scale);
+                    boardRef->setStripIdx(properties->stripIdx);
                 } else {
                     particle.isAlive = false;
                     Eend::Entities::boards().erase(particle.id);
