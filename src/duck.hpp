@@ -16,13 +16,13 @@ class Duck {
         Duck();
         ~Duck();
 
+        void setRotation(Eend::Angle rotation);
         void setPosition(Eend::Point position);
-        void setRotation(float x, float y, float z);
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
         float getRadius();
-        float getAngle();
+        Eend::Angle getAngle();
 
         bool isKicking();
         void kick(Dog& dog);
@@ -33,7 +33,7 @@ class Duck {
 
     private:
         static constexpr float M_MOVE_SPEED = 25.0f;
-        static constexpr float M_KICK_RADIUS = 10.0f;
+        static constexpr float M_KICK_RADIUS = 15.0f;
         static constexpr float M_KICK_OFFSET = 5.0f;
         static constexpr float M_KICK_SPREAD = 120.0f;
         static constexpr float M_DUCK_RADIUS = 5.0f;
@@ -43,17 +43,14 @@ class Duck {
         std::optional<Direction> getDirection();
 
         void handleMovement(float dt, std::optional<Duck::Direction> direction);
-        void handleDirection(
-            float dt, std::optional<Duck::Direction> direction, Eend::Point& position,
-            float& rotation);
-        void handleCollision(Terrain* terrain, Eend::Point oldPosition, Eend::Point& newPosition);
+        void updatePosition(float dt);
+        void handleCollision(Terrain* terrain, Eend::Point& oldPosition);
         Particles::Behavior getKickParticleMovement(Duck::Direction direction);
 
         Eend::StatueId m_bodyId;
         Eend::BoardId m_headId;
         Eend::Point m_position;
-        float m_rotX;
-        float m_rotY;
+        Eend::Angle m_rotation;
 
         bool m_kicking;
         bool m_inAir;
