@@ -3,7 +3,6 @@
 #include <optional>
 
 #include "collision.hpp"
-#include "particles.hpp"
 
 #include "duck.hpp"
 #include "duckParticles.hpp"
@@ -52,10 +51,8 @@ void Duck::update(float dt, Terrain* terrain) {
     m_kicking = false;
     if (Eend::InputManager::get().getSpacePress() && !m_inAir) {
         m_kicking = true;
-        Particles::get().create(
-            m_position, 2, PARTICLE_KICK_TEXTURE_PATH, getKickParticleMovement(m_direction));
-        Particles::get().create(
-            m_position, 5, PARTICLE_JUMP_TEXTURE_PATH, getJumpParticleMovement());
+        Eend::Particles::get().create(m_position, 2, getKickParticleProperties(m_direction));
+        Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
         m_inAir = true;
         m_upVelocity = -M_GRAVITY * 20.0f;
         m_height = heightAtPoint + 0.1f;
@@ -190,7 +187,10 @@ Eend::Angle Duck::getAngle() {
 
 void Duck::kick(Dog& dog) {
     std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
-        dog.getPosition3d(), Eend::Sphere(getPosition(), M_KICK_RADIUS), m_rotation, M_KICK_SPREAD);
+        dog.getPosition3d(),
+        Eend::Sphere(getPosition(), M_KICK_RADIUS),
+        m_rotation,
+        M_KICK_SPREAD);
     if (kick) {
         dog.kick(*kick);
         dog.giveDamage(1);

@@ -6,7 +6,6 @@
 
 #include "dog.hpp"
 #include "healthBar.hpp"
-#include "particles.hpp"
 #include "terrain.hpp"
 
 namespace Eend = Eendgine;

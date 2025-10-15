@@ -8,6 +8,7 @@
 #include <Eendgine/textureCache.hpp>
 #include <Eendgine/types.hpp>
 #include <Eendgine/window.hpp>
+#include <Eendgine/particles.hpp>
 
 #include <cmath>
 #include <optional>
@@ -16,11 +17,8 @@
 #include <filesystem>
 #include <print>
 
-#include "Eendgine/panel.hpp"
-#include "dog.hpp"
 #include "duck.hpp"
 #include "healthBar.hpp"
-#include "particles.hpp"
 #include "puppyMill.hpp"
 #include "terrain.hpp"
 #include "text.hpp"
@@ -38,7 +36,7 @@ int main() {
     Eend::InputManager::construct();
     Eend::FrameLimiter::construct(60.0f, 20.0f);
     Eend::Entities::construct();
-    Particles::construct();
+    Eend::Particles::construct();
 
     Eend::Shaders shaders(
         Eend::ShaderProgram("shaders/panel.vert", "shaders/panel.frag"),
@@ -49,7 +47,8 @@ int main() {
 
     Eend::Camera2D hudCamera(screenWidth, screenHeight);
     Eend::Camera3D sceneCamera(
-        (float)screenWidth / (float)screenHeight, Eend::Point(-20.0f, 5.0f, 0.0f),
+        (float)screenWidth / (float)screenHeight,
+        Eend::Point(-20.0f, 5.0f, 0.0f),
         Eend::Point(3.0f, 0.0f, 3.0f));
 
     TextBoxQueue::construct();
@@ -76,10 +75,12 @@ int main() {
     TextBoxQueue::get().queue("duck", Font::DANIEL, "Help meeeee!", 3.0f, true);
     TextBoxQueue::get().queue("dog", Font::DANIEL, "It's over for you bucko.", 3.0f, false);
     TextBoxQueue::get().queue(
-        "duck", Font::DANIEL,
+        "duck",
+        Font::DANIEL,
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
-        5.0f, true);
+        5.0f,
+        true);
 
     while (!Eend::InputManager::get().getShouldClose()) {
         float dt = Eend::FrameLimiter::get().deltaTime;
@@ -121,7 +122,7 @@ int main() {
                 Eend::InputManager::get().getMiddleClick()));
         // clang-format on
 
-        Particles::get().update(dt);
+        Eend::Particles::get().update(dt);
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
         Eend::Screen::get().render(shaders.getShader(Eend::Shader::SCREEN));
 
@@ -144,7 +145,7 @@ int main() {
         Eend::FrameLimiter::get().stopInterval();
     }
     TextBoxQueue::destruct();
-    Particles::destruct();
+    Eend::Particles::destruct();
     Eend::Entities::destruct();
     Eend::Screen::destruct();
     Eend::Window::destruct();

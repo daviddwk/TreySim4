@@ -5,3 +5,6 @@ AlignAfterOpenBracket: AlwaysBreak
 ColumnLimit: 100
 IndentAccessModifiers: true
 PointerAlignment: Left
+BinPackArguments: false
+AllowAllArgumentsOnNextLine: false
+AllowShortIfStatemntsOnASingleLine: true
