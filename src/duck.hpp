@@ -30,6 +30,7 @@ class Duck {
         void update(float dt, Terrain* terrain);
 
         HealthBar health;
+        enum Direction { UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT };
 
     private:
         static constexpr float M_MOVE_SPEED = 25.0f;
@@ -39,13 +40,11 @@ class Duck {
         static constexpr float M_DUCK_RADIUS = 5.0f;
         static constexpr float M_GRAVITY = -1.0f; // only ducks believe in gravity
 
-        enum Direction { UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT };
         std::optional<Direction> getDirection();
 
         void handleMovement(float dt, std::optional<Duck::Direction> direction);
         void updatePosition(float dt);
         void handleCollision(Terrain* terrain, Eend::Point& oldPosition);
-        Particles::Behavior getKickParticleMovement(Duck::Direction direction);
 
         Eend::StatueId m_bodyId;
         Eend::BoardId m_headId;
