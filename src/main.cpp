@@ -86,7 +86,7 @@ int main() {
 
     Eend::Audio::get().playTrack(
         "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
-        100);
+        50.0f);
 
     while (!Eend::InputManager::get().getShouldClose()) {
         float dt = Eend::FrameLimiter::get().deltaTime;

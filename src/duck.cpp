@@ -59,7 +59,7 @@ void Duck::update(float dt, Terrain* terrain) {
 
         Eend::Particles::get().create(m_position, 2, getKickParticleProperties(m_direction));
         Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
-        Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100);
+        Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
     } else if (m_inAir) {
         m_upVelocity += M_GRAVITY;
         m_height += (m_upVelocity * dt);
