@@ -1,6 +1,8 @@
+#include <Eendgine/audio.hpp>
 #include <Eendgine/inputManager.hpp>
 
 #include <optional>
+#include <print>
 
 #include "collision.hpp"
 
@@ -51,11 +53,13 @@ void Duck::update(float dt, Terrain* terrain) {
     m_kicking = false;
     if (Eend::InputManager::get().getSpacePress() && !m_inAir) {
         m_kicking = true;
-        Eend::Particles::get().create(m_position, 2, getKickParticleProperties(m_direction));
-        Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
         m_inAir = true;
         m_upVelocity = -M_GRAVITY * 20.0f;
         m_height = heightAtPoint + 0.1f;
+
+        Eend::Particles::get().create(m_position, 2, getKickParticleProperties(m_direction));
+        Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
+        Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100);
     } else if (m_inAir) {
         m_upVelocity += M_GRAVITY;
         m_height += (m_upVelocity * dt);
@@ -93,28 +97,17 @@ std::optional<Duck::Direction> Duck::getDirection() {
     const bool leftPress = Eend::InputManager::get().getLeftPress();
 
     if (upPress) {
-        if (rightPress) {
-            return UP_RIGHT;
-        }
-        if (leftPress) {
-            return UP_LEFT;
-        }
+        if (rightPress) return UP_RIGHT;
+        if (leftPress) return UP_LEFT;
         return UP;
     }
     if (downPress) {
-        if (rightPress) {
-            return DOWN_RIGHT;
-        }
-        if (leftPress) {
-            return DOWN_LEFT;
-        }
+        if (rightPress) return DOWN_RIGHT;
+        if (leftPress) return DOWN_LEFT;
         return DOWN;
     }
-    if (rightPress) {
-        return RIGHT;
-    } else if (leftPress) {
-        return LEFT;
-    }
+    if (rightPress) return RIGHT;
+    if (leftPress) return LEFT;
     return std::nullopt;
 }
 

@@ -1,14 +1,15 @@
+#include <Eendgine/audio.hpp>
 #include <Eendgine/camera.hpp>
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/inputManager.hpp>
+#include <Eendgine/particles.hpp>
 #include <Eendgine/screen.hpp>
 #include <Eendgine/shader.hpp>
 #include <Eendgine/shaders.hpp>
 #include <Eendgine/textureCache.hpp>
 #include <Eendgine/types.hpp>
 #include <Eendgine/window.hpp>
-#include <Eendgine/particles.hpp>
 
 #include <cmath>
 #include <optional>
@@ -33,6 +34,7 @@ int main() {
 
     Eend::Window::construct(screenWidth, screenHeight, "Quack");
     Eend::Screen::construct(screenWidth, screenHeight);
+    Eend::Audio::construct();
     Eend::InputManager::construct();
     Eend::FrameLimiter::construct(60.0f, 20.0f);
     Eend::Entities::construct();
@@ -81,6 +83,10 @@ int main() {
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f,
         true);
+
+    Eend::Audio::get().playTrack(
+        "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
+        100);
 
     while (!Eend::InputManager::get().getShouldClose()) {
         float dt = Eend::FrameLimiter::get().deltaTime;
@@ -147,6 +153,7 @@ int main() {
     TextBoxQueue::destruct();
     Eend::Particles::destruct();
     Eend::Entities::destruct();
+    Eend::Audio::destruct();
     Eend::Screen::destruct();
     Eend::Window::destruct();
     Eend::FrameLimiter::destruct();

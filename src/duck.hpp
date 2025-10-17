@@ -39,6 +39,9 @@ class Duck {
         static constexpr float M_DUCK_RADIUS = 5.0f;
         static constexpr float M_GRAVITY = -1.0f; // only ducks believe in gravity
 
+        const std::filesystem::path M_JUMP_NOISE_PATH =
+            std::filesystem::path("resources/noises/Quack_Fart_Noise_44k.wav");
+
         std::optional<Direction> getDirection();
 
         void handleMovement(float dt, std::optional<Duck::Direction> direction);
