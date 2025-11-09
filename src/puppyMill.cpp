@@ -13,12 +13,6 @@ float calcKnockback(float depthRatio) {
 
 PuppyMill::PuppyMill(Terrain* terrain) : m_terrain(terrain) {}
 
-PuppyMill::~PuppyMill() {
-    for (Dog& dog : m_dogs) {
-        dog.eraseEntities();
-    }
-}
-
 void PuppyMill::update(float dt, Duck* duck) {
     for (Dog& dog : m_dogs) {
         dog.update(dt, duck->getPosition());
@@ -67,7 +61,6 @@ void PuppyMill::damage(Duck* duck) {
     }
     for (std::vector<Dog>::size_type dogIdx = m_dogs.size() - 1; dogIdx < m_dogs.size(); --dogIdx) {
         if (m_dogs[dogIdx].shouldDelete()) {
-            m_dogs[dogIdx].eraseEntities();
             m_dogs.erase(m_dogs.begin() + dogIdx);
             break;
         }

@@ -5,7 +5,6 @@
 class PuppyMill {
     public:
         PuppyMill(Terrain* terrain);
-        ~PuppyMill();
 
         void update(float dt, Duck* duck);
 

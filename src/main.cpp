@@ -55,6 +55,9 @@ int main() {
 
     TextBoxQueue::construct();
 
+    bool escapeReleased = false;
+    bool paused = false;
+
     Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
     Duck duck = Duck();
@@ -122,30 +125,53 @@ int main() {
                 duck.getPosition().x, duck.getPosition().y, duck.getPosition().z,
                 testColliding, exitMouseString,
                 Eend::InputManager::get().getMouseX(), Eend::InputManager::get().getDeltaMouseX(),
-                Eend::InputManager::get().getMouseY(),Eend::InputManager::get().getDeltaMouseY(),
+                Eend::InputManager::get().getMouseY(), Eend::InputManager::get().getDeltaMouseY(),
                 Eend::InputManager::get().getLeftClick(),
                 Eend::InputManager::get().getRightClick(),
                 Eend::InputManager::get().getMiddleClick()));
         // clang-format on
 
-        Eend::Particles::get().update(dt);
-        Eend::Entities::draw(shaders, hudCamera, sceneCamera);
-        Eend::Screen::get().render(shaders.getShader(Eend::Shader::SCREEN));
-
         Eend::InputManager::get().processInput();
 
-        duck.update(dt, &testTerrain);
-        testTerrain.update();
+        // pause latch and menu setup / teardown
+        if (paused) {
+            bool escapePressed = Eend::InputManager::get().getEscapePress();
+            if (!escapePressed) escapeReleased = true;
+            if (escapeReleased && escapePressed) {
+                paused = false;
+                escapeReleased = false;
+                // destroy menu
+            }
+        } else {
+            bool escapePressed = Eend::InputManager::get().getEscapePress();
+            if (!escapePressed) escapeReleased = true;
+            if (escapeReleased && escapePressed) {
+                paused = true;
+                escapeReleased = false;
+                // create menu
+            }
+        }
 
-        puppyMill.update(dt, &duck);
-        TextBoxQueue::get().update();
+        if (paused) {
+            // handle menu
+        } else {
 
-        Eend::Point duckPosition = duck.getPosition();
-        sceneCamera.setPosition(
-            Eend::Point(duckPosition.x, duckPosition.y - 25.0f, duckPosition.z + 15.0f));
-        sceneCamera.setTarget(duckPosition);
+            testTerrain.update();
+            duck.update(dt, &testTerrain);
+            puppyMill.update(dt, &duck);
 
-        Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
+            Eend::Point duckPosition = duck.getPosition();
+            sceneCamera.setPosition(
+                Eend::Point(duckPosition.x, duckPosition.y - 25.0f, duckPosition.z + 15.0f));
+            sceneCamera.setTarget(duckPosition);
+
+            TextBoxQueue::get().update();
+            Eend::Particles::get().update(dt);
+            Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
+        }
+
+        Eend::Entities::draw(shaders, hudCamera, sceneCamera);
+        Eend::Screen::get().render(shaders.getShader(Eend::Shader::SCREEN));
 
         Eend::Window::get().swapBuffers();
         Eend::FrameLimiter::get().stopInterval();

@@ -3,6 +3,8 @@
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
 
+#include <optional>
+
 #include "terrain.hpp"
 
 namespace Eend = Eendgine;
@@ -10,7 +12,13 @@ namespace Eend = Eendgine;
 class Dog {
     public:
         Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain);
-        void eraseEntities();
+        ~Dog();
+
+        Dog(const Dog& other) = delete;
+        Dog& operator=(const Dog& other) = delete;
+
+        Dog(Dog&& other) noexcept;
+        Dog& operator=(Dog&& other) noexcept;
 
         void setSpeed(float speed);
         Eend::Point2D getPosition();
@@ -28,6 +36,7 @@ class Dog {
 
     private:
         static constexpr float M_SPEED = 15.0f;
+
         static constexpr unsigned int M_DAMAGE = 2;
         static constexpr unsigned int M_HEALTH = 3;
 
@@ -46,7 +55,7 @@ class Dog {
         static constexpr float M_BLINK_AFTER_DEATH_TIME = 3.0f;
         static constexpr float M_DELETE_AFTER_DEATH_TIME = 5.0f;
 
-        Eend::BoardId m_bodyId;
+        std::optional<Eend::BoardId> m_bodyId;
         Eend::Point2D m_position;
         float m_speed;
         Eend::Vector2D m_knockback;
