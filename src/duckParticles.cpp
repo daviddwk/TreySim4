@@ -55,7 +55,7 @@ Eend::Particles::Properties getKickParticleProperties(Duck::Direction direction)
 
     // clang-format off
     Eend::Vector2D directionVector = Eend::Vector2D(0.0f);
-     switch (direction) {
+    switch (direction) {
     case Duck::UP:
         directionVector = Eend::Vector2D(                0.0f,                1.0f);
         break;
@@ -80,11 +80,11 @@ Eend::Particles::Properties getKickParticleProperties(Duck::Direction direction)
     case Duck::UP_LEFT:
         directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
         break;
-        }
+    }
     // clang-format on
 
     const Eend::Particles::Behavior behavior =
-        [&directionVector](
+        [directionVector](
             int seed,
             std::chrono::milliseconds time) -> std::optional<Eend::Particles::State> {
         constexpr int LIFETIME_BASE = 250;
