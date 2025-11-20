@@ -102,11 +102,9 @@ int main() {
         std::string exitMouseString = "";
         if (exitMouseStatus == Eend::Panel::MouseStatus::CLICK) {
             exitMouseString = "click";
-        }
-        if (exitMouseStatus == Eend::Panel::MouseStatus::HOVER) {
+        } else if (exitMouseStatus == Eend::Panel::MouseStatus::HOVER) {
             exitMouseString = "hover";
-        }
-        if (exitMouseStatus == Eend::Panel::MouseStatus::NONE) {
+        } else if (exitMouseStatus == Eend::Panel::MouseStatus::NONE) {
             exitMouseString = "none";
         }
 
