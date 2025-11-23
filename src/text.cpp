@@ -16,7 +16,7 @@ Text::Text(Font font, std::string text, Eend::Point position, float scale, float
     // auto rootPath = std::filesystem::path("resources") / std::filesystem::path("fonts");
     m_fontPath = std::filesystem::path("fonts");
     switch (font) {
-    case DANIEL:
+    case Font::daniel:
         m_fontPath = m_fontPath / std::filesystem::path("daniel");
         break;
     }
@@ -38,8 +38,7 @@ Text::Text(Font font, std::string text, Eend::Point position, float scale, float
     // ' ' to '~' see https://www.ascii-code.com/
     for (char ch = 32; ch < 127; ++ch) {
         Json::Value jsonChar = root[std::format("{}", ch)];
-        if (!jsonChar.isArray())
-            continue;
+        if (!jsonChar.isArray()) continue;
         const unsigned int firstColumn = jsonChar[0].asUInt();
         const unsigned int lastColumn = jsonChar[1].asUInt();
 
@@ -70,8 +69,7 @@ Text::~Text() {
 }
 
 void Text::setText(const std::string& text) {
-    if (m_text == text)
-        return;
+    if (m_text == text) return;
 
     m_text = text;
 
@@ -160,6 +158,7 @@ void Text::updateText() {
             Eend::Scale2D(m_scale * ((float)charWidth / (float)m_texture.height), m_scale));
 
         panelRef->cropTexture(
-            Eend::Point2D(firstColumn, 0.0f), Eend::Point2D(lastColumn + 1.0f, m_texture.height));
+            Eend::Point2D(firstColumn, 0.0f),
+            Eend::Point2D(lastColumn + 1.0f, m_texture.height));
     }
 }

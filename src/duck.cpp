@@ -17,7 +17,7 @@ Duck::Duck()
     : m_bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
       m_headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_height(0.0f), m_direction(UP) {
+      m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up) {
     Eend::Board* head = Eend::Entities::boards().getRef(m_headId);
     head->setScale(Eend::Scale2D(3.5f, 3.5f));
     head->setStrip("eyesOpen");
@@ -97,48 +97,48 @@ std::optional<Duck::Direction> Duck::getDirection() {
     const bool leftPress = Eend::InputManager::get().getLeftPress();
 
     if (upPress) {
-        if (rightPress) return UP_RIGHT;
-        if (leftPress) return UP_LEFT;
-        return UP;
+        if (rightPress) return Direction::upRight;
+        if (leftPress) return Direction::upLeft;
+        return Direction::up;
     }
     if (downPress) {
-        if (rightPress) return DOWN_RIGHT;
-        if (leftPress) return DOWN_LEFT;
-        return DOWN;
+        if (rightPress) return Direction::downRight;
+        if (leftPress) return Direction::downLeft;
+        return Direction::down;
     }
-    if (rightPress) return RIGHT;
-    if (leftPress) return LEFT;
+    if (rightPress) return Direction::right;
+    if (leftPress) return Direction::left;
     return std::nullopt;
 }
 
 void Duck::updatePosition(float dt) {
 
     switch (m_direction) {
-    case UP:
+    case Direction::up:
         m_position.y += M_MOVE_SPEED * dt;
         break;
-    case UP_RIGHT:
+    case Direction::upRight:
         m_position.y += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         m_position.x += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         break;
-    case RIGHT:
+    case Direction::right:
         m_position.x += M_MOVE_SPEED * dt;
         break;
-    case DOWN_RIGHT:
+    case Direction::downRight:
         m_position.y -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         m_position.x += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         break;
-    case DOWN:
+    case Direction::down:
         m_position.y -= M_MOVE_SPEED * dt;
         break;
-    case DOWN_LEFT:
+    case Direction::downLeft:
         m_position.y -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         m_position.x -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         break;
-    case LEFT:
+    case Direction::left:
         m_position.x -= M_MOVE_SPEED * dt;
         break;
-    case UP_LEFT:
+    case Direction::upLeft:
         m_position.y += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         m_position.x -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         break;
@@ -159,21 +159,21 @@ void Duck::handleCollision(Terrain* terrain, Eend::Point& oldPosition) {
 
 Eend::Angle Duck::getAngle() {
     switch (m_direction) {
-    case UP:
+    case Direction::up:
         return Eend::Angle(45.0f) * 0.0f;
-    case UP_RIGHT:
+    case Direction::upRight:
         return Eend::Angle(45.0f) * 1.0f;
-    case RIGHT:
+    case Direction::right:
         return Eend::Angle(45.0f) * 2.0f;
-    case DOWN_RIGHT:
+    case Direction::downRight:
         return Eend::Angle(45.0f) * 3.0f;
-    case DOWN:
+    case Direction::down:
         return Eend::Angle(45.0f) * 4.0f;
-    case DOWN_LEFT:
+    case Direction::downLeft:
         return Eend::Angle(45.0f) * 5.0f;
-    case LEFT:
+    case Direction::left:
         return Eend::Angle(45.0f) * 6.0f;
-    case UP_LEFT:
+    case Direction::upLeft:
         return Eend::Angle(45.0f) * 7.0f;
     }
 }

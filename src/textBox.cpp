@@ -59,7 +59,7 @@ void TextBoxQueue::update() {
     if (m_textBox) {
         if (m_continue) {
             Eend::Panel* arrowRef = Eend::Entities::panels().getRef(m_textBox->arrow);
-            if (arrowRef->isClicked() == Eend::Panel::MouseStatus::CLICK) {
+            if (arrowRef->isClicked() == Eend::Panel::MouseStatus::click) {
                 delete m_textBox;
                 m_textBox = NULL;
                 m_continue = false;
@@ -88,7 +88,10 @@ void TextBoxQueue::update() {
             const TextBoxParams params = m_textBoxQueue.front();
             m_textBoxQueue.pop();
             m_textBox = new TextBox(
-                params.thumbnail, params.font, params.text, params.duration,
+                params.thumbnail,
+                params.font,
+                params.text,
+                params.duration,
                 params.clickToContinue);
         }
     }

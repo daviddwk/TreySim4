@@ -30,7 +30,7 @@ class Duck {
         void update(float dt, Terrain* terrain);
 
         HealthBar health;
-        enum Direction { UP, UP_RIGHT, RIGHT, DOWN_RIGHT, DOWN, DOWN_LEFT, LEFT, UP_LEFT };
+        enum class Direction { up, upRight, right, downRight, down, downLeft, left, upLeft };
 
     private:
         static constexpr float M_MOVE_SPEED = 25.0f;

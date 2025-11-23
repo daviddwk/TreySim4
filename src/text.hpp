@@ -11,7 +11,7 @@
 
 namespace Eend = Eendgine;
 
-enum Font { DANIEL };
+enum class Font { daniel };
 
 class Text {
     public:

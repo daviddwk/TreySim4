@@ -56,28 +56,28 @@ Eend::Particles::Properties getKickParticleProperties(Duck::Direction direction)
     // clang-format off
     Eend::Vector2D directionVector = Eend::Vector2D(0.0f);
     switch (direction) {
-    case Duck::UP:
+    case Duck::Direction::up:
         directionVector = Eend::Vector2D(                0.0f,                1.0f);
         break;
-    case Duck::UP_RIGHT:
+    case Duck::Direction::upRight:
         directionVector = Eend::Vector2D(  Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
         break;
-    case Duck::RIGHT:
+    case Duck::Direction::right:
         directionVector = Eend::Vector2D(                1.0f,                0.0f);
         break;
-    case Duck::DOWN_RIGHT:
+    case Duck::Direction::downRight:
         directionVector = Eend::Vector2D(  Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
         break;
-    case Duck::DOWN:
+    case Duck::Direction::down:
         directionVector = Eend::Vector2D(                0.0f,               -1.0f);
         break;
-    case Duck::DOWN_LEFT:
+    case Duck::Direction::downLeft:
         directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
         break;
-    case Duck::LEFT:
+    case Duck::Direction::left:
         directionVector = Eend::Vector2D(               -1.0f,                0.0f);
         break;
-    case Duck::UP_LEFT:
+    case Duck::Direction::upLeft:
         directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
         break;
     }

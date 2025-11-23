@@ -67,8 +67,8 @@ int main() {
     float testAnimScale = 0.0f;
     Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
 
-    Text testText(Font::DANIEL, "", Eend::Point(20.0f), 50.0f, INFINITY);
-    Text deathText(Font::DANIEL, "", Eend::Point(500.0f, 300.0f, 0.0f), 200.0f, INFINITY);
+    Text testText(Font::daniel, "", Eend::Point(20.0f), 50.0f, INFINITY);
+    Text deathText(Font::daniel, "", Eend::Point(500.0f, 300.0f, 0.0f), 200.0f, INFINITY);
 
     bool testColliding = false;
 
@@ -77,11 +77,11 @@ int main() {
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
     exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
-    TextBoxQueue::get().queue("duck", Font::DANIEL, "Help meeeee!", 3.0f, true);
-    TextBoxQueue::get().queue("dog", Font::DANIEL, "It's over for you bucko.", 3.0f, false);
+    TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
+    TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
     TextBoxQueue::get().queue(
         "duck",
-        Font::DANIEL,
+        Font::daniel,
         "What the duck did you just call me? You little quack! "
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f,
@@ -100,15 +100,15 @@ int main() {
         Eend::Panel::MouseStatus exitMouseStatus =
             Eend::Entities::panels().getRef(exitId)->isClicked();
         std::string exitMouseString = "";
-        if (exitMouseStatus == Eend::Panel::MouseStatus::CLICK) {
+        if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
             exitMouseString = "click";
-        } else if (exitMouseStatus == Eend::Panel::MouseStatus::HOVER) {
+        } else if (exitMouseStatus == Eend::Panel::MouseStatus::hover) {
             exitMouseString = "hover";
-        } else if (exitMouseStatus == Eend::Panel::MouseStatus::NONE) {
+        } else if (exitMouseStatus == Eend::Panel::MouseStatus::none) {
             exitMouseString = "none";
         }
 
-        if (exitMouseStatus == Eend::Panel::MouseStatus::CLICK) {
+        if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
             Eend::InputManager::get().setShouldClose(true);
         }
         // clang-format off
@@ -189,7 +189,7 @@ int main() {
         }
 
         Eend::Entities::draw(shaders, hudCamera, sceneCamera);
-        Eend::Screen::get().render(shaders.getShader(Eend::Shader::SCREEN));
+        Eend::Screen::get().render(shaders.getShader(Eend::Shader::screen));
 
         Eend::Window::get().swapBuffers();
         Eend::FrameLimiter::get().stopInterval();
