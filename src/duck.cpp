@@ -178,7 +178,7 @@ Eend::Angle Duck::getAngle() {
     }
 }
 
-void Duck::kick(Dog& dog) {
+bool Duck::kick(Dog& dog) {
     std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
         dog.getPosition3d(),
         Eend::Sphere(getPosition(), M_KICK_RADIUS),
@@ -186,6 +186,8 @@ void Duck::kick(Dog& dog) {
         M_KICK_SPREAD);
     if (kick) {
         dog.kick(*kick);
-        dog.giveDamage(1);
+        bool dies = dog.giveDamage(1);
+        return dies;
     }
+    return false;
 }

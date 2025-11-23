@@ -65,7 +65,7 @@ Eend::Point Dog::getPosition3d() {
 
 unsigned int Dog::getDamage() { return M_DAMAGE; }
 
-void Dog::giveDamage(unsigned int damage) {
+bool Dog::giveDamage(unsigned int damage) {
     if (damage >= m_health) {
         m_health = 0;
         assert(m_bodyId);
@@ -73,8 +73,10 @@ void Dog::giveDamage(unsigned int damage) {
         board->setStrip("dead");
         board->setStripIdx(0);
         m_knockback *= M_KNOCKBACK_DEAD_MULTIPLIER;
+        return true;
     } else {
         m_health -= damage;
+        return false;
     }
 }
 

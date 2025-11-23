@@ -8,6 +8,8 @@ class PuppyMill {
 
         void update(float dt, Duck* duck);
 
+        unsigned int getNumKilled();
+
     private:
         void damage(Duck* duck);
         void spawn();
@@ -17,4 +19,5 @@ class PuppyMill {
 
         Terrain* m_terrain;
         std::vector<Dog> m_dogs;
+        unsigned int m_numKilled;
 };

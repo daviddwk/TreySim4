@@ -12,14 +12,12 @@
 #include <Eendgine/window.hpp>
 
 #include <cmath>
-#include <optional>
 #include <stb/stb_image.h>
 
 #include <filesystem>
 #include <print>
 
 #include "duck.hpp"
-#include "healthBar.hpp"
 #include "puppyMill.hpp"
 #include "terrain.hpp"
 #include "text.hpp"
@@ -57,6 +55,7 @@ int main() {
 
     bool escapeReleased = false;
     bool paused = false;
+    bool dead = false;
 
     Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
@@ -69,6 +68,7 @@ int main() {
     Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
 
     Text testText(Font::DANIEL, "", Eend::Point(20.0f), 50.0f, INFINITY);
+    Text deathText(Font::DANIEL, "", Eend::Point(500.0f, 300.0f, 0.0f), 200.0f, INFINITY);
 
     bool testColliding = false;
 
@@ -118,7 +118,8 @@ int main() {
                 "X:{:.4f} Y:{:.4f} Z:{:.4f}\n"
                 "duck:{} mouse:{} \n"
                 "mouseX:{} dx:{} mouseY:{} dy:{}\n"
-                "left:{} right:{} mid:{}\n",
+                "left:{} right:{} mid:{}\n"
+                "dogs slain:{}",
                 1.0f / dt, dt,
                 duck.getPosition().x, duck.getPosition().y, duck.getPosition().z,
                 testColliding, exitMouseString,
@@ -126,19 +127,37 @@ int main() {
                 Eend::InputManager::get().getMouseY(), Eend::InputManager::get().getDeltaMouseY(),
                 Eend::InputManager::get().getLeftClick(),
                 Eend::InputManager::get().getRightClick(),
-                Eend::InputManager::get().getMiddleClick()));
+                Eend::InputManager::get().getMiddleClick(),
+                puppyMill.getNumKilled()));
         // clang-format on
 
         Eend::InputManager::get().processInput();
 
+        // run once on death
+        if (!dead && (duck.health.getHealth() == 0)) {
+            dead = true;
+            deathText.setText("YOU DIED!\nPRESS ESC\n");
+        }
+
         // pause latch and menu setup / teardown
-        if (paused) {
+        if (paused || dead) {
             bool escapePressed = Eend::InputManager::get().getEscapePress();
             if (!escapePressed) escapeReleased = true;
             if (escapeReleased && escapePressed) {
-                paused = false;
                 escapeReleased = false;
+                if (paused) {
+                    paused = false;
+                }
                 // destroy menu
+                // every frame death stuff
+                if (dead) {
+                    dead = false;
+                    deathText.setText("");
+                    puppyMill = PuppyMill(&testTerrain);
+                    Eendgine::Entities::shrink();
+                    duck.health.heal(100);
+                    duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
+                }
             }
         } else {
             bool escapePressed = Eend::InputManager::get().getEscapePress();
@@ -147,10 +166,11 @@ int main() {
                 paused = true;
                 escapeReleased = false;
                 // create menu
+                // testing shrink
             }
         }
 
-        if (paused) {
+        if (paused || dead) {
             // handle menu
         } else {
 

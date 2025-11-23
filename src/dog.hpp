@@ -25,7 +25,8 @@ class Dog {
         Eend::Point getPosition3d();
 
         unsigned int getDamage();
-        void giveDamage(unsigned int damage);
+        // retruns true if dies
+        bool giveDamage(unsigned int damage);
 
         unsigned int getHealth();
         bool shouldDelete();

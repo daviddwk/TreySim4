@@ -42,6 +42,8 @@ void HealthBar::heal(unsigned int heal) {
     update();
 }
 
+unsigned int HealthBar::getHealth() { return m_health; }
+
 void HealthBar::update() {
     Eend::Panel* barRef = Eend::Entities::panels().getRef(m_bar);
     barRef->setScale(

@@ -11,7 +11,7 @@ float calcKnockback(float depthRatio) {
     return pow(depthRatio, 2.0f);
 }
 
-PuppyMill::PuppyMill(Terrain* terrain) : m_terrain(terrain) {}
+PuppyMill::PuppyMill(Terrain* terrain) : m_terrain(terrain), m_numKilled(0) {}
 
 void PuppyMill::update(float dt, Duck* duck) {
     for (Dog& dog : m_dogs) {
@@ -20,6 +20,8 @@ void PuppyMill::update(float dt, Duck* duck) {
     damage(duck);
     spawn();
 }
+
+unsigned int PuppyMill::getNumKilled() { return m_numKilled; }
 
 void PuppyMill::spawn() {
     static auto tickLast = std::chrono::steady_clock::now();
@@ -56,7 +58,8 @@ void PuppyMill::damage(Duck* duck) {
 
     if (duck->isKicking()) {
         for (Dog& dog : m_dogs) {
-            duck->kick(dog);
+            bool dogDies = duck->kick(dog);
+            if (dogDies) m_numKilled++;
         }
     }
     for (std::vector<Dog>::size_type dogIdx = m_dogs.size() - 1; dogIdx < m_dogs.size(); --dogIdx) {

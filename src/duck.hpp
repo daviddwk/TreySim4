@@ -24,7 +24,8 @@ class Duck {
         Eend::Angle getAngle();
 
         bool isKicking();
-        void kick(Dog& dog);
+        // return true if dog dies
+        bool kick(Dog& dog);
 
         void update(float dt, Terrain* terrain);
 

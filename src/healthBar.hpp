@@ -12,6 +12,8 @@ class HealthBar {
         bool damage(unsigned int damage);
         void heal(unsigned int heal);
 
+        unsigned int getHealth();
+
     private:
         const unsigned int M_HEALTH_MAX = 100;
         const float M_BAR_SCALE_MAX = 500.0f;
