@@ -179,9 +179,12 @@ int main() {
             puppyMill.update(dt, &duck);
 
             Eend::Point duckPosition = duck.getPosition();
+            float terrainHeight =
+                testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
             sceneCamera.setPosition(
-                Eend::Point(duckPosition.x, duckPosition.y - 25.0f, duckPosition.z + 15.0f));
-            sceneCamera.setTarget(duckPosition);
+                Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 15.0f));
+            sceneCamera.setTarget(
+                Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
 
             TextBoxQueue::get().update();
             Eend::Particles::get().update(dt);
