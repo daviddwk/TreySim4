@@ -137,6 +137,7 @@ int main() {
         if (!dead && (duck.health.getHealth() == 0)) {
             dead = true;
             deathText.setText("YOU DIED!\nPRESS ESC\n");
+            // duck.unalive();
         }
 
         // pause latch and menu setup / teardown
@@ -170,19 +171,26 @@ int main() {
             }
         }
 
-        if (paused || dead) {
+        if (paused) {
             // handle menu
         } else {
 
             testTerrain.update();
-            duck.update(dt, &testTerrain);
+            if (!dead) duck.update(dt, &testTerrain);
             puppyMill.update(dt, &duck);
 
             Eend::Point duckPosition = duck.getPosition();
             float terrainHeight =
                 testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
-            sceneCamera.setPosition(
-                Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 15.0f));
+
+            static Eend::Point lastCameraPosition =
+                Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
+            Eend::Point approachCameraPosition =
+                Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
+            float cameraLag = (10.0f * dt);
+            lastCameraPosition =
+                (lastCameraPosition + (approachCameraPosition * cameraLag)) / (cameraLag + 1.0f);
+            sceneCamera.setPosition(lastCameraPosition);
             sceneCamera.setTarget(
                 Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
 
