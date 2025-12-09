@@ -17,6 +17,7 @@ class Duck {
 
         void setRotation(Eend::Angle rotation);
         void setPosition(Eend::Point position);
+        void setAlive(bool alive);
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
@@ -59,4 +60,5 @@ class Duck {
         float m_upVelocity;
         float m_height;
         Direction m_direction;
+        bool m_alive;
 };

@@ -95,6 +95,7 @@ int main() {
         float dt = Eend::FrameLimiter::get().deltaTime;
         Eend::FrameLimiter::get().startInterval();
         Eend::Screen::get().bind();
+        Eend::InputManager::get().processInput();
         shaders.setPixelSize(5);
 
         Eend::Panel::MouseStatus exitMouseStatus =
@@ -131,13 +132,11 @@ int main() {
                 puppyMill.getNumKilled()));
         // clang-format on
 
-        Eend::InputManager::get().processInput();
-
         // run once on death
         if (!dead && (duck.health.getHealth() == 0)) {
             dead = true;
             deathText.setText("YOU DIED!\nPRESS ESC\n");
-            // duck.unalive();
+            duck.setAlive(false);
         }
 
         // pause latch and menu setup / teardown
@@ -158,6 +157,7 @@ int main() {
                     Eendgine::Entities::shrink();
                     duck.health.heal(100);
                     duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
+                    duck.setAlive(true);
                 }
             }
         } else {
@@ -176,7 +176,7 @@ int main() {
         } else {
 
             testTerrain.update();
-            if (!dead) duck.update(dt, &testTerrain);
+            duck.update(dt, &testTerrain);
             puppyMill.update(dt, &duck);
 
             Eend::Point duckPosition = duck.getPosition();

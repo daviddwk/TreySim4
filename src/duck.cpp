@@ -17,7 +17,7 @@ Duck::Duck()
     : m_bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
       m_headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up) {
+      m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up), m_alive(true) {
     Eend::Board* head = Eend::Entities::boards().getRef(m_headId);
     head->setScale(Eend::Scale2D(3.5f, 3.5f));
     head->setStrip("eyesOpen");
@@ -29,6 +29,7 @@ Duck::~Duck() {
 }
 
 void Duck::setPosition(Eend::Point position) { m_position = position; }
+void Duck::setAlive(bool alive) { m_alive = alive; }
 
 Eend::Point Duck::getPosition() { return m_position; };
 Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
@@ -39,7 +40,7 @@ void Duck::update(float dt, Terrain* terrain) {
     Eend::Point oldDuckPosition = getPosition();
 
     std::optional<Direction> currentDirection = getDirection();
-    if (currentDirection) {
+    if (currentDirection && m_alive) {
         m_direction = *currentDirection;
         m_rotation = getAngle();
         updatePosition(dt);
@@ -51,7 +52,7 @@ void Duck::update(float dt, Terrain* terrain) {
     float heightAtPoint = terrain->heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
 
     m_kicking = false;
-    if (Eend::InputManager::get().getSpacePress() && !m_inAir) {
+    if (Eend::InputManager::get().getSpacePress() && !m_inAir && m_alive) {
         m_kicking = true;
         m_inAir = true;
         m_upVelocity = -M_GRAVITY * 20.0f;
