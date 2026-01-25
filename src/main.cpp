@@ -56,63 +56,65 @@ int main() {
     bool escapeReleased = false;
     bool paused = false;
     bool dead = false;
+    // Weird hack to get terrain destructor to run before Entity Batches are deleted
+    // I need to create a level system that handles terrain
+    {
+        Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
-    Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
+        Duck duck = Duck();
+        PuppyMill puppyMill(&testTerrain);
 
-    Duck duck = Duck();
-    PuppyMill puppyMill(&testTerrain);
+        duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
 
-    duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
+        float testAnimScale = 0.0f;
+        Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
 
-    float testAnimScale = 0.0f;
-    Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
+        Text testText(Font::daniel, "", Eend::Point(20.0f), 50.0f, INFINITY);
+        Text deathText(Font::daniel, "", Eend::Point(500.0f, 300.0f, 0.0f), 200.0f, INFINITY);
 
-    Text testText(Font::daniel, "", Eend::Point(20.0f), 50.0f, INFINITY);
-    Text deathText(Font::daniel, "", Eend::Point(500.0f, 300.0f, 0.0f), 200.0f, INFINITY);
+        bool testColliding = false;
 
-    bool testColliding = false;
+        Eend::PanelId exitId = Eend::Entities::panels().insert("exit");
+        Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitId);
+        exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
+        exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
-    Eend::PanelId exitId = Eend::Entities::panels().insert("exit");
-    Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitId);
-    exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
-    exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
+        TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
+        TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
+        TextBoxQueue::get().queue(
+            "duck",
+            Font::daniel,
+            "What the duck did you just call me? You little quack! "
+            "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
+            5.0f,
+            true);
 
-    TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
-    TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
-    TextBoxQueue::get().queue(
-        "duck",
-        Font::daniel,
-        "What the duck did you just call me? You little quack! "
-        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
-        5.0f,
-        true);
+        Eend::Audio::get().playTrack(
+            "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
+            50.0f);
 
-    Eend::Audio::get().playTrack(
-        "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
-        50.0f);
+        while (!Eend::InputManager::get().getShouldClose()) {
+            float dt = Eend::FrameLimiter::get().deltaTime;
+            Eend::FrameLimiter::get().startInterval();
+            Eend::Screen::get().bind();
+            Eend::InputManager::get().processInput();
+            shaders.setPixelSize(5);
 
-    while (!Eend::InputManager::get().getShouldClose()) {
-        float dt = Eend::FrameLimiter::get().deltaTime;
-        Eend::FrameLimiter::get().startInterval();
-        Eend::Screen::get().bind();
-        Eend::InputManager::get().processInput();
-        shaders.setPixelSize(5);
+            Eend::Panel::MouseStatus exitMouseStatus =
+                Eend::Entities::panels().getRef(exitId)->isClicked();
+            std::string exitMouseString = "";
+            if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
+                exitMouseString = "click";
+            } else if (exitMouseStatus == Eend::Panel::MouseStatus::hover) {
+                exitMouseString = "hover";
+            } else if (exitMouseStatus == Eend::Panel::MouseStatus::none) {
+                exitMouseString = "none";
+            }
 
-        Eend::Panel::MouseStatus exitMouseStatus =
-            Eend::Entities::panels().getRef(exitId)->isClicked();
-        std::string exitMouseString = "";
-        if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
-            exitMouseString = "click";
-        } else if (exitMouseStatus == Eend::Panel::MouseStatus::hover) {
-            exitMouseString = "hover";
-        } else if (exitMouseStatus == Eend::Panel::MouseStatus::none) {
-            exitMouseString = "none";
-        }
-
-        if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
-            Eend::InputManager::get().setShouldClose(true);
-        }
-        // clang-format off
+            if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
+                Eend::InputManager::get().setShouldClose(true);
+            }
+            // clang-format off
         testText.setText(
             std::format(
                 "FPS:{:.4f} DT:{:.4f}\n"
@@ -130,81 +132,82 @@ int main() {
                 Eend::InputManager::get().getRightClick(),
                 Eend::InputManager::get().getMiddleClick(),
                 puppyMill.getNumKilled()));
-        // clang-format on
+            // clang-format on
 
-        // run once on death
-        if (!dead && (duck.health.getHealth() == 0)) {
-            dead = true;
-            deathText.setText("YOU DIED!\nPRESS ESC\n");
-            duck.setAlive(false);
-        }
+            // run once on death
+            if (!dead && (duck.health.getHealth() == 0)) {
+                dead = true;
+                deathText.setText("YOU DIED!\nPRESS ESC\n");
+                duck.setAlive(false);
+            }
 
-        // pause latch and menu setup / teardown
-        if (paused || dead) {
-            bool escapePressed = Eend::InputManager::get().getEscapePress();
-            if (!escapePressed) escapeReleased = true;
-            if (escapeReleased && escapePressed) {
-                escapeReleased = false;
-                if (paused) {
-                    paused = false;
+            // pause latch and menu setup / teardown
+            if (paused || dead) {
+                bool escapePressed = Eend::InputManager::get().getEscapePress();
+                if (!escapePressed) escapeReleased = true;
+                if (escapeReleased && escapePressed) {
+                    escapeReleased = false;
+                    if (paused) {
+                        paused = false;
+                    }
+                    // destroy menu
+                    // every frame death stuff
+                    if (dead) {
+                        dead = false;
+                        deathText.setText("");
+                        puppyMill = PuppyMill(&testTerrain);
+                        Eendgine::Entities::shrink();
+                        duck.health.heal(100);
+                        duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
+                        duck.setAlive(true);
+                    }
                 }
-                // destroy menu
-                // every frame death stuff
-                if (dead) {
-                    dead = false;
-                    deathText.setText("");
-                    puppyMill = PuppyMill(&testTerrain);
-                    Eendgine::Entities::shrink();
-                    duck.health.heal(100);
-                    duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
-                    duck.setAlive(true);
+            } else {
+                bool escapePressed = Eend::InputManager::get().getEscapePress();
+                if (!escapePressed) escapeReleased = true;
+                if (escapeReleased && escapePressed) {
+                    paused = true;
+                    escapeReleased = false;
+                    // create menu
+                    // testing shrink
                 }
             }
-        } else {
-            bool escapePressed = Eend::InputManager::get().getEscapePress();
-            if (!escapePressed) escapeReleased = true;
-            if (escapeReleased && escapePressed) {
-                paused = true;
-                escapeReleased = false;
-                // create menu
-                // testing shrink
+
+            if (paused) {
+                // handle menu
+            } else {
+
+                testTerrain.update();
+                duck.update(dt, &testTerrain);
+                puppyMill.update(dt, &duck);
+
+                Eend::Point duckPosition = duck.getPosition();
+                float terrainHeight =
+                    testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+
+                static Eend::Point lastCameraPosition =
+                    Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
+                Eend::Point approachCameraPosition =
+                    Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
+                float cameraLag = (10.0f * dt);
+                lastCameraPosition = (lastCameraPosition + (approachCameraPosition * cameraLag)) /
+                                     (cameraLag + 1.0f);
+                sceneCamera.setPosition(lastCameraPosition);
+                sceneCamera.setTarget(
+                    Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
+
+                TextBoxQueue::get().update();
+                Eend::Particles::get().update(dt);
+                Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
             }
+
+            Eend::Entities::draw(shaders, hudCamera, sceneCamera);
+            Eend::Screen::get().render(shaders.getShader(Eend::Shader::screen));
+
+            Eend::Window::get().swapBuffers();
+            Eend::FrameLimiter::get().stopInterval();
         }
-
-        if (paused) {
-            // handle menu
-        } else {
-
-            testTerrain.update();
-            duck.update(dt, &testTerrain);
-            puppyMill.update(dt, &duck);
-
-            Eend::Point duckPosition = duck.getPosition();
-            float terrainHeight =
-                testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
-
-            static Eend::Point lastCameraPosition =
-                Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
-            Eend::Point approachCameraPosition =
-                Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
-            float cameraLag = (10.0f * dt);
-            lastCameraPosition =
-                (lastCameraPosition + (approachCameraPosition * cameraLag)) / (cameraLag + 1.0f);
-            sceneCamera.setPosition(lastCameraPosition);
-            sceneCamera.setTarget(
-                Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
-
-            TextBoxQueue::get().update();
-            Eend::Particles::get().update(dt);
-            Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
-        }
-
-        Eend::Entities::draw(shaders, hudCamera, sceneCamera);
-        Eend::Screen::get().render(shaders.getShader(Eend::Shader::screen));
-
-        Eend::Window::get().swapBuffers();
-        Eend::FrameLimiter::get().stopInterval();
-    }
+    } // Terrain
     TextBoxQueue::destruct();
     Eend::Particles::destruct();
     Eend::Entities::destruct();
