@@ -1,3 +1,5 @@
+#pragma once
+
 #include "dog.hpp"
 #include "duck.hpp"
 

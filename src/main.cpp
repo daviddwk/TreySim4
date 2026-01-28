@@ -19,7 +19,6 @@
 
 #include "duck.hpp"
 #include "park.hpp"
-#include "puppyMill.hpp"
 #include "terrain.hpp"
 #include "text.hpp"
 #include "textBox.hpp"
@@ -61,7 +60,6 @@ int main() {
         TextBoxQueue::construct();
         Duck duck = Duck(); // also make singleton
         Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f), &duck);
-        PuppyMill puppyMill = PuppyMill(); // also make singleton
 
         Terrain& terrain = Park::get().getTerrain();
 
@@ -132,7 +130,7 @@ int main() {
                 Eend::InputManager::get().getLeftClick(),
                 Eend::InputManager::get().getRightClick(),
                 Eend::InputManager::get().getMiddleClick(),
-                puppyMill.getNumKilled()));
+                Park::get().numDogsKilled()));
             // clang-format on
 
             // run once on death
@@ -156,7 +154,7 @@ int main() {
                     if (dead) {
                         dead = false;
                         deathText.setText("");
-                        puppyMill = PuppyMill(); // TODO puppymill.reset()
+                        Park::get().reset();
                         Eendgine::Entities::shrink();
                         duck.health.heal(100);
                         duck.setPosition(terrain.positionAtTile(20.0f, 20.0f, 0.0f));
@@ -180,7 +178,7 @@ int main() {
 
                 terrain.update();
                 duck.update(dt);
-                puppyMill.update(dt, &duck);
+                Park::get().update(dt);
 
                 Eend::Point duckPosition = duck.getPosition();
                 float terrainHeight =
