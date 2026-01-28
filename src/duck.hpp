@@ -28,7 +28,7 @@ class Duck {
         // return true if dog dies
         bool kick(Dog& dog);
 
-        void update(float dt, Terrain* terrain);
+        void update(float dt);
 
         HealthBar health;
         enum class Direction { up, upRight, right, downRight, down, downLeft, left, upLeft };
@@ -48,7 +48,7 @@ class Duck {
 
         void handleMovement(float dt, std::optional<Duck::Direction> direction);
         void updatePosition(float dt);
-        void handleCollision(Terrain* terrain, Eend::Point& oldPosition);
+        void handleCollision(Terrain& terrain, Eend::Point& oldPosition);
 
         Eend::StatueId m_bodyId;
         Eend::BoardId m_headId;

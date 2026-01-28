@@ -18,6 +18,7 @@
 #include <print>
 
 #include "duck.hpp"
+#include "park.hpp"
 #include "puppyMill.hpp"
 #include "terrain.hpp"
 #include "text.hpp"
@@ -51,20 +52,20 @@ int main() {
         Eend::Point(-20.0f, 5.0f, 0.0f),
         Eend::Point(3.0f, 0.0f, 3.0f));
 
-    TextBoxQueue::construct();
-
     bool escapeReleased = false;
     bool paused = false;
     bool dead = false;
     // Weird hack to get terrain destructor to run before Entity Batches are deleted
     // I need to create a level system that handles terrain
     {
-        Terrain testTerrain("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
+        TextBoxQueue::construct();
+        Duck duck = Duck(); // also make singleton
+        Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f), &duck);
+        PuppyMill puppyMill = PuppyMill(); // also make singleton
 
-        Duck duck = Duck();
-        PuppyMill puppyMill(&testTerrain);
+        Terrain& terrain = Park::get().getTerrain();
 
-        duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
+        duck.setPosition(terrain.positionAtTile(20.0f, 20.0f, 0.0f));
 
         float testAnimScale = 0.0f;
         Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
@@ -155,10 +156,10 @@ int main() {
                     if (dead) {
                         dead = false;
                         deathText.setText("");
-                        puppyMill = PuppyMill(&testTerrain);
+                        puppyMill = PuppyMill(); // TODO puppymill.reset()
                         Eendgine::Entities::shrink();
                         duck.health.heal(100);
-                        duck.setPosition(testTerrain.positionAtTile(20.0f, 20.0f, 0.0f));
+                        duck.setPosition(terrain.positionAtTile(20.0f, 20.0f, 0.0f));
                         duck.setAlive(true);
                     }
                 }
@@ -177,13 +178,13 @@ int main() {
                 // handle menu
             } else {
 
-                testTerrain.update();
-                duck.update(dt, &testTerrain);
+                terrain.update();
+                duck.update(dt);
                 puppyMill.update(dt, &duck);
 
                 Eend::Point duckPosition = duck.getPosition();
                 float terrainHeight =
-                    testTerrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+                    terrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
 
                 static Eend::Point lastCameraPosition =
                     Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
@@ -207,8 +208,9 @@ int main() {
             Eend::Window::get().swapBuffers();
             Eend::FrameLimiter::get().stopInterval();
         }
+        TextBoxQueue::destruct();
+        Park::destruct();
     } // Terrain
-    TextBoxQueue::destruct();
     Eend::Particles::destruct();
     Eend::Entities::destruct();
     Eend::Audio::destruct();

@@ -11,7 +11,7 @@ namespace Eend = Eendgine;
 
 class Dog {
     public:
-        Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain);
+        Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain& terrain);
         ~Dog();
 
         Dog(const Dog& other) = delete;
@@ -60,7 +60,6 @@ class Dog {
         Eend::Point2D m_position;
         float m_speed;
         Eend::Vector2D m_knockback;
-        Terrain* m_terrain;
         float m_animTime;
         unsigned int m_health;
         float m_deadTime;

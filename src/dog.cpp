@@ -1,19 +1,20 @@
 #include "Eendgine/board.hpp"
 #include "Eendgine/types.hpp"
 #include "dog.hpp"
+#include "park.hpp"
 
 #include <glm/vector_relational.hpp>
 #include <print>
 namespace Eend = Eendgine;
 
-Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain* terrain)
+Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain& terrain)
     : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards"))),
-      m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_terrain(terrain),
-      m_animTime(0.0f), m_health(M_HEALTH), m_deadTime(0.0f), m_delete(false) {
+      m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_animTime(0.0f),
+      m_health(M_HEALTH), m_deadTime(0.0f), m_delete(false) {
     Eend::Board* boardRef = Eend::Entities::boards().getRef(*m_bodyId);
     boardRef->setStrip("walk");
     boardRef->setScale(scale);
-    boardRef->setPosition(Eend::Point(position.x, terrain->heightAtPoint(position), position.y));
+    boardRef->setPosition(Eend::Point(position.x, terrain.heightAtPoint(position), position.y));
 }
 Dog::~Dog() {
     if (m_bodyId) Eend::Entities::boards().erase(*m_bodyId);
@@ -22,9 +23,8 @@ Dog::~Dog() {
 Dog::Dog(Dog&& other) noexcept
     : m_bodyId(std::move(other.m_bodyId)), m_position(std::move(other.m_position)),
       m_speed(std::move(other.m_speed)), m_knockback(std::move(other.m_knockback)),
-      m_terrain(std::move(other.m_terrain)), m_animTime(std::move(other.m_animTime)),
-      m_health(std::move(other.m_health)), m_deadTime(std::move(other.m_deadTime)),
-      m_delete(std::move(other.m_delete))
+      m_animTime(std::move(other.m_animTime)), m_health(std::move(other.m_health)),
+      m_deadTime(std::move(other.m_deadTime)), m_delete(std::move(other.m_delete))
 
 {
     other.m_bodyId = std::nullopt;
@@ -43,7 +43,6 @@ Dog& Dog::operator=(Dog&& other) noexcept {
     m_position = other.m_position;
     m_speed = other.m_speed;
     m_knockback = other.m_knockback;
-    m_terrain = other.m_terrain;
     m_animTime = other.m_animTime;
     m_health = other.m_health;
     m_deadTime = other.m_deadTime;
@@ -60,7 +59,10 @@ void Dog::setSpeed(float speed) { m_speed = speed; }
 Eend::Point2D Dog::getPosition() { return m_position; }
 
 Eend::Point Dog::getPosition3d() {
-    return Eend::Point(m_position.x, m_position.y, m_terrain->heightAtPoint(m_position));
+    return Eend::Point(
+        m_position.x,
+        m_position.y,
+        Park::get().getTerrain().heightAtPoint(m_position));
 }
 
 unsigned int Dog::getDamage() { return M_DAMAGE; }
@@ -137,5 +139,5 @@ void Dog::update(float dt, Eend::Point2D approachPoint) {
         Eend::Point(
             m_position.x,
             m_position.y,
-            m_terrain->heightAtPoint(m_position) + M_UP_OFFSET));
+            Park::get().getTerrain().heightAtPoint(m_position) + M_UP_OFFSET));
 }

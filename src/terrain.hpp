@@ -9,6 +9,7 @@ namespace Eend = Eendgine;
 
 class Terrain {
     public:
+        // would like this to be one path with scale build into the format
         Terrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
         ~Terrain();
 

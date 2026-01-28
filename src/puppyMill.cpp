@@ -1,4 +1,7 @@
 #include "puppyMill.hpp"
+
+#include "park.hpp"
+
 #include <Eendgine/random.hpp>
 
 #include <glm/glm.hpp>
@@ -11,7 +14,7 @@ float calcKnockback(float depthRatio) {
     return pow(depthRatio, 2.0f);
 }
 
-PuppyMill::PuppyMill(Terrain* terrain) : m_terrain(terrain), m_numKilled(0) {}
+PuppyMill::PuppyMill() : m_numKilled(0) {}
 
 void PuppyMill::update(float dt, Duck* duck) {
     for (Dog& dog : m_dogs) {
@@ -27,16 +30,17 @@ void PuppyMill::spawn() {
     static auto tickLast = std::chrono::steady_clock::now();
     auto now = std::chrono::steady_clock::now();
     auto tickMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - tickLast).count();
+    Terrain& terrain = Park::get().getTerrain();
     if (tickMs >= M_SPAWN_TIME_MS) {
         tickLast = now;
         Eend::Point2D spawnPosition = Eend::Point2D(0.0f);
         if (Eend::randomRange(0, 1)) {
-            spawnPosition.x = m_terrain->getWidth();
+            spawnPosition.x = terrain.getWidth();
         }
         if (Eend::randomRange(0, 1)) {
-            spawnPosition.y = -m_terrain->getHeight();
+            spawnPosition.y = -terrain.getHeight();
         }
-        m_dogs.emplace_back(spawnPosition, Eend::Scale2D(5.0f, 5.0f), 0.0f, m_terrain);
+        m_dogs.emplace_back(spawnPosition, Eend::Scale2D(5.0f, 5.0f), 0.0f, terrain);
     }
 }
 
