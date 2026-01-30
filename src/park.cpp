@@ -1,12 +1,14 @@
 #include "park.hpp"
 
-// should be path to park format, not png height map
-Park::Park(std::filesystem::path pngHeightMap, Eend::Scale scale, Duck* duck)
-    : m_terrain(pngHeightMap, scale), m_puppyMill(), m_duck(duck) {}
+#include "duck.hpp"
 
-void Park::construct(std::filesystem::path pngHeightMap, Eend::Scale scale, Duck* duck) {
+// should be path to park format, not png height map
+Park::Park(std::filesystem::path pngHeightMap, Eend::Scale scale)
+    : m_terrain(pngHeightMap, scale), m_puppyMill() {}
+
+void Park::construct(std::filesystem::path pngHeightMap, Eend::Scale scale) {
     assert(m_instance == nullptr);
-    m_instance = new Park(pngHeightMap, scale, duck);
+    m_instance = new Park(pngHeightMap, scale);
 }
 
 void Park::destruct() {
@@ -20,7 +22,7 @@ Park& Park::get() {
     return *m_instance;
 }
 
-void Park::update(float dt) { m_puppyMill.update(dt, m_duck); }
+void Park::update(float dt) { m_puppyMill.update(dt, Duck::get()); }
 void Park::reset() {
     // TODO also reset duck position to default
     m_puppyMill = PuppyMill();

@@ -60,7 +60,7 @@ int main() {
         TextBoxQueue::construct();
         Duck::construct();
         Duck& duck = Duck::get();
-        Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f), &duck);
+        Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
         Terrain& terrain = Park::get().getTerrain();
 

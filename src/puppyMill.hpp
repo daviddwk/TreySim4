@@ -7,12 +7,12 @@ class PuppyMill {
     public:
         PuppyMill();
 
-        void update(float dt, Duck* duck);
+        void update(float dt, Duck& duck);
 
         unsigned int getNumKilled();
 
     private:
-        void damage(Duck* duck);
+        void damage(Duck& duck);
         void spawn();
 
         static constexpr int M_DMG_TICK_MS = 200;

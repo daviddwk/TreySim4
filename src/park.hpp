@@ -1,6 +1,5 @@
 #pragma once
 
-#include "duck.hpp"
 #include "puppyMill.hpp"
 #include "terrain.hpp"
 
@@ -10,8 +9,7 @@
 
 class Park {
     public:
-        // TODO get rid of need for duck ref
-        static void construct(std::filesystem::path pngHeightMap, Eend::Scale scale, Duck* duck);
+        static void construct(std::filesystem::path pngHeightMap, Eend::Scale scale);
         static void destruct();
         static Park& get();
 
@@ -26,7 +24,7 @@ class Park {
         Terrain& getTerrain();
 
     private:
-        Park(std::filesystem::path pngHeightMap, Eend::Scale scale, Duck* duck);
+        Park(std::filesystem::path pngHeightMap, Eend::Scale scale);
         ~Park() = default;
 
         Park(const Park& other) = delete;
@@ -40,5 +38,4 @@ class Park {
         Terrain m_terrain;
         // part of park and dog spawns should be a part of the park format TODO
         PuppyMill m_puppyMill;
-        Duck* m_duck;
 };
