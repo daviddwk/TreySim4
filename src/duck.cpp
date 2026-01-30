@@ -29,6 +29,22 @@ Duck::~Duck() {
     Eend::Entities::boards().erase(m_headId);
 }
 
+void Duck::construct() {
+    assert(m_instance == nullptr);
+    m_instance = new Duck();
+}
+
+void Duck::destruct() {
+    assert(m_instance != nullptr);
+    delete m_instance;
+    m_instance = nullptr;
+}
+
+Duck& Duck::get() {
+    assert(m_instance != nullptr);
+    return *m_instance;
+}
+
 void Duck::setPosition(Eend::Point position) { m_position = position; }
 void Duck::setAlive(bool alive) { m_alive = alive; }
 

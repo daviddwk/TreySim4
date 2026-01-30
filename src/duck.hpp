@@ -12,8 +12,9 @@ namespace Eend = Eendgine;
 
 class Duck {
     public:
-        Duck();
-        ~Duck();
+        static void construct();
+        static void destruct();
+        static Duck& get();
 
         void setRotation(Eend::Angle rotation);
         void setPosition(Eend::Point position);
@@ -34,6 +35,17 @@ class Duck {
         enum class Direction { up, upRight, right, downRight, down, downLeft, left, upLeft };
 
     private:
+        Duck();
+        ~Duck();
+
+        Duck(const Duck& other) = delete;
+        Duck& operator=(const Duck& other) = delete;
+
+        Duck(Duck&& other) = delete;
+        Duck& operator=(Duck&& other) = delete;
+
+        inline static Duck* m_instance = nullptr;
+
         static constexpr float M_MOVE_SPEED = 25.0f;
         static constexpr float M_KICK_RADIUS = 15.0f;
         static constexpr float M_KICK_OFFSET = 5.0f;

@@ -58,7 +58,8 @@ int main() {
     // I need to create a level system that handles terrain
     {
         TextBoxQueue::construct();
-        Duck duck = Duck(); // also make singleton
+        Duck::construct();
+        Duck& duck = Duck::get();
         Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f), &duck);
 
         Terrain& terrain = Park::get().getTerrain();
@@ -206,7 +207,9 @@ int main() {
             Eend::Window::get().swapBuffers();
             Eend::FrameLimiter::get().stopInterval();
         }
+
         TextBoxQueue::destruct();
+        Duck::destruct();
         Park::destruct();
     } // Terrain
     Eend::Particles::destruct();
