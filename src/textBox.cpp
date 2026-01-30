@@ -55,6 +55,9 @@ void TextBoxQueue::queue(
     m_textBoxQueue.push(TextBoxParams(thumbnail, font, text, seconds, clickToContinue));
 }
 
+TextBoxQueue::TextBoxQueue() {}
+TextBoxQueue::~TextBoxQueue() { delete m_textBox; }
+
 void TextBoxQueue::update() {
     if (m_textBox) {
         if (m_continue) {

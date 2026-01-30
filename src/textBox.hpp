@@ -12,9 +12,6 @@ class TextBoxQueue {
         static void destruct();
         static TextBoxQueue& get();
 
-        TextBoxQueue(const TextBoxQueue&) = delete;
-        TextBoxQueue& operator=(const TextBoxQueue&) = delete;
-
         void queue(
             std::string thumbnail, Font font, std::string text, float seconds,
             bool clickToContinue);
@@ -47,8 +44,14 @@ class TextBoxQueue {
                 bool clickToContinue;
         };
 
-        TextBoxQueue() = default;
-        ~TextBoxQueue() = default;
+        TextBoxQueue();
+        ~TextBoxQueue();
+
+        TextBoxQueue(const TextBoxQueue&) = delete;
+        TextBoxQueue& operator=(const TextBoxQueue&) = delete;
+
+        TextBoxQueue(TextBoxQueue&& other) = delete;
+        TextBoxQueue& operator=(TextBoxQueue&& other) = delete;
 
         inline static TextBoxQueue* m_instance = nullptr;
 

@@ -51,23 +51,24 @@ int main() {
         Eend::Point(-20.0f, 5.0f, 0.0f),
         Eend::Point(3.0f, 0.0f, 3.0f));
 
+    TextBoxQueue::construct();
+    Duck::construct();
+    Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
+
     bool escapeReleased = false;
     bool paused = false;
     bool dead = false;
     // Weird hack to get terrain destructor to run before Entity Batches are deleted
     // I need to create a level system that handles terrain
     {
-        TextBoxQueue::construct();
-        Duck::construct();
         Duck& duck = Duck::get();
-        Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
         Terrain& terrain = Park::get().getTerrain();
 
         duck.setPosition(terrain.positionAtTile(20.0f, 20.0f, 0.0f));
 
-        float testAnimScale = 0.0f;
-        Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
+        // float testAnimScale = 0.0f;
+        // Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
 
         Text testText(Font::daniel, "", Eend::Point(20.0f), 50.0f, INFINITY);
         Text deathText(Font::daniel, "", Eend::Point(500.0f, 300.0f, 0.0f), 200.0f, INFINITY);
@@ -198,7 +199,7 @@ int main() {
 
                 TextBoxQueue::get().update();
                 Eend::Particles::get().update(dt);
-                Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
+                // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
             }
 
             Eend::Entities::draw(shaders, hudCamera, sceneCamera);
@@ -207,11 +208,12 @@ int main() {
             Eend::Window::get().swapBuffers();
             Eend::FrameLimiter::get().stopInterval();
         }
-
-        TextBoxQueue::destruct();
-        Duck::destruct();
-        Park::destruct();
+        Eend::Entities::panels().erase(exitId);
     } // Terrain
+    TextBoxQueue::destruct();
+    Duck::destruct();
+    Park::destruct();
+
     Eend::Particles::destruct();
     Eend::Entities::destruct();
     Eend::Audio::destruct();
