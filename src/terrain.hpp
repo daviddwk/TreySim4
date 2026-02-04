@@ -2,6 +2,7 @@
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
 #include <filesystem>
+#include <print>
 #include <tuple>
 #include <vector>
 
@@ -18,8 +19,10 @@ class Terrain {
 
         float getHeight() { return static_cast<float>(m_height) * m_scale.x; }
         float getWidth() { return static_cast<float>(m_width) * m_scale.y; }
+        Eend::Point getSpawn() { return positionAtTile(m_spawnTileX, m_spawnTileY); }
 
         float heightAtPoint(Eend::Point2D point);
+        Eend::Point positionAtTile(const float tileXIdx, const float tileYIdx);
         Eend::Point positionAtTile(float tileXIdx, float tileYIdx, float heightOffset);
 
     private:
@@ -32,4 +35,6 @@ class Terrain {
         std::vector<Eend::StatueId> m_statues;
         std::vector<std::tuple<Eend::DollId, float>> m_dolls;
         glm::vec3 m_scale;
+        float m_spawnTileX; // TODO make a type alias or struct for tile positions
+        float m_spawnTileY;
 };

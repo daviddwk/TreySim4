@@ -1,6 +1,7 @@
 #include "terrain.hpp"
 
 #include "collision.hpp"
+#include "duck.hpp"
 
 #include <Eendgine/board.hpp>
 #include <Eendgine/doll.hpp>
@@ -21,7 +22,8 @@
 namespace Eend = Eendgine;
 
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
-    : m_height(0), m_width(0), m_statueId(0), m_scale(scale) {
+    : m_height(0), m_width(0), m_statueId(0), m_scale(scale), m_spawnTileX(0.0f),
+      m_spawnTileY(0.0f) {
     // height map from image
     std::filesystem::path pngHeightMap = "resources" / path / "heightMap.png";
     std::filesystem::path pngCollisionMap = "resources" / path / "collisionMap.png";
@@ -40,10 +42,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     for (int h = 0; h < (m_height - 1); ++h) {
         // handling edge cases looks horrible ugly, i'll admit
         m_heightMap.emplace_back();
-        if (h == 0)
-            m_heightMap.emplace_back();
-        if (h == (m_height - 2))
-            m_heightMap.emplace_back();
+        if (h == 0) m_heightMap.emplace_back();
+        if (h == (m_height - 2)) m_heightMap.emplace_back();
         for (int w = 0; w < (m_width - 1); ++w) {
             unsigned int averageHeight = 0;
 
@@ -146,6 +146,11 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
         Eend::fatalError("improper json: " + metadataPath.string());
     }
 
+    if (rootJson["Spawn"].isArray()) {
+        m_spawnTileX = rootJson["Spawn"][0].asFloat();
+        m_spawnTileY = rootJson["Spawn"][1].asFloat();
+    }
+
     if (rootJson["Boards"].isArray()) {
         for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
             Json::Value boardJson = rootJson["Boards"][boardIdx];
@@ -155,8 +160,8 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             m_boards.push_back(std::tie(id, pace));
 
             float tileXIdx = boardJson["position"][0].asFloat();
-            float tileYIdx = boardJson["position"][2].asFloat();
-            float heightOffset = boardJson["position"][1].asFloat();
+            float tileYIdx = boardJson["position"][1].asFloat();
+            float heightOffset = boardJson["position"][2].asFloat();
 
             boardRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
             boardRef->setRotation(boardJson["rotation"].asFloat());
@@ -172,16 +177,18 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             m_statues.push_back(id);
 
             float tileXIdx = statueJson["position"][0].asFloat();
-            float tileYIdx = statueJson["position"][2].asFloat();
-            float heightOffset = statueJson["position"][1].asFloat();
+            float tileYIdx = statueJson["position"][1].asFloat();
+            float heightOffset = statueJson["position"][2].asFloat();
 
             statueRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
             statueRef->setRotation(
-                statueJson["rotation"][0].asFloat(), statueJson["rotation"][1].asFloat(),
+                statueJson["rotation"][0].asFloat(),
+                statueJson["rotation"][1].asFloat(),
                 statueJson["rotation"][2].asFloat());
             statueRef->setScale(
                 Eend::Scale(
-                    statueJson["scale"][0].asFloat(), statueJson["scale"][1].asFloat(),
+                    statueJson["scale"][0].asFloat(),
+                    statueJson["scale"][1].asFloat(),
                     statueJson["scale"][2].asFloat()));
         }
     }
@@ -194,16 +201,18 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             m_dolls.push_back(std::tie(id, pace));
 
             float tileXIdx = dollJson["position"][0].asFloat();
-            float tileYIdx = dollJson["position"][2].asFloat();
-            float heightOffset = dollJson["position"][1].asFloat();
+            float tileYIdx = dollJson["position"][1].asFloat();
+            float heightOffset = dollJson["position"][2].asFloat();
 
             dollRef->setPosition(positionAtTile(tileXIdx, tileYIdx, heightOffset));
             dollRef->setRotation(
-                dollJson["rotation"][0].asFloat(), dollJson["rotation"][1].asFloat(),
+                dollJson["rotation"][0].asFloat(),
+                dollJson["rotation"][1].asFloat(),
                 dollJson["rotation"][2].asFloat());
             dollRef->setScale(
                 Eend::Scale(
-                    dollJson["scale"][0].asFloat(), dollJson["scale"][1].asFloat(),
+                    dollJson["scale"][0].asFloat(),
+                    dollJson["scale"][1].asFloat(),
                     dollJson["scale"][2].asFloat()));
             if (dollJson.isMember("animation"))
                 dollRef->setAnimation(dollJson["animation"].asString());
@@ -325,16 +334,20 @@ void Terrain::update() {
 
 bool Terrain::colliding(const Eend::Point2D point) {
     for (auto& rectangle : m_collisionRectangles) {
-        if (pointOnRectangle(point, rectangle))
-            return true;
+        if (pointOnRectangle(point, rectangle)) return true;
     }
     return false;
+}
+
+Eend::Point Terrain::positionAtTile(const float tileXIdx, const float tileYIdx) {
+    return positionAtTile(tileXIdx, tileYIdx, 0.0f);
 }
 
 Eend::Point
 Terrain::positionAtTile(const float tileXIdx, const float tileYIdx, const float heightOffset) {
     return Eend::Point(
-        (tileXIdx * m_scale.x) + (m_scale.x / 2.0), (tileYIdx * -m_scale.y) + (-m_scale.y / 2.0),
+        (tileXIdx * m_scale.x) + (m_scale.x / 2.0),
+        (tileYIdx * -m_scale.y) + (-m_scale.y / 2.0),
         heightOffset +
             heightAtPoint(Eend::Point2D((float)tileXIdx * m_scale.x, tileYIdx * -m_scale.y)));
 }
@@ -378,11 +391,13 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
     const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
 
     const Eend::Point topLeftPoint = Eend::Point(
-        (float)topLeftXIdx * m_scale.x, (float)topLeftYIdx * -m_scale.y,
+        (float)topLeftXIdx * m_scale.x,
+        (float)topLeftYIdx * -m_scale.y,
         m_heightMap[topLeftYIdx][topLeftXIdx]);
 
     const Eend::Point bottomRightPoint = Eend::Point(
-        (float)bottomRightXIdx * m_scale.x, (float)bottomRightYIdx * -m_scale.y,
+        (float)bottomRightXIdx * m_scale.x,
+        (float)bottomRightYIdx * -m_scale.y,
         m_heightMap[bottomRightYIdx][bottomRightXIdx]);
 
     if (upperTri) {
@@ -391,7 +406,8 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const size_t topRightYIdx = (size_t)floor(-scaledY);
 
         const Eend::Point topRightPoint = Eend::Point(
-            (float)topRightXIdx * m_scale.x, (float)topRightYIdx * -m_scale.y,
+            (float)topRightXIdx * m_scale.x,
+            (float)topRightYIdx * -m_scale.y,
             m_heightMap[topRightYIdx][topRightXIdx]);
 
         triangle = Eend::Triangle(topLeftPoint, topRightPoint, bottomRightPoint);
@@ -401,7 +417,8 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         const size_t bottomLeftXIdx = (size_t)floor(scaledX);
         const size_t bottomLeftYIdx = (size_t)floor(-scaledY + 1);
         const Eend::Point bottomLeftPoint = Eend::Point(
-            (float)bottomLeftXIdx * m_scale.x, (float)bottomLeftYIdx * -m_scale.y,
+            (float)bottomLeftXIdx * m_scale.x,
+            (float)bottomLeftYIdx * -m_scale.y,
             m_heightMap[bottomLeftYIdx][bottomLeftXIdx]);
 
         triangle = Eend::Triangle(topLeftPoint, bottomLeftPoint, bottomRightPoint);

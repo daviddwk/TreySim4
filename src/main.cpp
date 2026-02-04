@@ -65,7 +65,7 @@ int main() {
 
         Terrain& terrain = Park::get().getTerrain();
 
-        duck.setPosition(terrain.positionAtTile(20.0f, 20.0f, 0.0f));
+        duck.setPosition(terrain.getSpawn());
 
         // float testAnimScale = 0.0f;
         // Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
@@ -159,7 +159,7 @@ int main() {
                         Park::get().reset();
                         Eendgine::Entities::shrink();
                         duck.health.heal(100);
-                        duck.setPosition(terrain.positionAtTile(20.0f, 20.0f, 0.0f));
+                        duck.setPosition(terrain.getSpawn());
                         duck.setAlive(true);
                     }
                 }
@@ -177,7 +177,6 @@ int main() {
             if (paused) {
                 // handle menu
             } else {
-
                 terrain.update();
                 duck.update(dt);
                 Park::get().update(dt);
