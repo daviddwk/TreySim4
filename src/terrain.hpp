@@ -9,7 +9,9 @@
 namespace Eend = Eendgine;
 
 class Terrain {
+
     public:
+        using Tile = glm::vec2;
         // would like this to be one path with scale build into the format
         Terrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
         ~Terrain();
@@ -28,8 +30,8 @@ class Terrain {
         Eend::Point getSpawn() { return positionAtTile(m_spawn); }
 
         float heightAtPoint(Eend::Point2D point);
-        Eend::Point positionAtTile(Eend::Tile tile);
-        Eend::Point positionAtTile(Eend::Tile tile, float heightOffset);
+        Eend::Point positionAtTile(Tile tile);
+        Eend::Point positionAtTile(Tile tile, float heightOffset);
 
     private:
         int m_height;
@@ -41,5 +43,5 @@ class Terrain {
         std::vector<Eend::StatueId> m_statues;
         std::vector<std::tuple<Eend::DollId, float>> m_dolls;
         Eend::Scale m_scale;
-        Eend::Tile m_spawn;
+        Tile m_spawn;
 };

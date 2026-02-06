@@ -23,7 +23,6 @@ namespace Eend = Eendgine;
 
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : m_height(0), m_width(0), m_statueId(0), m_scale(scale), m_spawn(0.0f) {
-    std::print("CREATE TERRAIN\n");
     // height map from image
     std::filesystem::path pngHeightMap = "resources" / path / "heightMap.png";
     std::filesystem::path pngCollisionMap = "resources" / path / "collisionMap.png";
@@ -163,7 +162,7 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float tileYIdx = boardJson["position"][1].asFloat();
             float heightOffset = boardJson["position"][2].asFloat();
 
-            boardRef->setPosition(positionAtTile(Eend::Tile(tileXIdx, tileYIdx), heightOffset));
+            boardRef->setPosition(positionAtTile(Tile(tileXIdx, tileYIdx), heightOffset));
             boardRef->setRotation(boardJson["rotation"].asFloat());
             boardRef->setScale(
                 Eend::Scale2D(boardJson["scale"][0].asFloat(), boardJson["scale"][1].asFloat()));
@@ -180,7 +179,7 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float tileYIdx = statueJson["position"][1].asFloat();
             float heightOffset = statueJson["position"][2].asFloat();
 
-            statueRef->setPosition(positionAtTile(Eend::Tile(tileXIdx, tileYIdx), heightOffset));
+            statueRef->setPosition(positionAtTile(Tile(tileXIdx, tileYIdx), heightOffset));
             statueRef->setRotation(
                 statueJson["rotation"][0].asFloat(),
                 statueJson["rotation"][1].asFloat(),
@@ -204,7 +203,7 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
             float tileYIdx = dollJson["position"][1].asFloat();
             float heightOffset = dollJson["position"][2].asFloat();
 
-            dollRef->setPosition(positionAtTile(Eend::Tile(tileXIdx, tileYIdx), heightOffset));
+            dollRef->setPosition(positionAtTile(Tile(tileXIdx, tileYIdx), heightOffset));
             dollRef->setRotation(
                 dollJson["rotation"][0].asFloat(),
                 dollJson["rotation"][1].asFloat(),
@@ -306,7 +305,6 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
 }
 
 Terrain::~Terrain() {
-    std::print("DESTROY TERRAIN\n");
     Eend::Entities::statues().erase(m_statueId);
     for (auto& board : m_boards)
         Eend::Entities::boards().erase(std::get<Eend::BoardId>(board));
@@ -340,9 +338,9 @@ bool Terrain::colliding(const Eend::Point2D point) {
     return false;
 }
 
-Eend::Point Terrain::positionAtTile(const Eend::Tile tile) { return positionAtTile(tile, 0.0f); }
+Eend::Point Terrain::positionAtTile(const Tile tile) { return positionAtTile(tile, 0.0f); }
 
-Eend::Point Terrain::positionAtTile(const Eend::Tile tile, const float heightOffset) {
+Eend::Point Terrain::positionAtTile(const Tile tile, const float heightOffset) {
     return Eend::Point(
         (tile.x * m_scale.x) + (m_scale.x / 2.0),
         (tile.y * -m_scale.y) + (-m_scale.y / 2.0),
