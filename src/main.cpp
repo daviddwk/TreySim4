@@ -63,7 +63,7 @@ int main() {
     {
         Duck& duck = Duck::get();
 
-        duck.setPosition(Park::get().getTerrain()->getSpawn());
+        duck.setPosition(Park::get().getSpawn());
 
         // float testAnimScale = 0.0f;
         // Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
@@ -157,7 +157,7 @@ int main() {
                         Park::get().reset();
                         Eendgine::Entities::shrink();
                         duck.health.heal(100);
-                        duck.setPosition(Park::get().getTerrain()->getSpawn());
+                        duck.setPosition(Park::get().getSpawn());
                         duck.setAlive(true);
                     }
                 }
@@ -179,8 +179,8 @@ int main() {
                 duck.update(dt);
 
                 Eend::Point duckPosition = duck.getPosition();
-                float terrainHeight = Park::get().getTerrain()->heightAtPoint(
-                    Eend::Point2D(duckPosition.x, duckPosition.y));
+                float terrainHeight =
+                    Park::get().heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
 
                 static Eend::Point lastCameraPosition =
                     Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);

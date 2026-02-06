@@ -60,7 +60,7 @@ class Duck {
 
         void handleMovement(float dt, std::optional<Duck::Direction> direction);
         void updatePosition(float dt);
-        void handleCollision(Terrain* terrain, Eend::Point& oldPosition);
+        void handleCollision(Eend::Point& oldPosition);
 
         Eend::StatueId m_bodyId;
         Eend::BoardId m_headId;

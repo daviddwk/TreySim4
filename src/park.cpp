@@ -4,9 +4,7 @@
 
 // should be path to park format, not png height map
 Park::Park(std::filesystem::path pngHeightMap, Eend::Scale scale)
-    : m_terrain(new Terrain(pngHeightMap, scale)), m_puppyMill() {}
-
-Park::~Park() { delete m_terrain; }
+    : m_terrain(std::make_unique<Terrain>(pngHeightMap, scale)), m_puppyMill() {}
 
 void Park::construct(std::filesystem::path pngHeightMap, Eend::Scale scale) {
     assert(m_instance == nullptr);
@@ -27,8 +25,7 @@ Park& Park::get() {
 void Park::update(float dt) {
     m_puppyMill.update(dt, Duck::get());
     if (m_nextTerrain) {
-        delete m_terrain;
-        m_terrain = new Terrain(m_nextTerrain->pngHeightMap, m_nextTerrain->scale);
+        m_terrain.reset(new Terrain(m_nextTerrain->pngHeightMap, m_nextTerrain->scale));
         Duck::get().setPosition(m_terrain->getSpawn());
     }
     m_nextTerrain = std::nullopt;
@@ -46,5 +43,18 @@ void Park::setTerrain(std::filesystem::path pngHeightMap, Eend::Scale scale) {
     m_nextTerrain = NextTerrainParams(pngHeightMap, scale);
 }
 
-// TODO instead use passthrough functions for all of the terrain stuff
-Terrain* Park::getTerrain() { return m_terrain; }
+bool Park::colliding(Eend::Point2D point) { return m_terrain->colliding(point); };
+
+float Park::getHeight() { return m_terrain->getHeight(); }
+
+float Park::getWidth() { return m_terrain->getWidth(); }
+
+Eend::Point Park::getSpawn() { return m_terrain->getSpawn(); }
+
+float Park::heightAtPoint(Eend::Point2D point) { return m_terrain->heightAtPoint(point); }
+
+Eend::Point Park::positionAtTile(Terrain::Tile tile) { return m_terrain->positionAtTile(tile); }
+
+Eend::Point Park::positionAtTile(Terrain::Tile tile, float heightOffset) {
+    return m_terrain->positionAtTile(tile, heightOffset);
+}

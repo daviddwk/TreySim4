@@ -6,6 +6,7 @@
 #include <Eendgine/types.hpp>
 
 #include <filesystem>
+#include <memory>
 #include <optional>
 
 class Park {
@@ -27,15 +28,24 @@ class Park {
         void update(float dt);
         void reset();
 
+        bool colliding(Eend::Point2D point);
+
+        float getHeight();
+        float getWidth();
+        Eend::Point getSpawn();
+
+        float heightAtPoint(Eend::Point2D point);
+        Eend::Point positionAtTile(Terrain::Tile tile);
+        Eend::Point positionAtTile(Terrain::Tile tile, float heightOffset);
+
         unsigned int numDogsKilled();
 
         void setTerrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
         // just give pointer to terrain
-        Terrain* getTerrain();
 
     private:
         Park(std::filesystem::path pngHeightMap, Eend::Scale scale);
-        ~Park();
+        ~Park() = default;
 
         Park(const Park& other) = delete;
         Park& operator=(const Park& other) = delete;
@@ -47,7 +57,7 @@ class Park {
 
         std::optional<NextTerrainParams> m_nextTerrain = std::nullopt;
 
-        Terrain* m_terrain;
+        std::unique_ptr<Terrain> m_terrain;
         // part of park and dog spawns should be a part of the park format TODO
         PuppyMill m_puppyMill;
 };

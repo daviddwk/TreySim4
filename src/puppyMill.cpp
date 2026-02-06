@@ -30,15 +30,14 @@ void PuppyMill::spawn() {
     static auto tickLast = std::chrono::steady_clock::now();
     auto now = std::chrono::steady_clock::now();
     auto tickMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - tickLast).count();
-    Terrain* terrain = Park::get().getTerrain();
     if (tickMs >= M_SPAWN_TIME_MS) {
         tickLast = now;
         Eend::Point2D spawnPosition = Eend::Point2D(0.0f);
         if (Eend::randomRange(0, 1)) {
-            spawnPosition.x = terrain->getWidth();
+            spawnPosition.x = Park::get().getWidth();
         }
         if (Eend::randomRange(0, 1)) {
-            spawnPosition.y = -terrain->getHeight();
+            spawnPosition.y = -Park::get().getHeight();
         }
         m_dogs.emplace_back(spawnPosition, Eend::Scale2D(5.0f, 5.0f), 0.0f);
     }
