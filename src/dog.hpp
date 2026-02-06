@@ -11,7 +11,7 @@ namespace Eend = Eendgine;
 
 class Dog {
     public:
-        Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain& terrain);
+        Dog(Eend::Point2D position, Eend::Scale2D scale, float speed);
         ~Dog();
 
         Dog(const Dog& other) = delete;

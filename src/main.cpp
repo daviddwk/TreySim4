@@ -53,7 +53,7 @@ int main() {
 
     TextBoxQueue::construct();
     Duck::construct();
-    Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
+    Park::construct("terrain/test", Eend::Scale(3.0f, 3.0f, 20.0f));
 
     bool escapeReleased = false;
     bool paused = false;
@@ -63,9 +63,7 @@ int main() {
     {
         Duck& duck = Duck::get();
 
-        Terrain& terrain = Park::get().getTerrain();
-
-        duck.setPosition(terrain.getSpawn());
+        duck.setPosition(Park::get().getTerrain()->getSpawn());
 
         // float testAnimScale = 0.0f;
         // Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
@@ -159,7 +157,7 @@ int main() {
                         Park::get().reset();
                         Eendgine::Entities::shrink();
                         duck.health.heal(100);
-                        duck.setPosition(terrain.getSpawn());
+                        duck.setPosition(Park::get().getTerrain()->getSpawn());
                         duck.setAlive(true);
                     }
                 }
@@ -169,6 +167,7 @@ int main() {
                 if (escapeReleased && escapePressed) {
                     paused = true;
                     escapeReleased = false;
+                    Park::get().setTerrain("terrain/grassy", Eend::Scale(3.0));
                     // create menu
                     // testing shrink
                 }
@@ -177,13 +176,11 @@ int main() {
             if (paused) {
                 // handle menu
             } else {
-                terrain.update();
                 duck.update(dt);
-                Park::get().update(dt);
 
                 Eend::Point duckPosition = duck.getPosition();
-                float terrainHeight =
-                    terrain.heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+                float terrainHeight = Park::get().getTerrain()->heightAtPoint(
+                    Eend::Point2D(duckPosition.x, duckPosition.y));
 
                 static Eend::Point lastCameraPosition =
                     Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
@@ -196,6 +193,7 @@ int main() {
                 sceneCamera.setTarget(
                     Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
 
+                Park::get().update(dt);
                 TextBoxQueue::get().update();
                 Eend::Particles::get().update(dt);
                 // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);

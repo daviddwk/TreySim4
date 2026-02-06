@@ -23,6 +23,7 @@ namespace Eend = Eendgine;
 
 Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     : m_height(0), m_width(0), m_statueId(0), m_scale(scale), m_spawn(0.0f) {
+    std::print("CREATE TERRAIN\n");
     // height map from image
     std::filesystem::path pngHeightMap = "resources" / path / "heightMap.png";
     std::filesystem::path pngCollisionMap = "resources" / path / "collisionMap.png";
@@ -305,6 +306,7 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
 }
 
 Terrain::~Terrain() {
+    std::print("DESTROY TERRAIN\n");
     Eend::Entities::statues().erase(m_statueId);
     for (auto& board : m_boards)
         Eend::Entities::boards().erase(std::get<Eend::BoardId>(board));

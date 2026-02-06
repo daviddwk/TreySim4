@@ -55,7 +55,7 @@ float Duck::getRadius() { return M_DUCK_RADIUS; }
 void Duck::update(float dt) {
 
     Eend::Point oldDuckPosition = getPosition();
-    Terrain& terrain = Park::get().getTerrain();
+    Terrain* terrain = Park::get().getTerrain();
 
     std::optional<Direction> currentDirection = getDirection();
     if (currentDirection && m_alive) {
@@ -67,7 +67,7 @@ void Duck::update(float dt) {
     }
     handleCollision(terrain, oldDuckPosition);
 
-    float heightAtPoint = terrain.heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
+    float heightAtPoint = terrain->heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
 
     m_kicking = false;
     if (Eend::InputManager::get().getSpacePress() && !m_inAir && m_alive) {
@@ -164,11 +164,11 @@ void Duck::updatePosition(float dt) {
     }
 }
 
-void Duck::handleCollision(Terrain& terrain, Eend::Point& oldPosition) {
-    if (!terrain.colliding(Eend::Point2D(m_position.x, m_position.y))) {
-    } else if (!terrain.colliding(Eend::Point2D(oldPosition.x, m_position.y))) {
+void Duck::handleCollision(Terrain* terrain, Eend::Point& oldPosition) {
+    if (!terrain->colliding(Eend::Point2D(m_position.x, m_position.y))) {
+    } else if (!terrain->colliding(Eend::Point2D(oldPosition.x, m_position.y))) {
         m_position.x = oldPosition.x;
-    } else if (!terrain.colliding(Eend::Point2D(m_position.x, oldPosition.y))) {
+    } else if (!terrain->colliding(Eend::Point2D(m_position.x, oldPosition.y))) {
         m_position.y = oldPosition.y;
     } else {
         m_position.x = oldPosition.x;

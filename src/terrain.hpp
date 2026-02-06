@@ -14,6 +14,12 @@ class Terrain {
         Terrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
         ~Terrain();
 
+        Terrain(const Terrain& other) = delete;
+        Terrain& operator=(const Terrain& other) = delete;
+
+        Terrain(Terrain&& other) = delete;
+        Terrain& operator=(Terrain&& other) = delete;
+
         void update();
         bool colliding(Eend::Point2D point);
 

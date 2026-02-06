@@ -1,4 +1,5 @@
 {
+  "Spawn" : [2.0, 2.0],
   "Boards": [
     {
       "position": [1, 3, 2],

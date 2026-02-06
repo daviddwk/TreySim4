@@ -7,14 +7,15 @@
 #include <print>
 namespace Eend = Eendgine;
 
-Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Terrain& terrain)
+Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed)
     : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards"))),
       m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_animTime(0.0f),
       m_health(M_HEALTH), m_deadTime(0.0f), m_delete(false) {
     Eend::Board* boardRef = Eend::Entities::boards().getRef(*m_bodyId);
     boardRef->setStrip("walk");
     boardRef->setScale(scale);
-    boardRef->setPosition(Eend::Point(position.x, terrain.heightAtPoint(position), position.y));
+    boardRef->setPosition(
+        Eend::Point(position.x, Park::get().getTerrain()->heightAtPoint(position), position.y));
 }
 Dog::~Dog() {
     if (m_bodyId) Eend::Entities::boards().erase(*m_bodyId);
@@ -62,7 +63,7 @@ Eend::Point Dog::getPosition3d() {
     return Eend::Point(
         m_position.x,
         m_position.y,
-        Park::get().getTerrain().heightAtPoint(m_position));
+        Park::get().getTerrain()->heightAtPoint(m_position));
 }
 
 unsigned int Dog::getDamage() { return M_DAMAGE; }
@@ -139,5 +140,5 @@ void Dog::update(float dt, Eend::Point2D approachPoint) {
         Eend::Point(
             m_position.x,
             m_position.y,
-            Park::get().getTerrain().heightAtPoint(m_position) + M_UP_OFFSET));
+            Park::get().getTerrain()->heightAtPoint(m_position) + M_UP_OFFSET));
 }

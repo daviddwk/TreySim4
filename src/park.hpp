@@ -6,8 +6,18 @@
 #include <Eendgine/types.hpp>
 
 #include <filesystem>
+#include <optional>
 
 class Park {
+        class NextTerrainParams {
+            public:
+                NextTerrainParams(std::filesystem::path pngHeightMap, Eend::Scale scale)
+                    : pngHeightMap(pngHeightMap), scale(scale) {}
+
+                std::filesystem::path pngHeightMap;
+                Eend::Scale scale;
+        };
+
     public:
         static void construct(std::filesystem::path pngHeightMap, Eend::Scale scale);
         static void destruct();
@@ -21,11 +31,11 @@ class Park {
 
         void setTerrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
         // just give pointer to terrain
-        Terrain& getTerrain();
+        Terrain* getTerrain();
 
     private:
         Park(std::filesystem::path pngHeightMap, Eend::Scale scale);
-        ~Park() = default;
+        ~Park();
 
         Park(const Park& other) = delete;
         Park& operator=(const Park& other) = delete;
@@ -35,7 +45,9 @@ class Park {
 
         inline static Park* m_instance = nullptr;
 
-        Terrain m_terrain;
+        std::optional<NextTerrainParams> m_nextTerrain = std::nullopt;
+
+        Terrain* m_terrain;
         // part of park and dog spawns should be a part of the park format TODO
         PuppyMill m_puppyMill;
 };
