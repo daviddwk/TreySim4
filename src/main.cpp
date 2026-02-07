@@ -15,11 +15,9 @@
 #include <stb/stb_image.h>
 
 #include <filesystem>
-#include <print>
 
 #include "duck.hpp"
 #include "park.hpp"
-#include "terrain.hpp"
 #include "text.hpp"
 #include "textBox.hpp"
 
@@ -53,7 +51,7 @@ int main() {
 
     TextBoxQueue::construct();
     Duck::construct();
-    Park::construct("terrain/test", Eend::Scale(3.0f, 3.0f, 20.0f));
+    Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
     bool escapeReleased = false;
     bool paused = false;
@@ -167,7 +165,7 @@ int main() {
                 if (escapeReleased && escapePressed) {
                     paused = true;
                     escapeReleased = false;
-                    Park::get().setTerrain("terrain/grassy", Eend::Scale(3.0));
+                    Park::get().setTerrain("terrain/test", Eend::Scale(3.0));
                     // create menu
                     // testing shrink
                 }
@@ -193,10 +191,10 @@ int main() {
                 sceneCamera.setTarget(
                     Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
 
-                Park::get().update(dt);
                 TextBoxQueue::get().update();
                 Eend::Particles::get().update(dt);
                 // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
+                Park::get().update(dt);
             }
 
             Eend::Entities::draw(shaders, hudCamera, sceneCamera);

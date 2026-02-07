@@ -59,5 +59,5 @@ class Park {
 
         std::unique_ptr<Terrain> m_terrain;
         // part of park and dog spawns should be a part of the park format TODO
-        PuppyMill m_puppyMill;
+        std::unique_ptr<PuppyMill> m_puppyMill;
 };

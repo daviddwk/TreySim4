@@ -1,6 +1,7 @@
 #include "Eendgine/board.hpp"
 #include "Eendgine/types.hpp"
 #include "dog.hpp"
+#include "duck.hpp"
 #include "park.hpp"
 
 #include <glm/vector_relational.hpp>
@@ -90,8 +91,7 @@ void Dog::kick(Eend::Point kick) {
     m_knockback = glm::normalize(kick) * kickFactor;
 }
 
-void Dog::update(float dt, Eend::Point2D approachPoint) {
-
+void Dog::update(float dt) {
     assert(m_bodyId);
     Eend::Board* boardRef = Eend::Entities::boards().getRef(*m_bodyId);
 
@@ -112,6 +112,8 @@ void Dog::update(float dt, Eend::Point2D approachPoint) {
     }
 
     m_position += m_knockback * dt;
+
+    Eend::Point2D approachPoint = Duck::get().getPosition();
 
     if (m_health != 0) {
         const glm::vec2 difference = approachPoint - m_position;
