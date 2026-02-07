@@ -24,19 +24,20 @@ Park& Park::get() {
 }
 
 void Park::update(float dt) {
+
     m_puppyMill->update(dt);
+
     if (m_nextTerrain) {
+        m_terrain.reset(new Terrain(m_nextTerrain->pngHeightMap, m_nextTerrain->scale));
+        // after because then the new spawn is set
         reset();
-        Duck::get().setPosition(m_terrain->getSpawn());
     }
     m_nextTerrain = std::nullopt;
 }
 
 void Park::reset() {
-    std::print("park reset \n");
-    // TODO also reset duck position to default
-    m_terrain.reset(new Terrain(m_nextTerrain->pngHeightMap, m_nextTerrain->scale));
     m_puppyMill.reset(new PuppyMill());
+    Duck::get().setPosition(m_terrain->getSpawn());
 }
 
 unsigned int Park::numDogsKilled() { return m_puppyMill->getNumKilled(); }

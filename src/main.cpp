@@ -23,6 +23,13 @@
 
 namespace Eend = Eendgine;
 
+void pausedUpdate();
+void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera);
+void pauseLatch(bool& paused, bool& dead, Text& deathText);
+void onRespawn(Text& deathText);
+void onPause();
+void onUnpause();
+
 const unsigned int screenHeight = 1080;
 const unsigned int screenWidth = 1920;
 
@@ -53,7 +60,6 @@ int main() {
     Duck::construct();
     Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
 
-    bool escapeReleased = false;
     bool paused = false;
     bool dead = false;
     // Weird hack to get terrain destructor to run before Entity Batches are deleted
@@ -138,63 +144,12 @@ int main() {
                 duck.setAlive(false);
             }
 
-            // pause latch and menu setup / teardown
-            if (paused || dead) {
-                bool escapePressed = Eend::InputManager::get().getEscapePress();
-                if (!escapePressed) escapeReleased = true;
-                if (escapeReleased && escapePressed) {
-                    escapeReleased = false;
-                    if (paused) {
-                        paused = false;
-                    }
-                    // destroy menu
-                    // every frame death stuff
-                    if (dead) {
-                        dead = false;
-                        deathText.setText("");
-                        Park::get().reset();
-                        Eendgine::Entities::shrink();
-                        duck.health.heal(100);
-                        duck.setPosition(Park::get().getSpawn());
-                        duck.setAlive(true);
-                    }
-                }
-            } else {
-                bool escapePressed = Eend::InputManager::get().getEscapePress();
-                if (!escapePressed) escapeReleased = true;
-                if (escapeReleased && escapePressed) {
-                    paused = true;
-                    escapeReleased = false;
-                    Park::get().setTerrain("terrain/test", Eend::Scale(3.0));
-                    // create menu
-                    // testing shrink
-                }
-            }
+            pauseLatch(paused, dead, deathText);
 
             if (paused) {
-                // handle menu
+                pausedUpdate();
             } else {
-                duck.update(dt);
-
-                Eend::Point duckPosition = duck.getPosition();
-                float terrainHeight =
-                    Park::get().heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
-
-                static Eend::Point lastCameraPosition =
-                    Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
-                Eend::Point approachCameraPosition =
-                    Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
-                float cameraLag = (10.0f * dt);
-                lastCameraPosition = (lastCameraPosition + (approachCameraPosition * cameraLag)) /
-                                     (cameraLag + 1.0f);
-                sceneCamera.setPosition(lastCameraPosition);
-                sceneCamera.setTarget(
-                    Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
-
-                TextBoxQueue::get().update();
-                Eend::Particles::get().update(dt);
-                // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
-                Park::get().update(dt);
+                unpausedUpdate(dt, sceneCamera);
             }
 
             Eend::Entities::draw(shaders, hudCamera, sceneCamera);
@@ -216,4 +171,70 @@ int main() {
     Eend::Window::destruct();
     Eend::FrameLimiter::destruct();
     return 0;
+}
+
+void pauseLatch(bool& paused, bool& dead, Text& deathText) {
+    static bool escapeReleased = false;
+    if (paused || dead) {
+        bool escapePressed = Eend::InputManager::get().getEscapePress();
+        if (!escapePressed) escapeReleased = true;
+        if (escapeReleased && escapePressed) {
+            escapeReleased = false;
+            if (paused) {
+                paused = false;
+                onUnpause();
+            }
+            // destroy menu
+            // every frame death stuff
+            if (dead) {
+                dead = false;
+                onRespawn(deathText);
+            }
+        }
+    } else {
+        bool escapePressed = Eend::InputManager::get().getEscapePress();
+        if (!escapePressed) escapeReleased = true;
+        if (escapeReleased && escapePressed) {
+            paused = true;
+            escapeReleased = false;
+            onPause();
+        }
+    }
+}
+
+void onRespawn(Text& deathText) {
+    deathText.setText("");
+    Park::get().reset();
+    Duck::get().health.heal(100);
+    Duck::get().setPosition(Park::get().getSpawn());
+    Duck::get().setAlive(true);
+    Eendgine::Entities::shrink();
+}
+
+void onUnpause() { Park::get().setTerrain("terrain/test", Eend::Scale(3.0)); }
+
+void onPause() {}
+
+void pausedUpdate() {}
+
+void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera) {
+    Duck::get().update(dt);
+
+    Eend::Point duckPosition = Duck::get().getPosition();
+    float terrainHeight = Park::get().heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+
+    static Eend::Point lastCameraPosition =
+        Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
+    Eend::Point approachCameraPosition =
+        Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
+    float cameraLag = (10.0f * dt);
+    lastCameraPosition =
+        (lastCameraPosition + (approachCameraPosition * cameraLag)) / (cameraLag + 1.0f);
+    sceneCamera.setPosition(lastCameraPosition);
+    sceneCamera.setTarget(Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
+
+    TextBoxQueue::get().update();
+    Eend::Particles::get().update(dt);
+    // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
+    Park::get().update(dt);
 }
