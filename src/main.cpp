@@ -23,12 +23,13 @@
 
 namespace Eend = Eendgine;
 
-void pausedUpdate();
-void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera);
-void pauseLatch(bool& paused, bool& dead, Text& deathText);
-void onRespawn(Text& deathText);
-void onPause();
-void onUnpause();
+static void pausedUpdate();
+static void onDeath(Text& deathText);
+static void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera);
+static void pauseLatch(bool& paused, bool& dead, Text& deathText);
+static void onRespawn(Text& deathText);
+static void onPause();
+static void onUnpause();
 
 const unsigned int screenHeight = 1080;
 const unsigned int screenWidth = 1920;
@@ -137,15 +138,7 @@ int main() {
                 Park::get().numDogsKilled()));
             // clang-format on
 
-            // run once on death
-            if (!dead && (duck.health.getHealth() == 0)) {
-                dead = true;
-                deathText.setText("YOU DIED!\nPRESS ESC\n");
-                duck.setAlive(false);
-            }
-
             pauseLatch(paused, dead, deathText);
-
             if (paused) {
                 pausedUpdate();
             } else {
@@ -173,8 +166,15 @@ int main() {
     return 0;
 }
 
-void pauseLatch(bool& paused, bool& dead, Text& deathText) {
+static void pauseLatch(bool& paused, bool& dead, Text& deathText) {
+
     static bool escapeReleased = false;
+
+    if (!dead && (Duck::get().health.getHealth() == 0)) {
+        dead = true;
+        onDeath(deathText);
+    }
+
     if (paused || dead) {
         bool escapePressed = Eend::InputManager::get().getEscapePress();
         if (!escapePressed) escapeReleased = true;
@@ -201,8 +201,12 @@ void pauseLatch(bool& paused, bool& dead, Text& deathText) {
         }
     }
 }
+static void onDeath(Text& deathText) {
+    deathText.setText("YOU DIED!\nPRESS ESC\n");
+    Duck::get().setAlive(false);
+}
 
-void onRespawn(Text& deathText) {
+static void onRespawn(Text& deathText) {
     deathText.setText("");
     Park::get().reset();
     Duck::get().health.heal(100);
@@ -211,13 +215,13 @@ void onRespawn(Text& deathText) {
     Eendgine::Entities::shrink();
 }
 
-void onUnpause() { Park::get().setTerrain("terrain/test", Eend::Scale(3.0)); }
+static void onUnpause() { Park::get().setTerrain("terrain/test", Eend::Scale(3.0)); }
 
-void onPause() {}
+static void onPause() {}
 
-void pausedUpdate() {}
+static void pausedUpdate() {}
 
-void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera) {
+static void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera) {
     Duck::get().update(dt);
 
     Eend::Point duckPosition = Duck::get().getPosition();
