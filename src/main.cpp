@@ -65,48 +65,45 @@ int main() {
 
     bool paused = false;
     bool dead = false;
-    // Weird hack to get terrain destructor to run before Entity Batches are deleted
-    // I need to create a level system that handles terrain
-    {
-        Duck& duck = Duck::get();
+    Duck& duck = Duck::get();
 
-        duck.setPosition(Park::get().getSpawn());
+    duck.setPosition(Park::get().getSpawn());
 
-        TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
-        TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
-        TextBoxQueue::get().queue(
-            "duck",
-            Font::daniel,
-            "What the duck did you just call me? You little quack! "
-            "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
-            5.0f,
-            true);
+    TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
+    TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
+    TextBoxQueue::get().queue(
+        "duck",
+        Font::daniel,
+        "What the duck did you just call me? You little quack! "
+        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
+        5.0f,
+        true);
 
-        Eend::Audio::get().playTrack(
-            "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
-            50.0f);
+    Eend::Audio::get().playTrack(
+        "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
+        50.0f);
 
-        while (!Eend::InputManager::get().getShouldClose()) {
-            float dt = Eend::FrameLimiter::get().deltaTime;
-            Eend::FrameLimiter::get().startInterval();
-            Eend::Screen::get().bind();
-            Eend::InputManager::get().processInput();
-            shaders.setPixelSize(5);
+    while (!Eend::InputManager::get().getShouldClose()) {
+        float dt = Eend::FrameLimiter::get().deltaTime;
+        Eend::FrameLimiter::get().startInterval();
+        Eend::Screen::get().bind();
+        Eend::InputManager::get().processInput();
+        shaders.setPixelSize(5);
 
-            Hud::get().update(dt);
+        Hud::get().update(dt);
 
-            pauseLatch(paused, dead);
-            if (paused) {
-                pausedUpdate();
-            } else {
-                unpausedUpdate(dt, sceneCamera);
-            }
-
-            Eend::Entities::draw(shaders, hudCamera, sceneCamera);
-            Eend::Screen::get().render(shaders.getShader(Eend::Shader::screen));
-            Eend::Window::get().swapBuffers();
-            Eend::FrameLimiter::get().stopInterval();
+        pauseLatch(paused, dead);
+        if (paused) {
+            pausedUpdate();
+        } else {
+            unpausedUpdate(dt, sceneCamera);
         }
+
+        Eend::Entities::draw(shaders, hudCamera, sceneCamera);
+        Eend::Screen::get().render(shaders.getShader(Eend::Shader::screen));
+        Eend::Window::get().swapBuffers();
+        Eend::FrameLimiter::get().stopInterval();
+
     } // Terrain
     TextBoxQueue::destruct();
     Hud::destruct();
