@@ -17,6 +17,7 @@
 #include <filesystem>
 
 #include "duck.hpp"
+#include "hud.hpp"
 #include "park.hpp"
 #include "text.hpp"
 #include "textBox.hpp"
@@ -24,10 +25,10 @@
 namespace Eend = Eendgine;
 
 static void pausedUpdate();
-static void onDeath(Text& deathText);
+static void onDeath();
 static void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera);
-static void pauseLatch(bool& paused, bool& dead, Text& deathText);
-static void onRespawn(Text& deathText);
+static void pauseLatch(bool& paused, bool& dead);
+static void onRespawn();
 static void onPause();
 static void onUnpause();
 
@@ -57,9 +58,10 @@ int main() {
         Eend::Point(-20.0f, 5.0f, 0.0f),
         Eend::Point(3.0f, 0.0f, 3.0f));
 
-    TextBoxQueue::construct();
     Duck::construct();
     Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
+    Hud::construct();
+    TextBoxQueue::construct();
 
     bool paused = false;
     bool dead = false;
@@ -69,19 +71,6 @@ int main() {
         Duck& duck = Duck::get();
 
         duck.setPosition(Park::get().getSpawn());
-
-        // float testAnimScale = 0.0f;
-        // Eend::DollId testDollId = Eend::Entities::dolls().insert("testCube");
-
-        Text testText(Font::daniel, "", Eend::Point(20.0f), 50.0f, INFINITY);
-        Text deathText(Font::daniel, "", Eend::Point(500.0f, 300.0f, 0.0f), 200.0f, INFINITY);
-
-        bool testColliding = false;
-
-        Eend::PanelId exitId = Eend::Entities::panels().insert("exit");
-        Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitId);
-        exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
-        exitRef->setPosition(Eend::Point((float)screenWidth - 80.0f, 30.0f, 0.0f));
 
         TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
         TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
@@ -104,41 +93,9 @@ int main() {
             Eend::InputManager::get().processInput();
             shaders.setPixelSize(5);
 
-            Eend::Panel::MouseStatus exitMouseStatus =
-                Eend::Entities::panels().getRef(exitId)->isClicked();
-            std::string exitMouseString = "";
-            if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
-                exitMouseString = "click";
-            } else if (exitMouseStatus == Eend::Panel::MouseStatus::hover) {
-                exitMouseString = "hover";
-            } else if (exitMouseStatus == Eend::Panel::MouseStatus::none) {
-                exitMouseString = "none";
-            }
+            Hud::get().update(dt);
 
-            if (exitMouseStatus == Eend::Panel::MouseStatus::click) {
-                Eend::InputManager::get().setShouldClose(true);
-            }
-            // clang-format off
-        testText.setText(
-            std::format(
-                "FPS:{:.4f} DT:{:.4f}\n"
-                "X:{:.4f} Y:{:.4f} Z:{:.4f}\n"
-                "duck:{} mouse:{} \n"
-                "mouseX:{} dx:{} mouseY:{} dy:{}\n"
-                "left:{} right:{} mid:{}\n"
-                "dogs slain:{}",
-                1.0f / dt, dt,
-                duck.getPosition().x, duck.getPosition().y, duck.getPosition().z,
-                testColliding, exitMouseString,
-                Eend::InputManager::get().getMouseX(), Eend::InputManager::get().getDeltaMouseX(),
-                Eend::InputManager::get().getMouseY(), Eend::InputManager::get().getDeltaMouseY(),
-                Eend::InputManager::get().getLeftClick(),
-                Eend::InputManager::get().getRightClick(),
-                Eend::InputManager::get().getMiddleClick(),
-                Park::get().numDogsKilled()));
-            // clang-format on
-
-            pauseLatch(paused, dead, deathText);
+            pauseLatch(paused, dead);
             if (paused) {
                 pausedUpdate();
             } else {
@@ -147,13 +104,12 @@ int main() {
 
             Eend::Entities::draw(shaders, hudCamera, sceneCamera);
             Eend::Screen::get().render(shaders.getShader(Eend::Shader::screen));
-
             Eend::Window::get().swapBuffers();
             Eend::FrameLimiter::get().stopInterval();
         }
-        Eend::Entities::panels().erase(exitId);
     } // Terrain
     TextBoxQueue::destruct();
+    Hud::destruct();
     Duck::destruct();
     Park::destruct();
 
@@ -166,13 +122,13 @@ int main() {
     return 0;
 }
 
-static void pauseLatch(bool& paused, bool& dead, Text& deathText) {
+static void pauseLatch(bool& paused, bool& dead) {
 
     static bool escapeReleased = false;
 
     if (!dead && (Duck::get().health.getHealth() == 0)) {
         dead = true;
-        onDeath(deathText);
+        onDeath();
     }
 
     if (paused || dead) {
@@ -188,7 +144,7 @@ static void pauseLatch(bool& paused, bool& dead, Text& deathText) {
             // every frame death stuff
             if (dead) {
                 dead = false;
-                onRespawn(deathText);
+                onRespawn();
             }
         }
     } else {
@@ -201,13 +157,13 @@ static void pauseLatch(bool& paused, bool& dead, Text& deathText) {
         }
     }
 }
-static void onDeath(Text& deathText) {
-    deathText.setText("YOU DIED!\nPRESS ESC\n");
+static void onDeath() {
+    Hud::get().setDeathText("YOU DIED!\nPRESS ESC\n");
     Duck::get().setAlive(false);
 }
 
-static void onRespawn(Text& deathText) {
-    deathText.setText("");
+static void onRespawn() {
+    Hud::get().setDeathText("");
     Park::get().reset();
     Duck::get().health.heal(100);
     Duck::get().setPosition(Park::get().getSpawn());
