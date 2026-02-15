@@ -24,6 +24,7 @@
 
 namespace Eend = Eendgine;
 
+static void onStart();
 static void pausedUpdate();
 static void onDeath();
 static void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera);
@@ -31,6 +32,7 @@ static void pauseLatch(bool& paused, bool& dead);
 static void onRespawn();
 static void onPause();
 static void onUnpause();
+static void onEnd();
 
 const unsigned int screenHeight = 1080;
 const unsigned int screenWidth = 1920;
@@ -45,6 +47,7 @@ int main() {
     Eend::Entities::construct();
     Eend::Particles::construct();
 
+    // TODO make shaders part of Screen or its own thing
     Eend::Shaders shaders(
         Eend::ShaderProgram("shaders/panel.vert", "shaders/panel.frag"),
         Eend::ShaderProgram("shaders/board.vert", "shaders/board.frag"),
@@ -52,6 +55,7 @@ int main() {
         Eend::ShaderProgram("shaders/doll.vert", "shaders/doll.frag"),
         Eend::ShaderProgram("shaders/screen.vert", "shaders/screen.frag"));
 
+    // TODO make comeras their own thing
     Eend::Camera2D hudCamera(screenWidth, screenHeight);
     Eend::Camera3D sceneCamera(
         (float)screenWidth / (float)screenHeight,
@@ -63,32 +67,19 @@ int main() {
     Hud::construct();
     TextBoxQueue::construct();
 
-    bool paused = false;
-    bool dead = false;
-    Duck& duck = Duck::get();
-
-    duck.setPosition(Park::get().getSpawn());
-
-    TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
-    TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
-    TextBoxQueue::get().queue(
-        "duck",
-        Font::daniel,
-        "What the duck did you just call me? You little quack! "
-        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
-        5.0f,
-        true);
-
-    Eend::Audio::get().playTrack(
-        "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
-        50.0f);
+    onStart();
 
     while (!Eend::InputManager::get().getShouldClose()) {
-        float dt = Eend::FrameLimiter::get().deltaTime;
+        static bool paused = false;
+        static bool dead = false;
+        static float dt = 0.0;
+
         Eend::FrameLimiter::get().startInterval();
         Eend::Screen::get().bind();
         Eend::InputManager::get().processInput();
         shaders.setPixelSize(5);
+
+        dt = Eend::FrameLimiter::get().deltaTime;
 
         Hud::get().update(dt);
 
@@ -103,8 +94,10 @@ int main() {
         Eend::Screen::get().render(shaders.getShader(Eend::Shader::screen));
         Eend::Window::get().swapBuffers();
         Eend::FrameLimiter::get().stopInterval();
+    }
 
-    } // Terrain
+    onEnd();
+
     TextBoxQueue::destruct();
     Hud::destruct();
     Duck::destruct();
@@ -117,6 +110,25 @@ int main() {
     Eend::Window::destruct();
     Eend::FrameLimiter::destruct();
     return 0;
+}
+
+static void onStart() {
+
+    Duck::get().setPosition(Park::get().getSpawn());
+
+    TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
+    TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
+    TextBoxQueue::get().queue(
+        "duck",
+        Font::daniel,
+        "What the duck did you just call me? You little quack! "
+        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
+        5.0f,
+        true);
+
+    Eend::Audio::get().playTrack(
+        "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
+        50.0f);
 }
 
 static void pauseLatch(bool& paused, bool& dead) {
@@ -137,8 +149,6 @@ static void pauseLatch(bool& paused, bool& dead) {
                 paused = false;
                 onUnpause();
             }
-            // destroy menu
-            // every frame death stuff
             if (dead) {
                 dead = false;
                 onRespawn();
@@ -155,12 +165,12 @@ static void pauseLatch(bool& paused, bool& dead) {
     }
 }
 static void onDeath() {
-    Hud::get().setDeathText("YOU DIED!\nPRESS ESC\n");
+    Hud::get().setDeathText(true);
     Duck::get().setAlive(false);
 }
 
 static void onRespawn() {
-    Hud::get().setDeathText("");
+    Hud::get().setDeathText(false);
     Park::get().reset();
     Duck::get().health.heal(100);
     Duck::get().setPosition(Park::get().getSpawn());
@@ -195,3 +205,5 @@ static void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera) {
     // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
     Park::get().update(dt);
 }
+
+static void onEnd() {}
