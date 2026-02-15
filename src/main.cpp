@@ -46,9 +46,7 @@ int main() {
     Eend::FrameLimiter::construct(60.0f, 20.0f);
     Eend::Entities::construct();
     Eend::Particles::construct();
-
-    // TODO make shaders part of Screen or its own thing
-    Eend::Shaders shaders(
+    Eend::Shaders::construct(
         Eend::ShaderProgram("shaders/panel.vert", "shaders/panel.frag"),
         Eend::ShaderProgram("shaders/board.vert", "shaders/board.frag"),
         Eend::ShaderProgram("shaders/statue.vert", "shaders/statue.frag"),
@@ -77,7 +75,7 @@ int main() {
         Eend::FrameLimiter::get().startInterval();
         Eend::Screen::get().bind();
         Eend::InputManager::get().processInput();
-        shaders.setPixelSize(5);
+        Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
 
         dt = Eend::FrameLimiter::get().deltaTime;
 
@@ -90,8 +88,8 @@ int main() {
             unpausedUpdate(dt, sceneCamera);
         }
 
-        Eend::Entities::draw(shaders, hudCamera, sceneCamera);
-        Eend::Screen::get().render(shaders.getShader(Eend::Shader::screen));
+        Eend::Entities::draw(hudCamera, sceneCamera);
+        Eend::Screen::get().render();
         Eend::Window::get().swapBuffers();
         Eend::FrameLimiter::get().stopInterval();
     }
@@ -103,6 +101,7 @@ int main() {
     Duck::destruct();
     Park::destruct();
 
+    Eend::Shaders::destruct();
     Eend::Particles::destruct();
     Eend::Entities::destruct();
     Eend::Audio::destruct();
