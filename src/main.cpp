@@ -27,7 +27,7 @@ namespace Eend = Eendgine;
 static void onStart();
 static void pausedUpdate();
 static void onDeath();
-static void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera);
+static void unpausedUpdate();
 static void pauseLatch(bool& paused, bool& dead);
 static void onRespawn();
 static void onPause();
@@ -52,8 +52,6 @@ int main() {
         Eend::ShaderProgram("shaders/statue.vert", "shaders/statue.frag"),
         Eend::ShaderProgram("shaders/doll.vert", "shaders/doll.frag"),
         Eend::ShaderProgram("shaders/screen.vert", "shaders/screen.frag"));
-
-    // TODO make comeras their own thing
     Eend::Cameras::construct(
         Eend::Camera2D(screenWidth, screenHeight),
         Eend::Camera3D(
@@ -62,6 +60,7 @@ int main() {
             Eend::Point(3.0f, 0.0f, 3.0f)));
 
     Duck::construct();
+    // TODO build the scale into the format silly
     Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
     Hud::construct();
     TextBoxQueue::construct();
@@ -71,22 +70,19 @@ int main() {
     while (!Eend::InputManager::get().getShouldClose()) {
         static bool paused = false;
         static bool dead = false;
-        static float dt = 0.0;
 
         Eend::FrameLimiter::get().startInterval();
         Eend::Screen::get().bind();
         Eend::InputManager::get().processInput();
         Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
 
-        dt = Eend::FrameLimiter::get().deltaTime;
-
-        Hud::get().update(dt);
+        Hud::get().update();
 
         pauseLatch(paused, dead);
         if (paused) {
             pausedUpdate();
         } else {
-            unpausedUpdate(dt, Eend::Cameras::getScene());
+            unpausedUpdate();
         }
 
         Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
@@ -184,7 +180,9 @@ static void onPause() {}
 
 static void pausedUpdate() {}
 
-static void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera) {
+static void unpausedUpdate() {
+    float dt = Eend::FrameLimiter::get().deltaTime;
+
     Duck::get().update(dt);
 
     Eend::Point duckPosition = Duck::get().getPosition();
@@ -197,8 +195,9 @@ static void unpausedUpdate(float dt, Eend::Camera3D& sceneCamera) {
     float cameraLag = (10.0f * dt);
     lastCameraPosition =
         (lastCameraPosition + (approachCameraPosition * cameraLag)) / (cameraLag + 1.0f);
-    sceneCamera.setPosition(lastCameraPosition);
-    sceneCamera.setTarget(Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
+    Eend::Cameras::getScene().setPosition(lastCameraPosition);
+    Eend::Cameras::getScene().setTarget(
+        Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
 
     TextBoxQueue::get().update();
     Eend::Particles::get().update(dt);

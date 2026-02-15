@@ -4,6 +4,7 @@
 #include "park.hpp"
 
 #include <Eendgine/entityBatches.hpp>
+#include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/inputManager.hpp>
 #include <Eendgine/types.hpp>
 
@@ -45,7 +46,8 @@ void Hud::setDeathText(bool set) {
     }
 }
 
-void Hud::update(float dt) {
+void Hud::update() {
+    float dt = Eend::FrameLimiter::get().deltaTime;
     Eend::Point duckPosition = Duck::get().getPosition();
 
     Eend::Panel::MouseStatus exitMouseStatus =

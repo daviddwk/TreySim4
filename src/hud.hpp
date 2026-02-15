@@ -8,7 +8,7 @@ class Hud {
 
         void setDeathText(bool set);
 
-        void update(float dt);
+        void update();
 
     private:
         Hud();
