@@ -54,11 +54,12 @@ int main() {
         Eend::ShaderProgram("shaders/screen.vert", "shaders/screen.frag"));
 
     // TODO make comeras their own thing
-    Eend::Camera2D hudCamera(screenWidth, screenHeight);
-    Eend::Camera3D sceneCamera(
-        (float)screenWidth / (float)screenHeight,
-        Eend::Point(-20.0f, 5.0f, 0.0f),
-        Eend::Point(3.0f, 0.0f, 3.0f));
+    Eend::Cameras::construct(
+        Eend::Camera2D(screenWidth, screenHeight),
+        Eend::Camera3D(
+            static_cast<float>(screenWidth) / static_cast<float>(screenHeight),
+            Eend::Point(-20.0f, 5.0f, 0.0f),
+            Eend::Point(3.0f, 0.0f, 3.0f)));
 
     Duck::construct();
     Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
@@ -85,10 +86,10 @@ int main() {
         if (paused) {
             pausedUpdate();
         } else {
-            unpausedUpdate(dt, sceneCamera);
+            unpausedUpdate(dt, Eend::Cameras::getScene());
         }
 
-        Eend::Entities::draw(hudCamera, sceneCamera);
+        Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
         Eend::Screen::get().render();
         Eend::Window::get().swapBuffers();
         Eend::FrameLimiter::get().stopInterval();
