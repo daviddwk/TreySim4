@@ -1,5 +1,13 @@
 {
+  "Scale" : [3.0, 3.0, 20.0],
   "Spawn" : [20.0, 20.0],
+  "Portals" : [
+    {
+      "position": [28, 19],
+      "scale": [1, 1],
+      "path": "terrain/grassy2"
+    }
+  ],
   "Boards": [
     {
       "position": [9, 9, 5],

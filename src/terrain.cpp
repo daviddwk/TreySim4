@@ -1,5 +1,6 @@
 #include "terrain.hpp"
 
+#include "Eendgine/camera.hpp"
 #include "collision.hpp"
 #include "duck.hpp"
 
@@ -21,14 +22,60 @@
 
 namespace Eend = Eendgine;
 
-Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
-    : m_height(0), m_width(0), m_statueId(0), m_scale(scale), m_spawn(0.0f) {
+Terrain::Portal::Portal(
+    Eend::Point2D position, Eend::Vector2D toCorner, std::filesystem::path terrainPath)
+    : collision(position, position + toCorner), terrainPath(terrainPath) {}
+
+Terrain::Terrain(const std::filesystem::path path)
+    : m_height(0), m_width(0), m_statueId(0), m_spawn(0.0f) {
+    // TODO this is possibly the worst code in this whole project
     // height map from image
     std::filesystem::path pngHeightMap = "resources" / path / "heightMap.png";
     std::filesystem::path pngCollisionMap = "resources" / path / "collisionMap.png";
     int collisionHeight = 0;
     int collisionWidth = 0;
     int channels = 0;
+
+    Json::Value rootJson;
+    std::filesystem::path metadataPath = "resources" / path / "metadata.json";
+    std::ifstream metadata(metadataPath);
+    if (!metadata.is_open()) {
+        Eend::fatalError("could not open: " + metadataPath.string());
+    }
+    try {
+        metadata >> rootJson;
+    } catch (...) {
+        Eend::fatalError("improper json: " + metadataPath.string());
+    }
+
+    if (rootJson["Scale"].isArray()) {
+        m_scale.x = rootJson["Scale"][0].asFloat();
+        m_scale.y = rootJson["Scale"][1].asFloat();
+        m_scale.z = rootJson["Scale"][2].asFloat();
+    }
+
+    if (rootJson["Spawn"].isArray()) {
+        m_spawn.x = rootJson["Spawn"][0].asFloat();
+        m_spawn.y = rootJson["Spawn"][1].asFloat();
+    }
+
+    if (rootJson["Portals"].isArray()) {
+        for (unsigned int portalIdx = 0; portalIdx < rootJson["Portals"].size(); ++portalIdx) {
+            Json::Value portalJson = rootJson["Portals"][portalIdx];
+            Tile tilePosition =
+                glm::vec2(portalJson["position"][0].asFloat(), portalJson["position"][1].asFloat());
+            TileScale tileScale =
+                glm::vec2(portalJson["scale"][0].asFloat(), portalJson["scale"][1].asFloat());
+
+            Eend::Point2D position =
+                glm::vec2(tilePosition.x * m_scale.x, tilePosition.y * m_scale.y);
+            Eend::Vector2D toCorner = glm::vec2(tileScale.x * m_scale.x, tileScale.y * m_scale.y);
+
+            std::filesystem::path terrainPath = portalJson["path"].asString();
+
+            m_portals.emplace_back(position, toCorner, terrainPath);
+        }
+    }
 
     unsigned char* imageData = stbi_load(pngHeightMap.c_str(), &m_width, &m_height, &channels, 0);
     float IMAGE_DATA_MAX_VALUE = 256.0f;
@@ -133,23 +180,6 @@ Terrain::Terrain(const std::filesystem::path path, Eend::Scale scale)
     }
     stbi_image_free(imageData);
     //
-    Json::Value rootJson;
-    std::filesystem::path metadataPath = "resources" / path / "metadata.json";
-    std::ifstream metadata(metadataPath);
-    if (!metadata.is_open()) {
-        Eend::fatalError("could not open: " + metadataPath.string());
-    }
-    try {
-        metadata >> rootJson;
-    } catch (...) {
-        Eend::fatalError("improper json: " + metadataPath.string());
-    }
-
-    if (rootJson["Spawn"].isArray()) {
-        m_spawn.x = rootJson["Spawn"][0].asFloat();
-        m_spawn.y = rootJson["Spawn"][1].asFloat();
-    }
-
     if (rootJson["Boards"].isArray()) {
         for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
             Json::Value boardJson = rootJson["Boards"][boardIdx];

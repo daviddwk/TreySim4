@@ -3,13 +3,13 @@
 #include "duck.hpp"
 
 // should be path to park format, not png height map
-Park::Park(std::filesystem::path pngHeightMap, Eend::Scale scale)
-    : m_terrain(std::make_unique<Terrain>(pngHeightMap, scale)),
+Park::Park(std::filesystem::path pngHeightMap)
+    : m_terrain(std::make_unique<Terrain>(pngHeightMap)),
       m_puppyMill(std::make_unique<PuppyMill>()) {}
 
-void Park::construct(std::filesystem::path pngHeightMap, Eend::Scale scale) {
+void Park::construct(std::filesystem::path terrainPath) {
     assert(m_instance == nullptr);
-    m_instance = new Park(pngHeightMap, scale);
+    m_instance = new Park(terrainPath);
 }
 
 void Park::destruct() {
@@ -27,12 +27,12 @@ void Park::update(float dt) {
 
     m_puppyMill->update(dt);
 
-    if (m_nextTerrain) {
-        m_terrain.reset(new Terrain(m_nextTerrain->pngHeightMap, m_nextTerrain->scale));
+    if (m_nextTerrainPath) {
+        m_terrain.reset(new Terrain(*m_nextTerrainPath));
         // after because then the new spawn is set
         reset();
     }
-    m_nextTerrain = std::nullopt;
+    m_nextTerrainPath = std::nullopt;
 }
 
 void Park::reset() {
@@ -42,9 +42,7 @@ void Park::reset() {
 
 unsigned int Park::numDogsKilled() { return m_puppyMill->getNumKilled(); }
 
-void Park::setTerrain(std::filesystem::path pngHeightMap, Eend::Scale scale) {
-    m_nextTerrain = NextTerrainParams(pngHeightMap, scale);
-}
+void Park::setTerrain(std::filesystem::path terrainPath) { m_nextTerrainPath = terrainPath; }
 
 bool Park::colliding(Eend::Point2D point) { return m_terrain->colliding(point); };
 

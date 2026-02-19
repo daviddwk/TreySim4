@@ -12,8 +12,9 @@ class Terrain {
 
     public:
         using Tile = glm::vec2;
+        using TileScale = glm::vec2;
         // would like this to be one path with scale build into the format
-        Terrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
+        Terrain(std::filesystem::path pngHeightMap);
         ~Terrain();
 
         Terrain(const Terrain& other) = delete;
@@ -33,6 +34,16 @@ class Terrain {
         Eend::Point positionAtTile(Tile tile);
         Eend::Point positionAtTile(Tile tile, float heightOffset);
 
+        class Portal {
+            public:
+                Portal(
+                    Eend::Point2D position, Eend::Vector2D toCorner,
+                    std::filesystem::path terrainPath);
+
+                Eend::Rectangle collision;
+                std::filesystem::path terrainPath;
+        };
+
     private:
         int m_height;
         int m_width;
@@ -44,4 +55,5 @@ class Terrain {
         std::vector<std::tuple<Eend::DollId, float>> m_dolls;
         Eend::Scale m_scale;
         Tile m_spawn;
+        std::vector<Portal> m_portals;
 };

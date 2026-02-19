@@ -10,17 +10,8 @@
 #include <optional>
 
 class Park {
-        class NextTerrainParams {
-            public:
-                NextTerrainParams(std::filesystem::path pngHeightMap, Eend::Scale scale)
-                    : pngHeightMap(pngHeightMap), scale(scale) {}
-
-                std::filesystem::path pngHeightMap;
-                Eend::Scale scale;
-        };
-
     public:
-        static void construct(std::filesystem::path pngHeightMap, Eend::Scale scale);
+        static void construct(std::filesystem::path terrainPath);
         static void destruct();
         static Park& get();
 
@@ -40,11 +31,11 @@ class Park {
 
         unsigned int numDogsKilled();
 
-        void setTerrain(std::filesystem::path pngHeightMap, Eend::Scale scale);
+        void setTerrain(std::filesystem::path terrainPath);
         // just give pointer to terrain
 
     private:
-        Park(std::filesystem::path pngHeightMap, Eend::Scale scale);
+        Park(std::filesystem::path terrainPath);
         ~Park() = default;
 
         Park(const Park& other) = delete;
@@ -55,7 +46,7 @@ class Park {
 
         inline static Park* m_instance = nullptr;
 
-        std::optional<NextTerrainParams> m_nextTerrain = std::nullopt;
+        std::optional<std::filesystem::path> m_nextTerrainPath = std::nullopt;
 
         std::unique_ptr<Terrain> m_terrain;
         // part of park and dog spawns should be a part of the park format TODO

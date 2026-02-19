@@ -61,7 +61,7 @@ int main() {
 
     Duck::construct();
     // TODO build the scale into the format silly
-    Park::construct("terrain/grassy", Eend::Scale(3.0f, 3.0f, 20.0f));
+    Park::construct("terrain/grassy");
     Hud::construct();
     TextBoxQueue::construct();
 
@@ -174,7 +174,7 @@ static void onRespawn() {
     Eendgine::Entities::shrink();
 }
 
-static void onUnpause() { Park::get().setTerrain("terrain/test", Eend::Scale(3.0)); }
+static void onUnpause() { Park::get().setTerrain("terrain/test"); }
 
 static void onPause() {}
 
