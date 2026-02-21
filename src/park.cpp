@@ -26,6 +26,7 @@ Park& Park::get() {
 void Park::update(float dt) {
 
     m_puppyMill->update(dt);
+    m_terrain->update();
 
     if (m_nextTerrainPath) {
         m_terrain.reset(new Terrain(*m_nextTerrainPath));

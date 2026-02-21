@@ -3,6 +3,7 @@
 #include "Eendgine/camera.hpp"
 #include "collision.hpp"
 #include "duck.hpp"
+#include "park.hpp"
 
 #include <Eendgine/board.hpp>
 #include <Eendgine/doll.hpp>
@@ -22,13 +23,17 @@
 
 namespace Eend = Eendgine;
 
+// TODO horrible math :c
 Terrain::Portal::Portal(
     Eend::Point2D position, Eend::Vector2D toCorner, std::filesystem::path terrainPath)
-    : collision(position, position + toCorner), terrainPath(terrainPath) {}
+    : collision(
+          position - Eend::Vector2D(0.0f, toCorner.y), position + Eend::Vector2D(toCorner.x, 0.0f)),
+      terrainPath(terrainPath) {}
 
 Terrain::Terrain(const std::filesystem::path path)
     : m_height(0), m_width(0), m_statueId(0), m_spawn(0.0f) {
     // TODO this is possibly the worst code in this whole project
+
     // height map from image
     std::filesystem::path pngHeightMap = "resources" / path / "heightMap.png";
     std::filesystem::path pngCollisionMap = "resources" / path / "collisionMap.png";
@@ -68,7 +73,7 @@ Terrain::Terrain(const std::filesystem::path path)
                 glm::vec2(portalJson["scale"][0].asFloat(), portalJson["scale"][1].asFloat());
 
             Eend::Point2D position =
-                glm::vec2(tilePosition.x * m_scale.x, tilePosition.y * m_scale.y);
+                glm::vec2(tilePosition.x * m_scale.x, -tilePosition.y * m_scale.y);
             Eend::Vector2D toCorner = glm::vec2(tileScale.x * m_scale.x, tileScale.y * m_scale.y);
 
             std::filesystem::path terrainPath = portalJson["path"].asString();
@@ -364,6 +369,11 @@ void Terrain::update() {
 bool Terrain::colliding(const Eend::Point2D point) {
     for (auto& rectangle : m_collisionRectangles) {
         if (pointOnRectangle(point, rectangle)) return true;
+    }
+    for (auto& portal : m_portals) {
+        if (pointOnRectangle(point, portal.collision)) {
+            Park::get().setTerrain(portal.terrainPath);
+        }
     }
     return false;
 }
