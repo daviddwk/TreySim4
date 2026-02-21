@@ -34,8 +34,8 @@ static void onPause();
 static void onUnpause();
 static void onEnd();
 
-const unsigned int screenHeight = 1080;
-const unsigned int screenWidth = 1920;
+const unsigned int screenHeight = 960;
+const unsigned int screenWidth = 1280;
 
 int main() {
 

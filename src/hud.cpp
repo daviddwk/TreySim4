@@ -33,7 +33,7 @@ Hud::Hud()
 
     Eend::Panel* exitRef = Eend::Entities::panels().getRef(m_exitPanel);
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));
-    exitRef->setPosition(Eend::Point(1920.0f - 80.0f, 30.0f, 0.0f));
+    exitRef->setPosition(Eend::Point(1280.0f - 80.0f, 120.0f, 0.0f));
 }
 
 Hud::~Hud() { Eend::Entities::panels().erase(m_exitPanel); }

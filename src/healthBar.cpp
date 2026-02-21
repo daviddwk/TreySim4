@@ -8,11 +8,11 @@ HealthBar::HealthBar()
     Eend::Panel* barRef = Eend::Entities::panels().getRef(m_bar);
 
     backgroundRef->setScale(Eend::Scale2D(M_BAR_SCALE_MAX + 30.0f, 85.0f));
-    backgroundRef->setPosition(Eend::Point(1285.0f, 20.0f, -10.0f));
+    backgroundRef->setPosition(Eend::Point(750.0f - 15.0f, 20.0f, -10.0f));
 
     barRef->setTexture("high");
     barRef->setScale(Eend::Scale2D(M_BAR_SCALE_MAX, 75.0f));
-    barRef->setPosition(Eend::Point(1300.0f, 25.0f, 100.0f));
+    barRef->setPosition(Eend::Point(750.0f, 25.0f, -5.0f));
 }
 
 HealthBar::~HealthBar() {
