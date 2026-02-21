@@ -1,4 +1,5 @@
 #include <Eendgine/audio.hpp>
+#include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/inputManager.hpp>
 
 #include <optional>
@@ -52,8 +53,9 @@ Eend::Point Duck::getPosition() { return m_position; };
 Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
 float Duck::getRadius() { return M_DUCK_RADIUS; }
 
-void Duck::update(float dt) {
+void Duck::update() {
 
+    float dt = Eend::FrameLimiter::get().deltaTime;
     Eend::Point oldDuckPosition = getPosition();
 
     std::optional<Direction> currentDirection = getDirection();

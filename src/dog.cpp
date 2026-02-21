@@ -1,5 +1,7 @@
 #include "Eendgine/board.hpp"
+#include "Eendgine/frameLimiter.hpp"
 #include "Eendgine/types.hpp"
+
 #include "dog.hpp"
 #include "duck.hpp"
 #include "park.hpp"
@@ -91,9 +93,12 @@ void Dog::kick(Eend::Point kick) {
     m_knockback = glm::normalize(kick) * kickFactor;
 }
 
-void Dog::update(float dt) {
+void Dog::update() {
+
     assert(m_bodyId);
+
     Eend::Board* boardRef = Eend::Entities::boards().getRef(*m_bodyId);
+    float dt = Eend::FrameLimiter::get().deltaTime;
 
     m_animTime += dt;
     if (m_health == 0) {

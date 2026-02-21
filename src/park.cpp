@@ -23,9 +23,9 @@ Park& Park::get() {
     return *m_instance;
 }
 
-void Park::update(float dt) {
+void Park::update() {
 
-    m_puppyMill->update(dt);
+    m_puppyMill->update();
     m_terrain->update();
 
     if (m_nextTerrainPath) {

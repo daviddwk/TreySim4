@@ -16,9 +16,9 @@ float calcKnockback(float depthRatio) {
 
 PuppyMill::PuppyMill() : m_numKilled(0) {}
 
-void PuppyMill::update(float dt) {
+void PuppyMill::update() {
     for (Dog& dog : m_dogs) {
-        dog.update(dt);
+        dog.update();
     }
 
     damage();

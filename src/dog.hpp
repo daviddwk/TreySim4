@@ -33,7 +33,7 @@ class Dog {
 
         void kick(Eend::Point kick);
 
-        void update(float dt);
+        void update();
 
     private:
         static constexpr float M_SPEED = 15.0f;

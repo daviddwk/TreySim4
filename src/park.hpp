@@ -16,7 +16,7 @@ class Park {
         static Park& get();
 
         // maybe have an update function so that this actually gets set at end of frame
-        void update(float dt);
+        void update();
         void reset();
 
         bool colliding(Eend::Point2D point);

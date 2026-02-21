@@ -183,7 +183,7 @@ static void pausedUpdate() {}
 static void unpausedUpdate() {
     float dt = Eend::FrameLimiter::get().deltaTime;
 
-    Duck::get().update(dt);
+    Duck::get().update();
 
     Eend::Point duckPosition = Duck::get().getPosition();
     float terrainHeight = Park::get().heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
@@ -200,9 +200,9 @@ static void unpausedUpdate() {
         Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
 
     TextBoxQueue::get().update();
-    Eend::Particles::get().update(dt);
+    Eend::Particles::get().update();
     // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
-    Park::get().update(dt);
+    Park::get().update();
 }
 
 static void onEnd() {}

@@ -29,7 +29,7 @@ class Duck {
         // return true if dog dies
         bool kick(Dog& dog);
 
-        void update(float dt);
+        void update();
 
         HealthBar health;
         enum class Direction { up, upRight, right, downRight, down, downLeft, left, upLeft };

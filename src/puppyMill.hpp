@@ -7,7 +7,7 @@ class PuppyMill {
     public:
         PuppyMill();
 
-        void update(float dt);
+        void update();
 
         unsigned int getNumKilled();
 
