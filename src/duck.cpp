@@ -20,6 +20,7 @@ Duck::Duck()
       m_headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false),
       m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up), m_alive(true) {
+
     Eend::Board* head = Eend::Entities::boards().getRef(m_headId);
     head->setScale(Eend::Scale2D(3.5f, 3.5f));
     head->setStrip("eyesOpen");
@@ -101,6 +102,23 @@ void Duck::update() {
         headRef->setStrip("eyesOpen");
     } else if (m_position.y > oldDuckPosition.y) {
         headRef->setStrip("eyesClose");
+    }
+
+    // TODO improve this
+    static float lastStep = 0.0f;
+    bool waddling = false;
+    waddling |= Eend::InputManager::get().getDownPress();
+    waddling |= Eend::InputManager::get().getUpPress();
+    waddling |= Eend::InputManager::get().getLeftPress();
+    waddling |= Eend::InputManager::get().getRightPress();
+
+    if (waddling) {
+        lastStep += dt;
+    }
+
+    if (lastStep > 0.05f) {
+        lastStep = 0.0f;
+        bodyRef->setTextureIdx(bodyRef->getTextureIdx() + 1);
     }
 
     bodyRef->setPosition(Eend::Point(m_position.x - 0.5f, m_position.y, m_position.z + 0.08f));

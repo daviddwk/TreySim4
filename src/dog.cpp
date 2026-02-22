@@ -122,7 +122,7 @@ void Dog::update() {
 
     if (m_health != 0) {
         const glm::vec2 difference = approachPoint - m_position;
-        boardRef->setFlip(difference.x < 0.0f);
+        boardRef->setStripFlip(difference.x < 0.0f);
         if (glm::length(difference) > M_STOP_DISTANCE) {
             m_position += glm::normalize(approachPoint - m_position) * M_SPEED * dt;
         }

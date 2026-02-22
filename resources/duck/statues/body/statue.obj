@@ -1,6 +1,6 @@
 # Blender 4.4.3
 # www.blender.org
-mtllib body.mtl
+mtllib body2.mtl
 o Cube.001
 v 0.346450 0.938405 0.550375
 v 0.346450 0.938405 0.550375
