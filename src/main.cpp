@@ -7,7 +7,7 @@
 #include <Eendgine/screen.hpp>
 #include <Eendgine/shader.hpp>
 #include <Eendgine/shaders.hpp>
-#include <Eendgine/textureCache.hpp>
+#include <Eendgine/texture.hpp>
 #include <Eendgine/types.hpp>
 #include <Eendgine/window.hpp>
 

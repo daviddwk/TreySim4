@@ -20,7 +20,7 @@ Text::Text(Font font, std::string text, Eend::Point position, float scale, float
         m_fontPath = m_fontPath / std::filesystem::path("daniel");
         break;
     }
-    m_texture = Eend::loadTexture("resources" / m_fontPath / "font.png");
+    m_texture = Eend::TextureCache::getTexture("resources" / m_fontPath / "font.png");
 
     // open json
     Json::Value root;
