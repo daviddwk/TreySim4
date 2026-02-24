@@ -9,7 +9,7 @@ uniform mat4 projection;
 uniform mat4 transform;
 uniform uint frameIdx;
 uniform uint frameLen;
-uniform bool flip; // bool really
+uniform bool flip;
 
 out vec2 vertUV;
 out vec4 vertColor;

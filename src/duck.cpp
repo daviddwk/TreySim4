@@ -114,11 +114,13 @@ void Duck::update() {
 
     if (waddling) {
         lastStep += dt;
+        bodyRef->setStrip("waddle");
+    } else {
     }
 
-    if (lastStep > 0.05f) {
+    if (lastStep > 0.075f) {
         lastStep = 0.0f;
-        bodyRef->setTextureIdx(bodyRef->getTextureIdx() + 1);
+        bodyRef->nextStripIdx();
     }
 
     bodyRef->setPosition(Eend::Point(m_position.x - 0.5f, m_position.y, m_position.z + 0.08f));

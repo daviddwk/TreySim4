@@ -35,14 +35,14 @@ Terrain::Terrain(const std::filesystem::path path)
     // TODO this is possibly the worst code in this whole project
 
     // height map from image
-    std::filesystem::path pngHeightMap = "resources" / path / "heightMap.png";
-    std::filesystem::path pngCollisionMap = "resources" / path / "collisionMap.png";
+    std::filesystem::path pngHeightMap = "resources" / path / "generate/heightMap.png";
+    std::filesystem::path pngCollisionMap = "resources" / path / "generate/collisionMap.png";
     int collisionHeight = 0;
     int collisionWidth = 0;
     int channels = 0;
 
     Json::Value rootJson;
-    std::filesystem::path metadataPath = "resources" / path / "metadata.json";
+    std::filesystem::path metadataPath = "resources" / path / "generate/metadata.json";
     std::ifstream metadata(metadataPath);
     if (!metadata.is_open()) {
         Eend::fatalError("could not open: " + metadataPath.string());
