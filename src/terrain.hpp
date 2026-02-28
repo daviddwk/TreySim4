@@ -47,6 +47,7 @@ class Terrain {
     private:
         int m_height;
         int m_width;
+        float m_animationSpeed;
         std::vector<std::vector<float>> m_heightMap;
         Eend::StatueId m_statueId;
         std::vector<Eend::Rectangle> m_collisionRectangles;

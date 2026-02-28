@@ -125,7 +125,7 @@ void Duck::update() {
 
     bodyRef->setPosition(Eend::Point(m_position.x - 0.5f, m_position.y, m_position.z + 0.08f));
     headRef->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 3.00f));
-    bodyRef->setRotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f);
+    bodyRef->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
 }
 
 bool Duck::isKicking() { return m_kicking; }
