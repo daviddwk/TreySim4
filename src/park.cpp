@@ -1,6 +1,6 @@
 #include "park.hpp"
 
-#include "duck.hpp"
+#include "trey.hpp"
 
 // should be path to park format, not png height map
 Park::Park(std::filesystem::path pngHeightMap)
@@ -38,7 +38,7 @@ void Park::update() {
 
 void Park::reset() {
     m_puppyMill.reset(new PuppyMill());
-    Duck::get().setPosition(m_terrain->getSpawn());
+    Trey::get().setPosition(m_terrain->getSpawn());
 }
 
 unsigned int Park::numDogsKilled() { return m_puppyMill->getNumKilled(); }

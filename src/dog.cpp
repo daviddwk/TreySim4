@@ -3,8 +3,8 @@
 #include "Eendgine/types.hpp"
 
 #include "dog.hpp"
-#include "duck.hpp"
 #include "park.hpp"
+#include "trey.hpp"
 
 #include <glm/vector_relational.hpp>
 #include <print>
@@ -118,7 +118,7 @@ void Dog::update() {
 
     m_position += m_knockback * dt;
 
-    Eend::Point2D approachPoint = Duck::get().getPosition();
+    Eend::Point2D approachPoint = Trey::get().getPosition();
 
     if (m_health != 0) {
         const glm::vec2 difference = approachPoint - m_position;

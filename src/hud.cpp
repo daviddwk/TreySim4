@@ -1,7 +1,7 @@
 #include "hud.hpp"
 
-#include "duck.hpp"
 #include "park.hpp"
+#include "trey.hpp"
 
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/frameLimiter.hpp>
@@ -48,7 +48,7 @@ void Hud::setDeathText(bool set) {
 
 void Hud::update() {
     float dt = Eend::FrameLimiter::get().deltaTime;
-    Eend::Point duckPosition = Duck::get().getPosition();
+    Eend::Point treyPosition = Trey::get().getPosition();
 
     Eend::Panel::MouseStatus exitMouseStatus =
         Eend::Entities::panels().getRef(m_exitPanel)->isClicked();
@@ -75,10 +75,10 @@ void Hud::update() {
             "dogs slain:{}",
             1.0f / dt,
             dt,
-            duckPosition.x,
-            duckPosition.y,
-            duckPosition.z,
-            true,
+            treyPosition.x,
+            treyPosition.y,
+            treyPosition.z,
+            false,
             exitMouseString,
             Eend::InputManager::get().getMouseX(),
             Eend::InputManager::get().getDeltaMouseX(),

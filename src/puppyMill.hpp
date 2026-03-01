@@ -1,7 +1,6 @@
 #pragma once
 
 #include "dog.hpp"
-#include "duck.hpp"
 
 class PuppyMill {
     public:

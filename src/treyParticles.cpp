@@ -1,5 +1,5 @@
 #include "Eendgine/types.hpp"
-#include "duckParticles.hpp"
+#include "treyParticles.hpp"
 
 Eend::Particles::Properties getJumpParticleProperties() {
     Eend::Particles::Behavior behavior =
@@ -46,38 +46,38 @@ Eend::Particles::Properties getJumpParticleProperties() {
         }
         return std::nullopt;
     };
-    return Eend::Particles::Properties("duck/boards/poo", behavior);
+    return Eend::Particles::Properties("Trey/particles/poo", behavior);
 }
 
-Eend::Particles::Properties getKickParticleProperties(Duck::Direction direction) {
+Eend::Particles::Properties getKickParticleProperties(Trey::Direction direction) {
 
-    const std::filesystem::path boardPath("duck/boards/kick");
+    const std::filesystem::path boardPath("Trey/particles/kick");
 
     // clang-format off
     Eend::Vector2D directionVector = Eend::Vector2D(0.0f);
     switch (direction) {
-    case Duck::Direction::up:
+    case Trey::Direction::up:
         directionVector = Eend::Vector2D(                0.0f,                1.0f);
         break;
-    case Duck::Direction::upRight:
+    case Trey::Direction::upRight:
         directionVector = Eend::Vector2D(  Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
         break;
-    case Duck::Direction::right:
+    case Trey::Direction::right:
         directionVector = Eend::Vector2D(                1.0f,                0.0f);
         break;
-    case Duck::Direction::downRight:
+    case Trey::Direction::downRight:
         directionVector = Eend::Vector2D(  Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
         break;
-    case Duck::Direction::down:
+    case Trey::Direction::down:
         directionVector = Eend::Vector2D(                0.0f,               -1.0f);
         break;
-    case Duck::Direction::downLeft:
+    case Trey::Direction::downLeft:
         directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
         break;
-    case Duck::Direction::left:
+    case Trey::Direction::left:
         directionVector = Eend::Vector2D(               -1.0f,                0.0f);
         break;
-    case Duck::Direction::upLeft:
+    case Trey::Direction::upLeft:
         directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
         break;
     }

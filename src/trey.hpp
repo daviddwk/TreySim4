@@ -10,11 +10,11 @@
 
 namespace Eend = Eendgine;
 
-class Duck {
+class Trey {
     public:
         static void construct();
         static void destruct();
-        static Duck& get();
+        static Trey& get();
 
         void setRotation(Eend::Angle rotation);
         void setPosition(Eend::Point position);
@@ -35,22 +35,22 @@ class Duck {
         enum class Direction { up, upRight, right, downRight, down, downLeft, left, upLeft };
 
     private:
-        Duck();
-        ~Duck();
+        Trey();
+        ~Trey();
 
-        Duck(const Duck& other) = delete;
-        Duck& operator=(const Duck& other) = delete;
+        Trey(const Trey& other) = delete;
+        Trey& operator=(const Trey& other) = delete;
 
-        Duck(Duck&& other) = delete;
-        Duck& operator=(Duck&& other) = delete;
+        Trey(Trey&& other) = delete;
+        Trey& operator=(Trey&& other) = delete;
 
-        inline static Duck* m_instance = nullptr;
+        inline static Trey* m_instance = nullptr;
 
         static constexpr float M_MOVE_SPEED = 25.0f;
         static constexpr float M_KICK_RADIUS = 15.0f;
         static constexpr float M_KICK_OFFSET = 5.0f;
         static constexpr float M_KICK_SPREAD = 120.0f;
-        static constexpr float M_DUCK_RADIUS = 5.0f;
+        static constexpr float M_TREY_RADIUS = 5.0f;
         static constexpr float M_GRAVITY = -1.0f; // only ducks believe in gravity
 
         const std::filesystem::path M_JUMP_NOISE_PATH =
@@ -58,12 +58,12 @@ class Duck {
 
         std::optional<Direction> getDirection();
 
-        void handleMovement(float dt, std::optional<Duck::Direction> direction);
+        void handleMovement(float dt, std::optional<Trey::Direction> direction);
         void updatePosition(float dt);
         void handleCollision(Eend::Point& oldPosition);
 
-        Eend::StatueId m_bodyId;
-        Eend::BoardId m_headId;
+        Eend::StatueId m_headId;
+        Eend::BoardId m_bodyId;
         Eend::Point m_position;
         Eend::Angle m_rotation;
 

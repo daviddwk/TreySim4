@@ -1,6 +1,7 @@
 #include "puppyMill.hpp"
 
 #include "park.hpp"
+#include "trey.hpp"
 
 #include <Eendgine/random.hpp>
 
@@ -52,19 +53,19 @@ void PuppyMill::damage() {
     if (tickMs >= M_DMG_TICK_MS) {
         tickLast = now;
         for (Dog& dog : m_dogs) {
-            const Eend::Point2D duckPosition = Duck::get().getPosition();
-            const float duckRadius = Duck::get().getRadius();
-            const float distance = glm::length(dog.getPosition() - duckPosition);
-            const bool colliding = distance < duckRadius;
+            const Eend::Point2D treyPosition = Trey::get().getPosition();
+            const float treyRadius = Trey::get().getRadius();
+            const float distance = glm::length(dog.getPosition() - treyPosition);
+            const bool colliding = distance < treyRadius;
             if (colliding && (dog.getHealth() > 0)) {
-                Duck::get().health.damage(dog.getDamage());
+                Trey::get().health.damage(dog.getDamage());
             }
         }
     }
 
-    if (Duck::get().isKicking()) {
+    if (Trey::get().isKicking()) {
         for (Dog& dog : m_dogs) {
-            bool dogDies = Duck::get().kick(dog);
+            bool dogDies = Trey::get().kick(dog);
             if (dogDies) m_numKilled++;
         }
     }

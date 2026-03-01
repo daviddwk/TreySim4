@@ -16,11 +16,11 @@
 
 #include <filesystem>
 
-#include "duck.hpp"
 #include "hud.hpp"
 #include "park.hpp"
 #include "text.hpp"
 #include "textBox.hpp"
+#include "trey.hpp"
 
 namespace Eend = Eendgine;
 
@@ -59,7 +59,7 @@ int main() {
             Eend::Point(-20.0f, 5.0f, 0.0f),
             Eend::Point(3.0f, 0.0f, 3.0f)));
 
-    Duck::construct();
+    Trey::construct();
     // TODO build the scale into the format silly
     Park::construct("terrain/grassy");
     Hud::construct();
@@ -95,7 +95,7 @@ int main() {
 
     TextBoxQueue::destruct();
     Hud::destruct();
-    Duck::destruct();
+    Trey::destruct();
     Park::destruct();
 
     Eend::Shaders::destruct();
@@ -110,7 +110,7 @@ int main() {
 
 static void onStart() {
 
-    Duck::get().setPosition(Park::get().getSpawn());
+    Trey::get().setPosition(Park::get().getSpawn());
 
     TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
     TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
@@ -131,7 +131,7 @@ static void pauseLatch(bool& paused, bool& dead) {
 
     static bool escapeReleased = false;
 
-    if (!dead && (Duck::get().health.getHealth() == 0)) {
+    if (!dead && (Trey::get().health.getHealth() == 0)) {
         dead = true;
         onDeath();
     }
@@ -162,15 +162,15 @@ static void pauseLatch(bool& paused, bool& dead) {
 }
 static void onDeath() {
     Hud::get().setDeathText(true);
-    Duck::get().setAlive(false);
+    Trey::get().setAlive(false);
 }
 
 static void onRespawn() {
     Hud::get().setDeathText(false);
     Park::get().reset();
-    Duck::get().health.heal(100);
-    Duck::get().setPosition(Park::get().getSpawn());
-    Duck::get().setAlive(true);
+    Trey::get().health.heal(100);
+    Trey::get().setPosition(Park::get().getSpawn());
+    Trey::get().setAlive(true);
     Eendgine::Entities::shrink();
 }
 
@@ -183,21 +183,21 @@ static void pausedUpdate() {}
 static void unpausedUpdate() {
     float dt = Eend::FrameLimiter::get().deltaTime;
 
-    Duck::get().update();
+    Trey::get().update();
 
-    Eend::Point duckPosition = Duck::get().getPosition();
-    float terrainHeight = Park::get().heightAtPoint(Eend::Point2D(duckPosition.x, duckPosition.y));
+    Eend::Point treyPosition = Trey::get().getPosition();
+    float terrainHeight = Park::get().heightAtPoint(Eend::Point2D(treyPosition.x, treyPosition.y));
 
     static Eend::Point lastCameraPosition =
-        Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
+        Eend::Point(treyPosition.x, treyPosition.y - 25.0f, terrainHeight + 12.5f);
     Eend::Point approachCameraPosition =
-        Eend::Point(duckPosition.x, duckPosition.y - 25.0f, terrainHeight + 12.5f);
+        Eend::Point(treyPosition.x, treyPosition.y - 25.0f, terrainHeight + 12.5f);
     float cameraLag = (10.0f * dt);
     lastCameraPosition =
         (lastCameraPosition + (approachCameraPosition * cameraLag)) / (cameraLag + 1.0f);
     Eend::Cameras::getScene().setPosition(lastCameraPosition);
     Eend::Cameras::getScene().setTarget(
-        Eend::Point(duckPosition.x, duckPosition.y, terrainHeight + 3.0f));
+        Eend::Point(treyPosition.x, treyPosition.y, terrainHeight + 3.0f));
 
     TextBoxQueue::get().update();
     Eend::Particles::get().update();

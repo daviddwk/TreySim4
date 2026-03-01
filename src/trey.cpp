@@ -8,56 +8,57 @@
 #include "collision.hpp"
 #include "park.hpp"
 
-#include "duck.hpp"
-#include "duckParticles.hpp"
+#include "trey.hpp"
+#include "treyParticles.hpp"
 // have static last direction in update function
 // use this to get new diruction if there is one, and know that keys are actually being pressed
 //
 //
 
-Duck::Duck()
-    : m_bodyId(Eend::Entities::statues().insert(std::filesystem::path("duck/statues/body"))),
-      m_headId(Eend::Entities::boards().insert(std::filesystem::path("duck/boards/head"))),
+Trey::Trey()
+    : m_headId(Eend::Entities::statues().insert(std::filesystem::path("Trey/head"))),
+      m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("Trey/body"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false),
       m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up), m_alive(true) {
 
-    Eend::Board* head = Eend::Entities::boards().getRef(m_headId);
-    head->setScale(Eend::Scale2D(3.5f, 3.5f));
-    head->setStrip("eyesOpen");
+    Eend::Board* head = Eend::Entities::boards().getRef(m_bodyId);
+    head->setScale(Eend::Scale2D(2.5f, 3.0f));
+    head->setStrip("stand");
+    Eend::Entities::statues().getRef(m_headId)->setScale(Eend::Scale(0.7f));
 }
 
-Duck::~Duck() {
-    Eend::Entities::statues().erase(m_bodyId);
-    Eend::Entities::boards().erase(m_headId);
+Trey::~Trey() {
+    Eend::Entities::statues().erase(m_headId);
+    Eend::Entities::boards().erase(m_bodyId);
 }
 
-void Duck::construct() {
+void Trey::construct() {
     assert(m_instance == nullptr);
-    m_instance = new Duck();
+    m_instance = new Trey();
 }
 
-void Duck::destruct() {
+void Trey::destruct() {
     assert(m_instance != nullptr);
     delete m_instance;
     m_instance = nullptr;
 }
 
-Duck& Duck::get() {
+Trey& Trey::get() {
     assert(m_instance != nullptr);
     return *m_instance;
 }
 
-void Duck::setPosition(Eend::Point position) { m_position = position; }
-void Duck::setAlive(bool alive) { m_alive = alive; }
+void Trey::setPosition(Eend::Point position) { m_position = position; }
+void Trey::setAlive(bool alive) { m_alive = alive; }
 
-Eend::Point Duck::getPosition() { return m_position; };
-Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
-float Duck::getRadius() { return M_DUCK_RADIUS; }
+Eend::Point Trey::getPosition() { return m_position; };
+Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
+float Trey::getRadius() { return M_TREY_RADIUS; }
 
-void Duck::update() {
+void Trey::update() {
 
     float dt = Eend::FrameLimiter::get().deltaTime;
-    Eend::Point oldDuckPosition = getPosition();
+    Eend::Point oldTreyPosition = getPosition();
 
     std::optional<Direction> currentDirection = getDirection();
     if (currentDirection && m_alive) {
@@ -67,7 +68,7 @@ void Duck::update() {
     } else {
         m_rotation = m_rotation + Eend::Angle(100 * dt);
     }
-    handleCollision(oldDuckPosition);
+    handleCollision(oldTreyPosition);
 
     float heightAtPoint = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
 
@@ -95,13 +96,13 @@ void Duck::update() {
     m_position.z = m_height;
 
     // update entities
-    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(m_bodyId);
-    Eend::Board* headRef = Eend::Entities::boards().getRef(m_headId);
+    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(m_headId);
+    Eend::Board* headRef = Eend::Entities::boards().getRef(m_bodyId);
 
-    if (m_position.y < oldDuckPosition.y) {
-        headRef->setStrip("eyesOpen");
-    } else if (m_position.y > oldDuckPosition.y) {
-        headRef->setStrip("eyesClose");
+    if (m_position.y < oldTreyPosition.y) {
+        // headRef->setStrip("eyesOpen");
+    } else if (m_position.y > oldTreyPosition.y) {
+        // headRef->setStrip("eyesClose");
     }
 
     // TODO improve this
@@ -112,25 +113,33 @@ void Duck::update() {
     waddling |= Eend::InputManager::get().getLeftPress();
     waddling |= Eend::InputManager::get().getRightPress();
 
+    if (Eend::InputManager::get().getLeftPress()) {
+        headRef->setStripFlip(true);
+    }
+    if (Eend::InputManager::get().getRightPress()) {
+        headRef->setStripFlip(false);
+    }
+
     if (waddling) {
         lastStep += dt;
-        bodyRef->setStrip("waddle");
+        headRef->setStrip("walk");
     } else {
+        headRef->setStrip("stand");
     }
 
     if (lastStep > 0.075f) {
         lastStep = 0.0f;
-        bodyRef->nextStripIdx();
+        headRef->nextStripIdx();
     }
 
-    bodyRef->setPosition(Eend::Point(m_position.x - 0.5f, m_position.y, m_position.z + 0.08f));
-    headRef->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 3.00f));
+    bodyRef->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 1.0f));
+    headRef->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 2.0f));
     bodyRef->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
 }
 
-bool Duck::isKicking() { return m_kicking; }
+bool Trey::isKicking() { return m_kicking; }
 
-std::optional<Duck::Direction> Duck::getDirection() {
+std::optional<Trey::Direction> Trey::getDirection() {
     const bool upPress = Eend::InputManager::get().getUpPress();
     const bool rightPress = Eend::InputManager::get().getRightPress();
     const bool downPress = Eend::InputManager::get().getDownPress();
@@ -151,7 +160,7 @@ std::optional<Duck::Direction> Duck::getDirection() {
     return std::nullopt;
 }
 
-void Duck::updatePosition(float dt) {
+void Trey::updatePosition(float dt) {
 
     switch (m_direction) {
     case Direction::up:
@@ -185,7 +194,7 @@ void Duck::updatePosition(float dt) {
     }
 }
 
-void Duck::handleCollision(Eend::Point& oldPosition) {
+void Trey::handleCollision(Eend::Point& oldPosition) {
     if (!Park::get().colliding(Eend::Point2D(m_position.x, m_position.y))) {
     } else if (!Park::get().colliding(Eend::Point2D(oldPosition.x, m_position.y))) {
         m_position.x = oldPosition.x;
@@ -197,7 +206,7 @@ void Duck::handleCollision(Eend::Point& oldPosition) {
     }
 }
 
-Eend::Angle Duck::getAngle() {
+Eend::Angle Trey::getAngle() {
     switch (m_direction) {
     case Direction::up:
         return Eend::Angle(45.0f) * 0.0f;
@@ -218,7 +227,7 @@ Eend::Angle Duck::getAngle() {
     }
 }
 
-bool Duck::kick(Dog& dog) {
+bool Trey::kick(Dog& dog) {
     std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
         dog.getPosition3d(),
         Eend::Sphere(getPosition(), M_KICK_RADIUS),

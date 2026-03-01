@@ -2,8 +2,8 @@
 
 #include "Eendgine/camera.hpp"
 #include "collision.hpp"
-#include "duck.hpp"
 #include "park.hpp"
+#include "trey.hpp"
 
 #include <Eendgine/board.hpp>
 #include <Eendgine/doll.hpp>
@@ -12,6 +12,7 @@
 #include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/types.hpp>
 
+// maybe just wrap this with my own stuffs
 #include <json/json.h>
 #include <stb/stb_image.h>
 
@@ -64,8 +65,8 @@ Terrain::Terrain(const std::filesystem::path path)
     m_spawn = jsonVec2(rootJson, "Spawn", metadataPath);
 
     // optional
-    if (rootJson["Speed"].isNumeric()) {
-        m_animationSpeed = jsonFloat(rootJson, "Speed", metadataPath);
+    if (rootJson["Pace"].isNumeric()) {
+        m_animationSpeed = jsonFloat(rootJson, "Pace", metadataPath);
     }
 
     // optional
