@@ -1,4 +1,5 @@
 {
-  "walk":6,
+  "walkForward":4,
+  "walkSide":4,
   "stand":1
 }

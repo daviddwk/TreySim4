@@ -16,19 +16,19 @@
 //
 
 Trey::Trey()
-    : m_headId(Eend::Entities::statues().insert(std::filesystem::path("Trey/head"))),
+    : // m_headId(Eend::Entities::statues().insert(std::filesystem::path("Trey/head"))),
       m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("Trey/body"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false),
       m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up), m_alive(true) {
 
     Eend::Board* head = Eend::Entities::boards().getRef(m_bodyId);
-    head->setScale(Eend::Scale2D(2.5f, 3.0f));
+    head->setScale(Eend::Scale2D(2.5f * 1.2f, 4.5f * 1.2f));
     head->setStrip("stand");
-    Eend::Entities::statues().getRef(m_headId)->setScale(Eend::Scale(0.7f));
+    // Eend::Entities::statues().getRef(m_headId)->setScale(Eend::Scale(0.7f));
 }
 
 Trey::~Trey() {
-    Eend::Entities::statues().erase(m_headId);
+    // Eend::Entities::statues().erase(m_headId);
     Eend::Entities::boards().erase(m_bodyId);
 }
 
@@ -96,8 +96,8 @@ void Trey::update() {
     m_position.z = m_height;
 
     // update entities
-    Eend::Statue* bodyRef = Eend::Entities::statues().getRef(m_headId);
-    Eend::Board* headRef = Eend::Entities::boards().getRef(m_bodyId);
+    // Eend::Statue* bodyRef = Eend::Entities::statues().getRef(m_headId);
+    Eend::Board* body = Eend::Entities::boards().getRef(m_bodyId);
 
     if (m_position.y < oldTreyPosition.y) {
         // headRef->setStrip("eyesOpen");
@@ -107,34 +107,41 @@ void Trey::update() {
 
     // TODO improve this
     static float lastStep = 0.0f;
-    bool waddling = false;
-    waddling |= Eend::InputManager::get().getDownPress();
-    waddling |= Eend::InputManager::get().getUpPress();
-    waddling |= Eend::InputManager::get().getLeftPress();
-    waddling |= Eend::InputManager::get().getRightPress();
+    bool waddlingForward = false;
+    waddlingForward |= Eend::InputManager::get().getDownPress();
+    waddlingForward |= Eend::InputManager::get().getUpPress();
+
+    bool waddlingSide = false;
+    waddlingSide |= Eend::InputManager::get().getLeftPress();
+    waddlingSide |= Eend::InputManager::get().getRightPress();
 
     if (Eend::InputManager::get().getLeftPress()) {
-        headRef->setStripFlip(true);
+        body->setStripFlip(true);
     }
     if (Eend::InputManager::get().getRightPress()) {
-        headRef->setStripFlip(false);
+        body->setStripFlip(false);
     }
 
-    if (waddling) {
-        lastStep += dt;
-        headRef->setStrip("walk");
+    if (waddlingSide) {
+        body->setStrip("walkSide");
+    } else if (waddlingForward) {
+        body->setStrip("walkForward");
     } else {
-        headRef->setStrip("stand");
+        body->setStrip("stand");
+    }
+
+    if (waddlingForward || waddlingSide) {
+        lastStep += dt;
     }
 
     if (lastStep > 0.075f) {
         lastStep = 0.0f;
-        headRef->nextStripIdx();
+        body->nextStripIdx();
     }
 
-    bodyRef->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 1.0f));
-    headRef->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 2.0f));
-    bodyRef->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
+    // bodyRef->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 1.0f));
+    body->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 3.0f));
+    // bodyRef->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
 }
 
 bool Trey::isKicking() { return m_kicking; }
