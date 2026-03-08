@@ -16,8 +16,10 @@
 //
 
 Trey::Trey()
-    : // m_headId(Eend::Entities::statues().insert(std::filesystem::path("Trey/head"))),
+    : m_headId(Eend::Entities::statues().insert(std::filesystem::path("Trey/head"))),
+      m_hairId(Eend::Entities::statues().insert(std::filesystem::path("Trey/hair"))),
       m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("Trey/body"))),
+      m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("Trey/eye"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false),
       m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up), m_alive(true),
       m_facingForward(true) {
@@ -31,11 +33,15 @@ Trey::Trey()
     body->setScale(Eend::Scale2D(bodyWidth * BODY_SCALE, bodyHeight * BODY_SCALE));
     body->setStrip("standForward");
     // Eend::Entities::statues().getRef(m_headId)->setScale(Eend::Scale(0.7f));
+    Eend::Entities::boards().getRef(m_eyeId)->setScale(Eend::Scale(3.3f));
+    Eend::Entities::boards().getRef(m_eyeId)->setStrip("open");
 }
 
 Trey::~Trey() {
-    // Eend::Entities::statues().erase(m_headId);
+    Eend::Entities::statues().erase(m_headId);
+    Eend::Entities::statues().erase(m_hairId);
     Eend::Entities::boards().erase(m_bodyId);
+    Eend::Entities::boards().erase(m_eyeId);
 }
 
 void Trey::construct() {
@@ -72,7 +78,7 @@ void Trey::update() {
         m_rotation = getAngle();
         updatePosition(dt);
     } else {
-        m_rotation = m_rotation + Eend::Angle(100 * dt);
+        // m_rotation = m_rotation + Eend::Angle(100 * dt);
     }
     handleCollision(oldTreyPosition);
 
@@ -102,8 +108,10 @@ void Trey::update() {
     m_position.z = m_height;
 
     // update entities
-    // Eend::Statue* bodyRef = Eend::Entities::statues().getRef(m_headId);
+    Eend::Statue* head = Eend::Entities::statues().getRef(m_headId);
+    Eend::Statue* hair = Eend::Entities::statues().getRef(m_hairId);
     Eend::Board* body = Eend::Entities::boards().getRef(m_bodyId);
+    Eend::Board* eye = Eend::Entities::boards().getRef(m_eyeId);
 
     if (m_position.y < oldTreyPosition.y) {
         // headRef->setStrip("eyesOpen");
@@ -172,14 +180,21 @@ void Trey::update() {
     }
 
     lastStep += dt;
+    eye->setRotation(eye->getRotation() + (1.0f * dt));
     if (lastStep > 0.075f) {
         lastStep = 0.0f;
         body->nextStripIdx();
     }
 
-    // bodyRef->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 1.0f));
     body->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 3.0f));
-    // bodyRef->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
+    head->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
+    hair->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
+    eye->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
+
+    hair->setScale(Eend::Scale(1.1f));
+
+    head->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
+    hair->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
 }
 
 bool Trey::isKicking() { return m_kicking; }

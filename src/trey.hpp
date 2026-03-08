@@ -62,8 +62,10 @@ class Trey {
         void updatePosition(float dt);
         void handleCollision(Eend::Point& oldPosition);
 
-        // Eend::StatueId m_headId;
+        Eend::StatueId m_headId;
+        Eend::StatueId m_hairId;
         Eend::BoardId m_bodyId;
+        Eend::BoardId m_eyeId;
         Eend::Point m_position;
         Eend::Angle m_rotation;
 
