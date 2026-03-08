@@ -1,9 +1,11 @@
 {
   "walkForward":4,
-  "walkSide":4,
+  "walkSideForward":4,
+  "walkSideBackward":4,
   "walkBackward":4,
   "kickForward":1,
-  "kickSide":1,
+  "kickSideForward":1,
+  "kickSideBackward":1,
   "kickBackward":1,
   "standForward":1,
   "standBackward":1

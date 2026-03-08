@@ -28,8 +28,6 @@ Trey::Trey()
     const float bodyWidth = static_cast<float>(body->getTexture().width);
     constexpr float BODY_SCALE = 0.12f;
 
-    std::print("h:{} w:{}\n", bodyHeight, bodyWidth);
-
     body->setScale(Eend::Scale2D(bodyWidth * BODY_SCALE, bodyHeight * BODY_SCALE));
     body->setStrip("standForward");
     // Eend::Entities::statues().getRef(m_headId)->setScale(Eend::Scale(0.7f));
@@ -139,7 +137,11 @@ void Trey::update() {
 
     if (m_inAir) {
         if (waddlingSide) {
-            body->setStrip("kickSide");
+            if (m_facingForward) {
+                body->setStrip("kickSideForward");
+            } else {
+                body->setStrip("kickSideBackward");
+            }
         } else {
             if (m_facingForward) {
                 body->setStrip("kickForward");
@@ -149,7 +151,11 @@ void Trey::update() {
         }
     } else {
         if (waddlingSide) {
-            body->setStrip("walkSide");
+            if (m_facingForward) {
+                body->setStrip("walkSideForward");
+            } else {
+                body->setStrip("walkSideBackward");
+            }
         } else if (waddling) {
             if (m_facingForward) {
                 body->setStrip("walkForward");
@@ -165,10 +171,7 @@ void Trey::update() {
         }
     }
 
-    if (waddlingForward || waddlingSide) {
-        lastStep += dt;
-    }
-
+    lastStep += dt;
     if (lastStep > 0.075f) {
         lastStep = 0.0f;
         body->nextStripIdx();
