@@ -19,11 +19,19 @@ Trey::Trey()
     : // m_headId(Eend::Entities::statues().insert(std::filesystem::path("Trey/head"))),
       m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("Trey/body"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up), m_alive(true) {
+      m_upVelocity(0.0f), m_height(0.0f), m_direction(Direction::up), m_alive(true),
+      m_facingForward(true) {
 
-    Eend::Board* head = Eend::Entities::boards().getRef(m_bodyId);
-    head->setScale(Eend::Scale2D(2.5f * 1.2f, 4.5f * 1.2f));
-    head->setStrip("stand");
+    Eend::Board* const body = Eend::Entities::boards().getRef(m_bodyId);
+    // TODO  make convenience function for setting to size of texture
+    const float bodyHeight = static_cast<float>(body->getTexture().height);
+    const float bodyWidth = static_cast<float>(body->getTexture().width);
+    constexpr float BODY_SCALE = 0.12f;
+
+    std::print("h:{} w:{}\n", bodyHeight, bodyWidth);
+
+    body->setScale(Eend::Scale2D(bodyWidth * BODY_SCALE, bodyHeight * BODY_SCALE));
+    body->setStrip("standForward");
     // Eend::Entities::statues().getRef(m_headId)->setScale(Eend::Scale(0.7f));
 }
 
@@ -107,13 +115,20 @@ void Trey::update() {
 
     // TODO improve this
     static float lastStep = 0.0f;
-    bool waddlingForward = false;
-    waddlingForward |= Eend::InputManager::get().getDownPress();
-    waddlingForward |= Eend::InputManager::get().getUpPress();
 
-    bool waddlingSide = false;
-    waddlingSide |= Eend::InputManager::get().getLeftPress();
-    waddlingSide |= Eend::InputManager::get().getRightPress();
+    bool waddlingSide =
+        Eend::InputManager::get().getLeftPress() || Eend::InputManager::get().getRightPress();
+
+    const bool waddlingForward = Eend::InputManager::get().getDownPress();
+    const bool waddlingBackward = Eend::InputManager::get().getUpPress();
+
+    if (waddlingForward) {
+        m_facingForward = true;
+    } else if (waddlingBackward) {
+        m_facingForward = false;
+    }
+
+    bool waddling = waddlingSide || waddlingForward || waddlingBackward;
 
     if (Eend::InputManager::get().getLeftPress()) {
         body->setStripFlip(true);
@@ -122,12 +137,32 @@ void Trey::update() {
         body->setStripFlip(false);
     }
 
-    if (waddlingSide) {
-        body->setStrip("walkSide");
-    } else if (waddlingForward) {
-        body->setStrip("walkForward");
+    if (m_inAir) {
+        if (waddlingSide) {
+            body->setStrip("kickSide");
+        } else {
+            if (m_facingForward) {
+                body->setStrip("kickForward");
+            } else {
+                body->setStrip("kickBackward");
+            }
+        }
     } else {
-        body->setStrip("stand");
+        if (waddlingSide) {
+            body->setStrip("walkSide");
+        } else if (waddling) {
+            if (m_facingForward) {
+                body->setStrip("walkForward");
+            } else {
+                body->setStrip("walkBackward");
+            }
+        } else {
+            if (m_facingForward) {
+                body->setStrip("standForward");
+            } else {
+                body->setStrip("standBackward");
+            }
+        }
     }
 
     if (waddlingForward || waddlingSide) {

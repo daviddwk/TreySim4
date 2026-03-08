@@ -73,4 +73,5 @@ class Trey {
         float m_height;
         Direction m_direction;
         bool m_alive;
+        bool m_facingForward;
 };
