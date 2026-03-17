@@ -64,10 +64,12 @@ class Trey {
 
         Eend::StatueId m_headId;
         Eend::StatueId m_hairId;
+        Eend::StatueId m_hairOutterId;
         Eend::BoardId m_bodyId;
         Eend::BoardId m_eyeId;
         Eend::Point m_position;
         Eend::Angle m_rotation;
+        Eend::Angle m_targetRotation;
 
         bool m_kicking;
         bool m_inAir;
