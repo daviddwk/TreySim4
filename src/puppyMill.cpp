@@ -15,7 +15,12 @@ float calcKnockback(float depthRatio) {
     return pow(depthRatio, 2.0f);
 }
 
-PuppyMill::PuppyMill() : m_numKilled(0) {}
+PuppyMill::PuppyMill(Terrain* terrain) : m_numKilled(0), m_terrain(terrain) {
+    m_spawns.emplace_back();
+    m_spawns[0].tile = Tile(10.0f, 10.0f);
+    m_spawns[0].timing[DogType::Classic] =
+        std::make_tuple(std::chrono::milliseconds(2000), std::chrono::steady_clock::now());
+}
 
 void PuppyMill::update() {
     for (Dog& dog : m_dogs) {
@@ -28,20 +33,22 @@ void PuppyMill::update() {
 
 unsigned int PuppyMill::getNumKilled() { return m_numKilled; }
 
+void PuppyMill::setTerrain(Terrain* terrain) { m_terrain = terrain; };
+
 void PuppyMill::spawn() {
-    static auto tickLast = std::chrono::steady_clock::now();
     auto now = std::chrono::steady_clock::now();
-    auto tickMs = std::chrono::duration_cast<std::chrono::milliseconds>(now - tickLast).count();
-    if (tickMs >= M_SPAWN_TIME_MS) {
-        tickLast = now;
-        Eend::Point2D spawnPosition = Eend::Point2D(0.0f);
-        if (Eend::randomRange(0, 1)) {
-            spawnPosition.x = Park::get().getWidth();
+
+    for (Spawn& spawn : m_spawns) {
+        for (auto& [dogType, timing] : spawn.timing) {
+            auto& [frequency, next] = timing;
+            if (now > next) {
+                m_dogs.emplace_back(
+                    m_terrain->positionAtTile(spawn.tile),
+                    Eend::Scale2D(5.0f, 5.0f),
+                    0.0f);
+                next = next + frequency;
+            }
         }
-        if (Eend::randomRange(0, 1)) {
-            spawnPosition.y = -Park::get().getHeight();
-        }
-        m_dogs.emplace_back(spawnPosition, Eend::Scale2D(5.0f, 5.0f), 0.0f);
     }
 }
 

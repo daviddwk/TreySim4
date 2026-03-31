@@ -1,6 +1,7 @@
 #pragma once
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
+#include <chrono>
 #include <filesystem>
 #include <print>
 #include <tuple>
@@ -8,11 +9,12 @@
 
 namespace Eend = Eendgine;
 
+using Tile = glm::vec2;
+using TileScale = glm::vec2;
+
 class Terrain {
 
     public:
-        using Tile = glm::vec2;
-        using TileScale = glm::vec2;
         // would like this to be one path with scale build into the format
         Terrain(std::filesystem::path pngHeightMap);
         ~Terrain();

@@ -26,8 +26,8 @@ class Park {
         Eend::Point getSpawn();
 
         float heightAtPoint(Eend::Point2D point);
-        Eend::Point positionAtTile(Terrain::Tile tile);
-        Eend::Point positionAtTile(Terrain::Tile tile, float heightOffset);
+        Eend::Point positionAtTile(Tile tile);
+        Eend::Point positionAtTile(Tile tile, float heightOffset);
 
         unsigned int numDogsKilled();
 
@@ -48,7 +48,8 @@ class Park {
 
         std::optional<std::filesystem::path> m_nextTerrainPath = std::nullopt;
 
-        std::unique_ptr<Terrain> m_terrain;
+        // TODO AHHH fix relationship between puppy mill and terrain
+        Terrain* m_terrain;
         // part of park and dog spawns should be a part of the park format TODO
         std::unique_ptr<PuppyMill> m_puppyMill;
 };
