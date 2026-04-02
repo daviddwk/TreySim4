@@ -28,9 +28,6 @@ class PuppyMill {
 
         unsigned int getNumKilled();
 
-        // TODO fix the need for this
-        void setTerrain(Terrain* terrain);
-
     private:
         void damage();
         void spawn();

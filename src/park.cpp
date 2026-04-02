@@ -29,7 +29,6 @@ void Park::update() {
 
     if (m_nextTerrainPath) {
         m_terrain = new Terrain(*m_nextTerrainPath);
-        m_puppyMill->setTerrain(m_terrain);
         // after because then the new spawn is set
         reset();
     }

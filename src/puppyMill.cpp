@@ -33,8 +33,6 @@ void PuppyMill::update() {
 
 unsigned int PuppyMill::getNumKilled() { return m_numKilled; }
 
-void PuppyMill::setTerrain(Terrain* terrain) { m_terrain = terrain; };
-
 void PuppyMill::spawn() {
     auto now = std::chrono::steady_clock::now();
 
