@@ -4,6 +4,7 @@
 #include "terrain.hpp"
 
 #include <chrono>
+#include <memory>
 #include <optional>
 
 enum class DogType { Classic };
@@ -22,7 +23,7 @@ class PuppyMill {
         };
 
     public:
-        PuppyMill(Terrain* terrain);
+        PuppyMill(std::weak_ptr<Terrain> terrain);
 
         void update();
 
@@ -43,5 +44,5 @@ class PuppyMill {
         std::vector<Dog> m_dogs;
         unsigned int m_numKilled;
 
-        Terrain* m_terrain;
+        std::weak_ptr<Terrain> m_terrain;
 };

@@ -4,7 +4,8 @@
 
 // should be path to park format, not png height map
 Park::Park(std::filesystem::path pngHeightMap)
-    : m_terrain(new Terrain(pngHeightMap)), m_puppyMill(std::make_unique<PuppyMill>(m_terrain)) {}
+    : m_terrain(std::make_shared<Terrain>(pngHeightMap)),
+      m_puppyMill(std::make_unique<PuppyMill>(m_terrain)) {}
 
 void Park::construct(std::filesystem::path terrainPath) {
     assert(m_instance == nullptr);
@@ -28,7 +29,7 @@ void Park::update() {
     m_terrain->update();
 
     if (m_nextTerrainPath) {
-        m_terrain = new Terrain(*m_nextTerrainPath);
+        m_terrain.reset(new Terrain(*m_nextTerrainPath));
         // after because then the new spawn is set
         reset();
     }

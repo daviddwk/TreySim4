@@ -15,7 +15,7 @@ float calcKnockback(float depthRatio) {
     return pow(depthRatio, 2.0f);
 }
 
-PuppyMill::PuppyMill(Terrain* terrain) : m_numKilled(0), m_terrain(terrain) {
+PuppyMill::PuppyMill(std::weak_ptr<Terrain> terrain) : m_numKilled(0), m_terrain(terrain) {
     m_spawns.emplace_back();
     m_spawns[0].tile = Tile(10.0f, 10.0f);
     m_spawns[0].timing[DogType::Classic] =
@@ -41,7 +41,7 @@ void PuppyMill::spawn() {
             auto& [frequency, next] = timing;
             if (now > next) {
                 m_dogs.emplace_back(
-                    m_terrain->positionAtTile(spawn.tile),
+                    m_terrain.lock().get()->positionAtTile(spawn.tile),
                     Eend::Scale2D(5.0f, 5.0f),
                     0.0f);
                 next = next + frequency;
