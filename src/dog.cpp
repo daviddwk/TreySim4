@@ -10,8 +10,8 @@
 #include <print>
 namespace Eend = Eendgine;
 
-Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed)
-    : m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("dog/boards"))),
+Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Dog::Type type)
+    : m_type(type), m_bodyId(Eend::Entities::boards().insert(getDogPath(type) / "boards")),
       m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_animTime(0.0f),
       m_health(M_HEALTH), m_deadTime(0.0f), m_delete(false) {
     Eend::Board* boardRef = Eend::Entities::boards().getRef(*m_bodyId);
@@ -34,7 +34,6 @@ Dog::Dog(Dog&& other) noexcept
 }
 
 Dog& Dog::operator=(Dog&& other) noexcept {
-
     // Self-assignment detection
     if (&other == this) return *this;
 
@@ -94,7 +93,6 @@ void Dog::kick(Eend::Point kick) {
 }
 
 void Dog::update() {
-
     assert(m_bodyId);
 
     Eend::Board* boardRef = Eend::Entities::boards().getRef(*m_bodyId);
@@ -144,4 +142,19 @@ void Dog::update() {
             m_position.x,
             m_position.y,
             Park::get().heightAtPoint(m_position) + M_UP_OFFSET));
+}
+
+std::filesystem::path Dog::getDogPath(Type type) {
+    std::filesystem::path dogPath;
+    switch (type) {
+    case Type::Classic:
+        dogPath = "dog";
+        break;
+    case Type::Snow:
+        dogPath = "dog2";
+        break;
+    default:
+        dogPath = "dog";
+    }
+    return dogPath;
 }

@@ -20,13 +20,13 @@ PuppyMill::PuppyMill(std::weak_ptr<Terrain> terrain)
     m_spawnWaves.emplace_back();
     m_spawnWaves[0].emplace_back();
     m_spawnWaves[0][0].tile = Tile(10.0f, 10.0f);
-    m_spawnWaves[0][0].timing[DogType::Classic] =
+    m_spawnWaves[0][0].timing[Dog::Type::Classic] =
         std::make_tuple(std::chrono::milliseconds(2000), std::chrono::steady_clock::now());
     m_spawnWaves.emplace_back();
     m_spawnWaves[1].emplace_back();
     m_spawnWaves[1][0].tile = Tile(20.0f, 10.0f);
-    m_spawnWaves[1][0].timing[DogType::Classic] =
-        std::make_tuple(std::chrono::milliseconds(2000), std::chrono::steady_clock::now());
+    m_spawnWaves[1][0].timing[Dog::Type::Snow] =
+        std::make_tuple(std::chrono::milliseconds(1000), std::chrono::steady_clock::now());
 }
 
 bool PuppyMill::setWaveIdx(std::vector<Dog>::size_type waveIdx) {
@@ -72,8 +72,11 @@ void PuppyMill::spawn() {
                 m_dogs.emplace_back(
                     m_terrain.lock().get()->positionAtTile(spawn.tile),
                     Eend::Scale2D(5.0f, 5.0f),
-                    0.0f);
-                next = next + frequency;
+                    0.0f,
+                    dogType);
+                next = now + frequency;
+                // no drift but I get a large backlog of dogs for future waves atm
+                // next = next + frequency;
             }
         }
     }

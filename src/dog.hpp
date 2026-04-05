@@ -11,7 +11,8 @@ namespace Eend = Eendgine;
 
 class Dog {
     public:
-        Dog(Eend::Point2D position, Eend::Scale2D scale, float speed);
+        enum class Type { Classic, Snow };
+        Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Dog::Type type);
         ~Dog();
 
         Dog(const Dog& other) = delete;
@@ -36,6 +37,8 @@ class Dog {
         void update();
 
     private:
+        std::filesystem::path getDogPath(Type type);
+
         static constexpr float M_SPEED = 15.0f;
 
         static constexpr unsigned int M_DAMAGE = 2;
@@ -56,6 +59,7 @@ class Dog {
         static constexpr float M_BLINK_AFTER_DEATH_TIME = 3.0f;
         static constexpr float M_DELETE_AFTER_DEATH_TIME = 5.0f;
 
+        Type m_type;
         std::optional<Eend::BoardId> m_bodyId;
         Eend::Point2D m_position;
         float m_speed;

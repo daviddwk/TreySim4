@@ -7,17 +7,15 @@
 #include <memory>
 #include <optional>
 
-enum class DogType { Classic };
-
 class PuppyMill {
         class Spawn {
 
             public:
                 Tile tile;
                 std::map<
-                    DogType, std::tuple<
-                                 std::chrono::milliseconds,
-                                 std::chrono::time_point<std::chrono::steady_clock>>>
+                    Dog::Type, std::tuple<
+                                   std::chrono::milliseconds,
+                                   std::chrono::time_point<std::chrono::steady_clock>>>
                     timing;
                 std::optional<std::chrono::milliseconds> duration;
         };
@@ -42,7 +40,7 @@ class PuppyMill {
         static constexpr float M_SPAWN_TIME_MS = 1000;
 
         std::vector<std::vector<Spawn>> m_spawnWaves;
-        std::vector<std::tuple<DogType, int>> m_numSpawned;
+        std::vector<std::tuple<Dog::Type, int>> m_numSpawned;
 
         std::chrono::time_point<std::chrono::steady_clock> m_start;
         std::chrono::time_point<std::chrono::steady_clock> m_last;
