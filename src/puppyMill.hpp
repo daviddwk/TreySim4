@@ -25,6 +25,11 @@ class PuppyMill {
     public:
         PuppyMill(std::weak_ptr<Terrain> terrain);
 
+        // returns true if wave overflow
+        bool setWaveIdx(std::vector<Dog>::size_type waveIdx);
+        // returns true if end of waves
+        bool nextWave();
+
         void update();
 
         unsigned int getNumKilled();
@@ -36,13 +41,14 @@ class PuppyMill {
         static constexpr int M_DMG_TICK_MS = 200;
         static constexpr float M_SPAWN_TIME_MS = 1000;
 
-        std::vector<Spawn> m_spawns;
+        std::vector<std::vector<Spawn>> m_spawnWaves;
         std::vector<std::tuple<DogType, int>> m_numSpawned;
 
-        std::chrono::time_point<std::chrono::steady_clock> start;
-        std::chrono::time_point<std::chrono::steady_clock> last;
+        std::chrono::time_point<std::chrono::steady_clock> m_start;
+        std::chrono::time_point<std::chrono::steady_clock> m_last;
         std::vector<Dog> m_dogs;
         unsigned int m_numKilled;
 
         std::weak_ptr<Terrain> m_terrain;
+        std::vector<Dog>::size_type m_waveIdx;
 };

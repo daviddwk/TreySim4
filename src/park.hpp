@@ -11,7 +11,7 @@
 
 class Park {
     public:
-        static void construct(std::filesystem::path terrainPath);
+        static void construct(std::filesystem::path parkPath);
         static void destruct();
         static Park& get();
 
@@ -29,13 +29,18 @@ class Park {
         Eend::Point positionAtTile(Tile tile);
         Eend::Point positionAtTile(Tile tile, float heightOffset);
 
+        // true if overflow
+        bool setWaveIdx(std::vector<Dog>::size_type waveIdx);
+        // true if hit the end
+        bool nextWave();
+
         unsigned int numDogsKilled();
 
-        void setTerrain(std::filesystem::path terrainPath);
+        void setTerrain(std::filesystem::path parkPath);
         // just give pointer to terrain
 
     private:
-        Park(std::filesystem::path terrainPath);
+        Park(std::filesystem::path parkPath);
         ~Park() = default;
 
         Park(const Park& other) = delete;
@@ -46,7 +51,7 @@ class Park {
 
         inline static Park* m_instance = nullptr;
 
-        std::optional<std::filesystem::path> m_nextTerrainPath = std::nullopt;
+        std::optional<std::filesystem::path> m_nextParkPath = std::nullopt;
 
         // TODO AHHH fix relationship between puppy mill and terrain
         std::shared_ptr<Terrain> m_terrain;

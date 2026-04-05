@@ -15,11 +15,41 @@ float calcKnockback(float depthRatio) {
     return pow(depthRatio, 2.0f);
 }
 
-PuppyMill::PuppyMill(std::weak_ptr<Terrain> terrain) : m_numKilled(0), m_terrain(terrain) {
-    m_spawns.emplace_back();
-    m_spawns[0].tile = Tile(10.0f, 10.0f);
-    m_spawns[0].timing[DogType::Classic] =
+PuppyMill::PuppyMill(std::weak_ptr<Terrain> terrain)
+    : m_numKilled(0), m_terrain(terrain), m_waveIdx(0) {
+    m_spawnWaves.emplace_back();
+    m_spawnWaves[0].emplace_back();
+    m_spawnWaves[0][0].tile = Tile(10.0f, 10.0f);
+    m_spawnWaves[0][0].timing[DogType::Classic] =
         std::make_tuple(std::chrono::milliseconds(2000), std::chrono::steady_clock::now());
+    m_spawnWaves.emplace_back();
+    m_spawnWaves[1].emplace_back();
+    m_spawnWaves[1][0].tile = Tile(20.0f, 10.0f);
+    m_spawnWaves[1][0].timing[DogType::Classic] =
+        std::make_tuple(std::chrono::milliseconds(2000), std::chrono::steady_clock::now());
+}
+
+bool PuppyMill::setWaveIdx(std::vector<Dog>::size_type waveIdx) {
+    bool overflowed = false;
+    if (waveIdx >= m_spawnWaves.size()) {
+        // do loop waves
+        waveIdx = waveIdx % m_spawnWaves.size();
+        overflowed = true;
+    }
+    m_waveIdx = waveIdx;
+    return overflowed;
+}
+// returns true if end of waves
+bool PuppyMill::nextWave() {
+    auto nextWaveIdx = m_waveIdx + 1;
+    bool reachedEnd = false;
+    if (nextWaveIdx >= m_spawnWaves.size()) {
+        // don't loop waves
+        nextWaveIdx = m_spawnWaves.size() - 1;
+        reachedEnd = true;
+    }
+    m_waveIdx = nextWaveIdx;
+    return reachedEnd;
 }
 
 void PuppyMill::update() {
@@ -35,8 +65,7 @@ unsigned int PuppyMill::getNumKilled() { return m_numKilled; }
 
 void PuppyMill::spawn() {
     auto now = std::chrono::steady_clock::now();
-
-    for (Spawn& spawn : m_spawns) {
+    for (Spawn& spawn : m_spawnWaves[m_waveIdx]) {
         for (auto& [dogType, timing] : spawn.timing) {
             auto& [frequency, next] = timing;
             if (now > next) {

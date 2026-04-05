@@ -174,9 +174,13 @@ static void onRespawn() {
     Eendgine::Entities::shrink();
 }
 
-static void onUnpause() { Park::get().setTerrain("terrain/grassy"); }
+static void onUnpause() {
+    // Park::get().setTerrain("terrain/grassy"); // DEBUG
+}
 
-static void onPause() {}
+static void onPause() {
+    Park::get().nextWave(); // DEBUG
+}
 
 static void pausedUpdate() {}
 
