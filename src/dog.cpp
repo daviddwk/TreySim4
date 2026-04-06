@@ -6,6 +6,7 @@
 #include "park.hpp"
 #include "trey.hpp"
 
+#include <algorithm>
 #include <glm/vector_relational.hpp>
 #include <print>
 namespace Eend = Eendgine;
@@ -142,6 +143,14 @@ void Dog::update() {
             m_position.x,
             m_position.y,
             Park::get().heightAtPoint(m_position) + M_UP_OFFSET));
+}
+
+Dog::Type Dog::stringToType(std::string string) {
+    transform(string.begin(), string.end(), string.begin(), ::tolower);
+    if (string == "classic") return Dog::Type::Classic;
+    if (string == "snow") return Dog::Type::Snow;
+
+    return Dog::Type::Classic;
 }
 
 std::filesystem::path Dog::getDogPath(Type type) {

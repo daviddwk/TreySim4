@@ -73,8 +73,7 @@ PuppyMill::PuppyMill(std::weak_ptr<Terrain> terrain, std::filesystem::path parkP
                 if (!dogTypeJson.isString()) Eend::fatalError("Dog type not string");
                 if (!dogFrequencyJson.isNumeric()) Eend::fatalError("Dog frequency not a number");
                 // TODO I need a string to dog type util function
-                Dog::Type type =
-                    dogTypeJson.asString() == "snow" ? Dog::Type::Snow : Dog::Type::Classic;
+                Dog::Type type = Dog::stringToType(dogTypeJson.asString());
                 m_spawnWaves[dogWaveIdx][dogSpawnIdx].timing[type] = std::make_tuple(
                     std::chrono::milliseconds(dogFrequencyJson.asInt()),
                     std::chrono::steady_clock::now());

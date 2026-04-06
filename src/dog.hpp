@@ -36,6 +36,8 @@ class Dog {
 
         void update();
 
+        static Dog::Type stringToType(std::string string);
+
     private:
         std::filesystem::path getDogPath(Type type);
 
