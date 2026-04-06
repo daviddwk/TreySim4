@@ -8,6 +8,55 @@
       "path": "terrain/grassy2"
     }
   ],
+  "Waves": [
+    [
+      {
+        "position": [10, 10],
+        "timing": [
+          {
+            "type": "classic",
+            "frequency": 2000
+          }
+        ]
+      },
+      {
+        "position": [20, 10],
+        "timing": [
+          {
+            "type": "snow",
+            "frequency": 1000
+          }
+        ]
+      }
+    ],
+    [
+
+    ],
+    [
+      {
+        "position": [5, 5],
+        "timing": [
+          {
+            "type": "classic",
+            "frequency": 3000
+          },
+          {
+            "type": "snow",
+            "frequency": 500
+          }
+        ]
+      },
+      {
+        "position": [20, 30],
+        "timing": [
+          {
+            "type": "snow",
+            "frequency": 4000
+          }
+        ]
+      }
+    ]
+  ],
   "Boards": [
     {
       "position": [9, 9, 5],

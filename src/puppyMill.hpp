@@ -4,6 +4,7 @@
 #include "terrain.hpp"
 
 #include <chrono>
+#include <filesystem>
 #include <memory>
 #include <optional>
 
@@ -21,7 +22,7 @@ class PuppyMill {
         };
 
     public:
-        PuppyMill(std::weak_ptr<Terrain> terrain);
+        PuppyMill(std::weak_ptr<Terrain> terrain, std::filesystem::path parkPath);
 
         // returns true if wave overflow
         bool setWaveIdx(std::vector<Dog>::size_type waveIdx);

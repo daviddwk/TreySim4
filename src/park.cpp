@@ -5,7 +5,7 @@
 // should be path to park format, not png height map
 Park::Park(std::filesystem::path parkPath)
     : m_terrain(std::make_shared<Terrain>(parkPath)),
-      m_puppyMill(std::make_unique<PuppyMill>(m_terrain)) {}
+      m_puppyMill(std::make_unique<PuppyMill>(m_terrain, parkPath)), m_path(parkPath) {}
 
 void Park::construct(std::filesystem::path parkPath) {
     assert(m_instance == nullptr);
@@ -37,7 +37,7 @@ void Park::update() {
 }
 
 void Park::reset() {
-    m_puppyMill.reset(new PuppyMill(m_terrain));
+    m_puppyMill.reset(new PuppyMill(m_terrain, m_path));
     Trey::get().setPosition(m_terrain->getSpawn());
 }
 
