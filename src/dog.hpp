@@ -5,8 +5,6 @@
 
 #include <optional>
 
-#include "terrain.hpp"
-
 namespace Eend = Eendgine;
 
 class Dog {

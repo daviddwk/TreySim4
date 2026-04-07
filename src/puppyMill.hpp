@@ -5,19 +5,21 @@
 
 #include <chrono>
 #include <filesystem>
+#include <json/json.h>
 #include <memory>
 #include <optional>
 
 class PuppyMill {
         class Spawn {
-
             public:
-                Tile tile;
-                std::map<
+                using Timing = std::map<
                     Dog::Type, std::tuple<
                                    std::chrono::milliseconds,
-                                   std::chrono::time_point<std::chrono::steady_clock>>>
-                    timing;
+                                   std::chrono::time_point<std::chrono::steady_clock>>>;
+
+                Spawn(Tile tile) : tile(tile) {};
+                Tile tile;
+                Timing timing;
                 std::optional<std::chrono::milliseconds> duration;
         };
 
@@ -36,6 +38,11 @@ class PuppyMill {
     private:
         void damage();
         void spawn();
+
+        void wavesFromJson(
+            const std::filesystem::path& parkPath, std::vector<std::vector<Spawn>>& spawnWaves);
+        void processTimingJson(const Json::Value& dogTimingJson, Spawn::Timing& timing);
+        Json::Value processSpawnJson(const Json::Value& dogSpawnJson, std::vector<Spawn>& spawns);
 
         static constexpr int M_DMG_TICK_MS = 200;
         static constexpr float M_SPAWN_TIME_MS = 1000;

@@ -146,6 +146,7 @@ void Dog::update() {
 }
 
 Dog::Type Dog::stringToType(std::string string) {
+    // case insensitive
     transform(string.begin(), string.end(), string.begin(), ::tolower);
     if (string == "classic") return Dog::Type::Classic;
     if (string == "snow") return Dog::Type::Snow;
