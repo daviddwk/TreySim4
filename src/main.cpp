@@ -54,35 +54,43 @@ int main() {
         Eend::ShaderProgram("shaders/screen.vert", "shaders/screen.frag"));
     Eend::Cameras::construct(
         Eend::Camera2D(screenWidth, screenHeight),
+        // starting position for menu
         Eend::Camera3D(
             static_cast<float>(screenWidth) / static_cast<float>(screenHeight),
             Eend::Point(-20.0f, 5.0f, 0.0f),
             Eend::Point(3.0f, 0.0f, 3.0f)));
 
-    Trey::construct();
-    // TODO build the scale into the format silly
-    Park::construct("terrain/grassy");
-    Hud::construct();
-    TextBoxQueue::construct();
+    bool menu = true;
+    bool start = false;
 
-    onStart();
-
-    while (!Eend::InputManager::get().getShouldClose()) {
-        static bool paused = false;
-        static bool dead = false;
-
+    // menu init
+    Eend::PanelId startButton = Eend::Entities::panels().insert("textbox/thumbnail");
+    Eend::Panel* startRef = Eend::Entities::panels().getRef(startButton);
+    startRef->setScale(Eend::Scale2D(100.0f, 100.0f));
+    startRef->setPosition(Eend::Point(10.0f, 10.0f, 0.0f));
+    Eend::PanelId stopButton = Eend::Entities::panels().insert("textbox/thumbnail");
+    Eend::Panel* stopRef = Eend::Entities::panels().getRef(stopButton);
+    stopRef->setScale(Eend::Scale2D(100.0f, 100.0f));
+    stopRef->setPosition(Eend::Point(200.0f, 10.0f, 0.0f));
+    stopRef->setTexture("duck");
+    //  menu init
+    while (menu && !Eend::InputManager::get().getShouldClose()) { // exit menu
         Eend::FrameLimiter::get().startInterval();
         Eend::Screen::get().bind();
         Eend::InputManager::get().processInput();
         Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
 
-        Hud::get().update();
-
-        pauseLatch(paused, dead);
-        if (paused) {
-            pausedUpdate();
-        } else {
-            unpausedUpdate();
+        Eend::Panel* startRef = Eend::Entities::panels().getRef(startButton);
+        if (startRef->isClicked() == Eend::Panel::MouseStatus::click) {
+            std::print("start\n");
+            menu = false;
+            start = true;
+        }
+        Eend::Panel* stopRef = Eend::Entities::panels().getRef(stopButton);
+        if (stopRef->isClicked() == Eend::Panel::MouseStatus::click) {
+            std::print("stop\n");
+            menu = false;
+            start = false;
         }
 
         Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
@@ -90,13 +98,52 @@ int main() {
         Eend::Window::get().swapBuffers();
         Eend::FrameLimiter::get().stopInterval();
     }
+    // menu destroy
+    Eend::Entities::panels().erase(startButton);
+    Eend::Entities::panels().erase(stopButton);
+    // menu destroy
 
-    onEnd();
+    if (start) {
+        // could wrap in a loading screen if it was slow enough
+        Trey::construct();
+        // TODO build the scale into the format silly
+        Park::construct("terrain/grassy");
+        Hud::construct();
+        TextBoxQueue::construct();
 
-    TextBoxQueue::destruct();
-    Hud::destruct();
-    Trey::destruct();
-    Park::destruct();
+        onStart();
+
+        while (!Eend::InputManager::get().getShouldClose()) {
+            static bool paused = false;
+            static bool dead = false;
+
+            Eend::FrameLimiter::get().startInterval();
+            Eend::Screen::get().bind();
+            Eend::InputManager::get().processInput();
+            Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
+
+            Hud::get().update();
+
+            pauseLatch(paused, dead);
+            if (paused) {
+                pausedUpdate();
+            } else {
+                unpausedUpdate();
+            }
+
+            Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
+            Eend::Screen::get().render();
+            Eend::Window::get().swapBuffers();
+            Eend::FrameLimiter::get().stopInterval();
+        }
+
+        onEnd();
+
+        TextBoxQueue::destruct();
+        Hud::destruct();
+        Trey::destruct();
+        Park::destruct();
+    }
 
     Eend::Shaders::destruct();
     Eend::Particles::destruct();
