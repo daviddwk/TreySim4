@@ -61,89 +61,116 @@ int main() {
             Eend::Point(3.0f, 0.0f, 3.0f)));
 
     bool menu = true;
-    bool start = false;
 
     // menu init
-    Eend::PanelId startButton = Eend::Entities::panels().insert("textbox/thumbnail");
+    Eend::PanelId startButton = Eend::Entities::panels().insert("menu/startButton");
     Eend::Panel* startRef = Eend::Entities::panels().getRef(startButton);
-    startRef->setScale(Eend::Scale2D(100.0f, 100.0f));
-    startRef->setPosition(Eend::Point(10.0f, 10.0f, 0.0f));
-    Eend::PanelId stopButton = Eend::Entities::panels().insert("textbox/thumbnail");
-    Eend::Panel* stopRef = Eend::Entities::panels().getRef(stopButton);
-    stopRef->setScale(Eend::Scale2D(100.0f, 100.0f));
-    stopRef->setPosition(Eend::Point(200.0f, 10.0f, 0.0f));
-    stopRef->setTexture("duck");
+    startRef->setScale(Eend::Scale2D(250.0f, 100.0f));
+    startRef->setPosition(Eend::Point(140.0f, 500.0f, 0.0f));
+    startRef->setTexture("none");
+    Eend::PanelId exitButton = Eend::Entities::panels().insert("menu/exitButton");
+    Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitButton);
+    exitRef->setScale(Eend::Scale2D(250.0f, 100.0f));
+    exitRef->setPosition(Eend::Point(890.0f, 500.0f, 0.0f));
+    exitRef->setTexture("none");
     //  menu init
     while (menu && !Eend::InputManager::get().getShouldClose()) { // exit menu
+        bool start = false;
         Eend::FrameLimiter::get().startInterval();
         Eend::Screen::get().bind();
         Eend::InputManager::get().processInput();
         Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
 
+        // menu update
         Eend::Panel* startRef = Eend::Entities::panels().getRef(startButton);
-        if (startRef->isClicked() == Eend::Panel::MouseStatus::click) {
+        auto startButtonStatus = startRef->isClicked();
+        if (startButtonStatus == Eend::Panel::MouseStatus::click) {
             std::print("start\n");
-            menu = false;
             start = true;
+        } else if (startButtonStatus == Eend::Panel::MouseStatus::hover) {
+            startRef->setTexture("hover");
+        } else {
+            startRef->setTexture("none");
         }
-        Eend::Panel* stopRef = Eend::Entities::panels().getRef(stopButton);
-        if (stopRef->isClicked() == Eend::Panel::MouseStatus::click) {
+        Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitButton);
+        auto exitButtonStatus = exitRef->isClicked();
+        if (exitButtonStatus == Eend::Panel::MouseStatus::click) {
             std::print("stop\n");
             menu = false;
-            start = false;
+        } else if (exitButtonStatus == Eend::Panel::MouseStatus::hover) {
+            exitRef->setTexture("hover");
+        } else {
+            exitRef->setTexture("none");
         }
+        // menu update
 
         Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
         Eend::Screen::get().render();
         Eend::Window::get().swapBuffers();
         Eend::FrameLimiter::get().stopInterval();
+
+        if (start) {
+            // menu destroy
+            Eend::Entities::panels().erase(startButton);
+            Eend::Entities::panels().erase(exitButton);
+            // menu destroy
+            // could wrap in a loading screen if it was slow enough
+            Trey::construct();
+            // TODO build the scale into the format silly
+            Park::construct("terrain/grassy");
+            Hud::construct();
+            TextBoxQueue::construct();
+
+            onStart();
+            while (!Eend::InputManager::get().getShouldClose()) {
+                static bool paused = false;
+                static bool dead = false;
+
+                Eend::FrameLimiter::get().startInterval();
+                Eend::Screen::get().bind();
+                Eend::InputManager::get().processInput();
+                Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
+
+                Hud::get().update();
+
+                pauseLatch(paused, dead);
+                if (paused) {
+                    pausedUpdate();
+                } else {
+                    unpausedUpdate();
+                }
+
+                Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
+                Eend::Screen::get().render();
+                Eend::Window::get().swapBuffers();
+                Eend::FrameLimiter::get().stopInterval();
+            }
+            Eend::InputManager::get().setShouldClose(false);
+
+            onEnd();
+
+            TextBoxQueue::destruct();
+            Hud::destruct();
+            Trey::destruct();
+            Park::destruct();
+            // menu init
+            startButton = Eend::Entities::panels().insert("menu/startButton");
+            startRef = Eend::Entities::panels().getRef(startButton);
+            startRef->setScale(Eend::Scale2D(250.0f, 100.0f));
+            startRef->setPosition(Eend::Point(140.0f, 500.0f, 0.0f));
+            startRef->setTexture("none");
+            exitButton = Eend::Entities::panels().insert("menu/exitButton");
+            exitRef = Eend::Entities::panels().getRef(exitButton);
+            exitRef->setScale(Eend::Scale2D(250.0f, 100.0f));
+            exitRef->setPosition(Eend::Point(890.0f, 500.0f, 0.0f));
+            exitRef->setTexture("none");
+            //  menu init
+        }
     }
     // menu destroy
     Eend::Entities::panels().erase(startButton);
-    Eend::Entities::panels().erase(stopButton);
+    Eend::Entities::panels().erase(exitButton);
     // menu destroy
-
-    if (start) {
-        // could wrap in a loading screen if it was slow enough
-        Trey::construct();
-        // TODO build the scale into the format silly
-        Park::construct("terrain/grassy");
-        Hud::construct();
-        TextBoxQueue::construct();
-
-        onStart();
-
-        while (!Eend::InputManager::get().getShouldClose()) {
-            static bool paused = false;
-            static bool dead = false;
-
-            Eend::FrameLimiter::get().startInterval();
-            Eend::Screen::get().bind();
-            Eend::InputManager::get().processInput();
-            Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
-
-            Hud::get().update();
-
-            pauseLatch(paused, dead);
-            if (paused) {
-                pausedUpdate();
-            } else {
-                unpausedUpdate();
-            }
-
-            Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
-            Eend::Screen::get().render();
-            Eend::Window::get().swapBuffers();
-            Eend::FrameLimiter::get().stopInterval();
-        }
-
-        onEnd();
-
-        TextBoxQueue::destruct();
-        Hud::destruct();
-        Trey::destruct();
-        Park::destruct();
-    }
 
     Eend::Shaders::destruct();
     Eend::Particles::destruct();
