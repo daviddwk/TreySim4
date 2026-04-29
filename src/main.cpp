@@ -117,7 +117,7 @@ int main() {
             // could wrap in a loading screen if it was slow enough
             Trey::construct();
             // TODO build the scale into the format silly
-            Park::construct("terrain/grassy");
+            Park::construct("terrain/arena");
             Hud::construct();
             TextBoxQueue::construct();
 
