@@ -3,5 +3,17 @@
   "Spawn" : [15.0, 76.0],
   "Portals" : [],
   "Waves": [],
-  "Boards": []
+  "Boards": [],
+  "Playgrounds" : {
+    "gate" : {
+      "Portals" : [],
+      "Boards" : [],
+      "Collision" : []
+    },
+    "portal" : {
+      "Portals" : [],
+      "Boards" : [],
+      "Collision" : []
+    }
+  }
 }

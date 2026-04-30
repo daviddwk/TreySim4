@@ -1,6 +1,10 @@
 #pragma once
+
+#include "playground.hpp"
+
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
+
 #include <chrono>
 #include <filesystem>
 #include <print>
@@ -59,4 +63,5 @@ class Terrain {
         Eend::Scale m_scale;
         Tile m_spawn;
         std::vector<Portal> m_portals;
+        std::map<std::string, Playground> m_playgrounds;
 };

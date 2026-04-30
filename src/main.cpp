@@ -85,7 +85,6 @@ int main() {
         Eend::Panel* startRef = Eend::Entities::panels().getRef(startButton);
         auto startButtonStatus = startRef->isClicked();
         if (startButtonStatus == Eend::Panel::MouseStatus::click) {
-            std::print("start\n");
             start = true;
         } else if (startButtonStatus == Eend::Panel::MouseStatus::hover) {
             startRef->setTexture("hover");
@@ -95,7 +94,6 @@ int main() {
         Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitButton);
         auto exitButtonStatus = exitRef->isClicked();
         if (exitButtonStatus == Eend::Panel::MouseStatus::click) {
-            std::print("stop\n");
             menu = false;
         } else if (exitButtonStatus == Eend::Panel::MouseStatus::hover) {
             exitRef->setTexture("hover");

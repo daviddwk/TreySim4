@@ -8,6 +8,18 @@
       "path": "terrain/grassy2"
     }
   ],
+  "Playgrounds" : [
+  	"gate" {
+  		"Portals" : [],
+  		"Boards" : [],
+  		"Collision" : []
+  	},,
+	"portal" {
+  		"Portals" : [],
+  		"Boards" : [],
+  		"Collision" : []
+  	}
+  ],
   "Waves": [
     [
       {
