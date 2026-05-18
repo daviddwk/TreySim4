@@ -1,9 +1,12 @@
 #pragma once
 
 #include "playground.hpp"
+#include "portal.hpp"
 
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
+
+#include <json/json.h>
 
 #include <chrono>
 #include <filesystem>
@@ -36,21 +39,19 @@ class Terrain {
         float getWidth() { return static_cast<float>(m_width) * m_scale.y; }
         Eend::Point getSpawn() { return positionAtTile(m_spawn); }
 
+        void enablePlayground(const std::string& playgroundName);
+        void disablePlayground(const std::string& playgroundName);
+
         float heightAtPoint(Eend::Point2D point);
         Eend::Point positionAtTile(Tile tile);
         Eend::Point positionAtTile(Tile tile, float heightOffset);
 
-        class Portal {
-            public:
-                Portal(
-                    Eend::Point2D position, Eend::Vector2D toCorner,
-                    std::filesystem::path terrainPath);
-
-                Eend::Rectangle collision;
-                std::filesystem::path terrainPath;
-        };
-
     private:
+        std::tuple<Eend::BoardId, float> boardFromJson(Json::Value boardJson);
+        Eend::StatueId statueFromJson(Json::Value statueJson);
+        std::tuple<Eend::DollId, float> dollFromJson(Json::Value dollJson);
+
+        const std::filesystem::path m_path;
         int m_height;
         int m_width;
         float m_animationSpeed;
