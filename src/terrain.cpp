@@ -175,10 +175,10 @@ Terrain::Terrain(const std::filesystem::path path)
             const size_t currentIdx = w + (h * collisionWidth);
             if (imageData[currentIdx] == 0) {
 
-                const float upperLeftX = (w * m_scale.x) + 1;
-                const float upperLeftY = -(((h + 1) * m_scale.y) + 1);
-                const float lowerRightX = ((w + 1) * m_scale.x) + 1;
-                const float lowerRightY = -((h * m_scale.y) + 1);
+                const float upperLeftX = (w * m_scale.x);
+                const float upperLeftY = -((h + 1) * m_scale.y);
+                const float lowerRightX = ((w + 1) * m_scale.x);
+                const float lowerRightY = -(h * m_scale.y);
 
                 const Eend::Point2D upperLeft(upperLeftX, upperLeftY);
                 const Eend::Point2D lowerRight(lowerRightX, lowerRightY);
