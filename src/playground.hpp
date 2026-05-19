@@ -10,20 +10,19 @@ namespace Eend = Eendgine;
 class Playground {
 
     public:
-        Playground(std::string playgroundName) : name(playgroundName) {};
+        Playground() {};
         ~Playground() {
-            for (auto& board : m_boards)
+            for (auto& board : boards)
                 Eend::Entities::boards().erase(std::get<Eend::BoardId>(board));
-            for (Eend::StatueId& statue : m_statues)
+            for (Eend::StatueId& statue : statues)
                 Eend::Entities::statues().erase(statue);
-            for (auto& doll : m_dolls)
+            for (auto& doll : dolls)
                 Eend::Entities::dolls().erase(std::get<Eend::DollId>(doll));
         }
 
-        std::vector<Eend::Rectangle> m_collisionRectangles;
-        std::vector<std::tuple<Eend::BoardId, float>> m_boards;
-        std::vector<Eend::StatueId> m_statues;
-        std::vector<std::tuple<Eend::DollId, float>> m_dolls;
-
-        const std::string name;
+        std::vector<Eend::Rectangle> collisionRectangles;
+        std::vector<Portal> portals;
+        std::vector<std::tuple<Eend::BoardId, float>> boards;
+        std::vector<Eend::StatueId> statues;
+        std::vector<std::tuple<Eend::DollId, float>> dolls;
 };

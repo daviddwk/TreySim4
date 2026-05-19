@@ -326,10 +326,31 @@ void Terrain::enablePlayground(const std::string& playgroundName) {
         Eend::fatalError("improper json: " + metadataPath.string());
     }
     // TODO see prev
+
+    m_playgrounds[playgroundName];
+
     if (rootJson["Playgrounds"].isArray()) {
         for (unsigned int pgIdx = 0; pgIdx < rootJson["Playgrounds"].size(); ++pgIdx) {
             Json::Value pgJson = rootJson["Playgrounds"][pgIdx];
-            if (pgJson["Boards"].isArray()) {
+            // TODO ADD IN PORTALS AND COLLISION
+            if (rootJson["Boards"].isArray()) {
+                for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
+                    m_playgrounds[playgroundName].boards.push_back(
+                        boardFromJson(rootJson["Boards"][boardIdx]));
+                }
+            }
+            if (rootJson["Statues"].isArray()) {
+                for (unsigned int statueIdx = 0; statueIdx < rootJson["Statues"].size();
+                     ++statueIdx) {
+                    m_playgrounds[playgroundName].statues.push_back(
+                        statueFromJson(rootJson["Statues"][statueIdx]));
+                }
+            }
+            if (rootJson["Dolls"].isArray()) {
+                for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
+                    m_playgrounds[playgroundName].dolls.push_back(
+                        dollFromJson(rootJson["Dolls"][dollIdx]));
+                }
             }
         }
     }
