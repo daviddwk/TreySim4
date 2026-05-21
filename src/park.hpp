@@ -37,6 +37,9 @@ class Park {
         unsigned int numDogsKilled();
 
         void setTerrain(std::filesystem::path parkPath);
+
+        void enablePlayground(const std::string& playgroundName);
+        void disablePlayground(const std::string& playgroundName);
         // just give pointer to terrain
 
     private:

@@ -21,7 +21,31 @@
       "path": "terrain/grassy2"
     }
   ],
-  "Waves": [
+  "Playgrounds": {
+    "tree1" : {
+      "Boards" : [
+        {
+          "position": [
+            9,
+            9,
+            5
+          ],
+          "scale": [
+            5.0,
+            10.0
+          ],
+          "pace": 1.0,
+          "rotation": 0.0,
+          "path": "terrain/grassy/boards/tree"
+        }
+      ],
+      "Statues" : [],
+      "Dolls" : [],
+      "Portals" : [],
+      "Collision" : []
+    }
+  },
+	"Waves": [
     [
       {
         "position": [
@@ -83,20 +107,6 @@
     ]
   ],
   "Boards": [
-    {
-      "position": [
-        9,
-        9,
-        5
-      ],
-      "scale": [
-        5.0,
-        10.0
-      ],
-      "pace": 1.0,
-      "rotation": 0.0,
-      "path": "terrain/grassy/boards/tree"
-    },
     {
       "position": [
         19,
@@ -283,6 +293,6 @@
       ],
       "rotation": 0.0,
       "path": "terrain/grassy/boards/rocks"
-    } 
+    }
   ]
 }

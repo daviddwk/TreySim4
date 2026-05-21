@@ -193,10 +193,10 @@ static void onStart() {
         "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
         5.0f,
         true);
-
     // Eend::Audio::get().playTrack(
     //     "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
     //     50.0f);
+    Park::get().enablePlayground("tree1"); // DEBUG
 }
 
 static void pauseLatch(bool& paused, bool& dead) {
@@ -248,10 +248,12 @@ static void onRespawn() {
 
 static void onUnpause() {
     // Park::get().setTerrain("terrain/grassy"); // DEBUG
+    Park::get().enablePlayground("tree1"); // DEBUG
 }
 
 static void onPause() {
-    Park::get().nextWave(); // DEBUG
+    Park::get().nextWave();                 // DEBUG
+    Park::get().disablePlayground("tree1"); // DEBUG
 }
 
 static void pausedUpdate() {}

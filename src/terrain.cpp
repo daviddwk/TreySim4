@@ -283,18 +283,33 @@ Terrain::~Terrain() {
 void Terrain::update() {
     static float cumulative = 0.0f;
     cumulative += Eend::FrameLimiter::get().deltaTime;
-    for (auto& doll : m_dolls) {
-        Eend::Doll* dollRef = Eend::Entities::dolls().getRef(std::get<Eend::DollId>(doll));
-        float animScale = dollRef->getAnim();
-        animScale += std::get<float>(doll) * Eend::FrameLimiter::get().deltaTime;
-        dollRef->setAnim(animScale);
-    }
-    for (auto& board : m_boards) {
-        Eend::Board* boardRef = Eend::Entities::boards().getRef(std::get<Eend::BoardId>(board));
-        if (std::get<float>(board) != 0) {
-            boardRef->setStripIdx((size_t)(cumulative / std::get<float>(board)));
+
+    auto animateBoards = [](std::vector<std::tuple<Eend::BoardId, float>>& pacedBoards) {
+        for (auto& board : pacedBoards) {
+            Eend::Board* boardRef = Eend::Entities::boards().getRef(std::get<Eend::BoardId>(board));
+            if (std::get<float>(board) != 0) {
+                boardRef->setStripIdx((size_t)(cumulative / std::get<float>(board)));
+            }
         }
+    };
+    auto animateDolls = [](std::vector<std::tuple<Eend::DollId, float>>& pacedDolls) {
+        for (auto& doll : pacedDolls) {
+            Eend::Doll* dollRef = Eend::Entities::dolls().getRef(std::get<Eend::DollId>(doll));
+            float animScale = dollRef->getAnim();
+            animScale += std::get<float>(doll) * Eend::FrameLimiter::get().deltaTime;
+            dollRef->setAnim(animScale);
+        }
+    };
+
+    animateBoards(m_boards);
+    for (auto& [key, playground] : m_playgrounds) {
+        animateBoards(playground.boards);
     }
+    animateDolls(m_dolls);
+    for (auto& [key, playground] : m_playgrounds) {
+        animateDolls(playground.dolls);
+    }
+
     if (m_animationSpeed != 0.0f) {
         Eend::Entities::statues().getRef(m_statueId)->setStripIdx(cumulative / m_animationSpeed);
     }
@@ -329,28 +344,26 @@ void Terrain::enablePlayground(const std::string& playgroundName) {
 
     m_playgrounds[playgroundName];
 
-    if (rootJson["Playgrounds"].isArray()) {
-        for (unsigned int pgIdx = 0; pgIdx < rootJson["Playgrounds"].size(); ++pgIdx) {
-            Json::Value pgJson = rootJson["Playgrounds"][pgIdx];
-            // TODO ADD IN PORTALS AND COLLISION
-            if (rootJson["Boards"].isArray()) {
-                for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
-                    m_playgrounds[playgroundName].boards.push_back(
-                        boardFromJson(rootJson["Boards"][boardIdx]));
-                }
+    if (rootJson["Playgrounds"].isObject()) {
+        Json::Value pgJson = rootJson["Playgrounds"][playgroundName];
+        assert(pgJson.isObject());
+        // TODO ADD IN PORTALS AND COLLISION
+        if (pgJson["Boards"].isArray()) {
+            for (unsigned int boardIdx = 0; boardIdx < pgJson["Boards"].size(); ++boardIdx) {
+                m_playgrounds[playgroundName].boards.push_back(
+                    boardFromJson(pgJson["Boards"][boardIdx]));
             }
-            if (rootJson["Statues"].isArray()) {
-                for (unsigned int statueIdx = 0; statueIdx < rootJson["Statues"].size();
-                     ++statueIdx) {
-                    m_playgrounds[playgroundName].statues.push_back(
-                        statueFromJson(rootJson["Statues"][statueIdx]));
-                }
+        }
+        if (pgJson["Statues"].isArray()) {
+            for (unsigned int statueIdx = 0; statueIdx < pgJson["Statues"].size(); ++statueIdx) {
+                m_playgrounds[playgroundName].statues.push_back(
+                    statueFromJson(pgJson["Statues"][statueIdx]));
             }
-            if (rootJson["Dolls"].isArray()) {
-                for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
-                    m_playgrounds[playgroundName].dolls.push_back(
-                        dollFromJson(rootJson["Dolls"][dollIdx]));
-                }
+        }
+        if (pgJson["Dolls"].isArray()) {
+            for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
+                m_playgrounds[playgroundName].dolls.push_back(
+                    dollFromJson(rootJson["Dolls"][dollIdx]));
             }
         }
     }
