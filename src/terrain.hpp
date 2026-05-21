@@ -52,6 +52,7 @@ class Terrain {
         std::tuple<Eend::BoardId, float> boardFromJson(Json::Value boardJson);
         Eend::StatueId statueFromJson(Json::Value statueJson);
         std::tuple<Eend::DollId, float> dollFromJson(Json::Value dollJson);
+        Portal portalFromJson(Json::Value portalJson);
 
         const std::filesystem::path m_path;
         int m_height;

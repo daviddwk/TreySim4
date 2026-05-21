@@ -9,25 +9,14 @@
     20.0
   ],
   "Portals": [
-    {
-      "position": [
-        28,
-        19
-      ],
-      "scale": [
-        1,
-        1
-      ],
-      "path": "terrain/grassy2"
-    }
   ],
   "Playgrounds": {
     "tree1" : {
       "Boards" : [
         {
           "position": [
-            9,
-            9,
+            28,
+            19,
             5
           ],
           "scale": [
@@ -39,9 +28,21 @@
           "path": "terrain/grassy/boards/tree"
         }
       ],
+      "Portals" : [
+        {
+          "position": [
+            28,
+            19
+          ],
+          "scale": [
+            1,
+            1
+          ],
+          "path": "terrain/grassy2"
+        }
+      ],
       "Statues" : [],
       "Dolls" : [],
-      "Portals" : [],
       "Collision" : []
     }
   },

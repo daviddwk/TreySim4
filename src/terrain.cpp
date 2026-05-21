@@ -316,13 +316,21 @@ void Terrain::update() {
 }
 
 bool Terrain::colliding(const Eend::Point2D point) {
+
+    auto handlePortals = [point](std::vector<Portal>& portals) {
+        for (auto& portal : portals) {
+            if (pointOnRectangle(point, portal.collision)) {
+                Park::get().setTerrain(portal.terrainPath);
+            }
+        }
+    };
+
     for (auto& rectangle : m_collisionRectangles) {
         if (pointOnRectangle(point, rectangle)) return true;
     }
-    for (auto& portal : m_portals) {
-        if (pointOnRectangle(point, portal.collision)) {
-            Park::get().setTerrain(portal.terrainPath);
-        }
+    handlePortals(m_portals);
+    for (auto& [key, playground] : m_playgrounds) {
+        handlePortals(playground.portals);
     }
     return false;
 }
@@ -348,7 +356,7 @@ void Terrain::playgroundEnable(const std::string& playgroundName) {
     if (rootJson["Playgrounds"].isObject()) {
         Json::Value pgJson = rootJson["Playgrounds"][playgroundName];
         assert(pgJson.isObject());
-        // TODO ADD IN PORTALS AND COLLISION
+        // TODO ADD COLLISION but using pngs
         if (pgJson["Boards"].isArray()) {
             for (unsigned int boardIdx = 0; boardIdx < pgJson["Boards"].size(); ++boardIdx) {
                 m_playgrounds[playgroundName].boards.push_back(
@@ -362,9 +370,15 @@ void Terrain::playgroundEnable(const std::string& playgroundName) {
             }
         }
         if (pgJson["Dolls"].isArray()) {
-            for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
+            for (unsigned int dollIdx = 0; dollIdx < pgJson["Dolls"].size(); ++dollIdx) {
                 m_playgrounds[playgroundName].dolls.push_back(
-                    dollFromJson(rootJson["Dolls"][dollIdx]));
+                    dollFromJson(pgJson["Dolls"][dollIdx]));
+            }
+        }
+        if (pgJson["Portals"].isArray()) {
+            for (unsigned int portalIdx = 0; portalIdx < pgJson["Portals"].size(); ++portalIdx) {
+                m_playgrounds[playgroundName].portals.push_back(
+                    portalFromJson(pgJson["Portals"][portalIdx]));
             }
         }
     }
@@ -510,6 +524,19 @@ std::tuple<Eend::DollId, float> Terrain::dollFromJson(Json::Value dollJson) {
     if (dollJson.isMember("animation"))
         dollRef->setAnimation(jsonString(dollJson, "animation", metadataPath));
     return std::tie(id, pace);
+}
+
+Portal Terrain::portalFromJson(Json::Value portalJson) {
+    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
+    Tile tilePosition = jsonVec2(portalJson, "position", metadataPath);
+    TileScale tileScale = jsonVec2(portalJson, "scale", metadataPath);
+
+    Eend::Point2D position = glm::vec2(tilePosition.x * m_scale.x, -tilePosition.y * m_scale.y);
+    Eend::Vector2D toCorner = glm::vec2(tileScale.x * m_scale.x, tileScale.y * m_scale.y);
+
+    std::filesystem::path terrainPath = jsonString(portalJson, "path", metadataPath);
+
+    return Portal(position, toCorner, terrainPath);
 }
 
 glm::vec3
