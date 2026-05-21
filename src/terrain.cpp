@@ -327,8 +327,9 @@ bool Terrain::colliding(const Eend::Point2D point) {
     return false;
 }
 
-void Terrain::enablePlayground(const std::string& playgroundName) {
+void Terrain::playgroundEnable(const std::string& playgroundName) {
     // TODO make this a function
+    assert(m_playgrounds.count(playgroundName) == 0); // TODO idk but handle better
     Json::Value rootJson;
     std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
     std::ifstream metadata(metadataPath);
@@ -369,8 +370,20 @@ void Terrain::enablePlayground(const std::string& playgroundName) {
     }
 }
 
-void Terrain::disablePlayground(const std::string& playgroundName) {
+void Terrain::playgroundDisable(const std::string& playgroundName) {
     m_playgrounds.erase(playgroundName);
+}
+
+bool Terrain::playgroundIsEnabled(const std::string& playgroundName) {
+    return m_playgrounds.count(playgroundName) > 0;
+}
+
+void Terrain::playgroundToggle(const std::string& playgroundName) {
+    if (playgroundIsEnabled(playgroundName)) {
+        playgroundDisable(playgroundName);
+    } else {
+        playgroundEnable(playgroundName);
+    }
 }
 
 Eend::Point Terrain::positionAtTile(const Tile tile) { return positionAtTile(tile, 0.0f); }

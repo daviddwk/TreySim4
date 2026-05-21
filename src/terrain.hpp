@@ -39,8 +39,10 @@ class Terrain {
         float getWidth() { return static_cast<float>(m_width) * m_scale.y; }
         Eend::Point getSpawn() { return positionAtTile(m_spawn); }
 
-        void enablePlayground(const std::string& playgroundName);
-        void disablePlayground(const std::string& playgroundName);
+        void playgroundEnable(const std::string& playgroundName);
+        void playgroundDisable(const std::string& playgroundName);
+        bool playgroundIsEnabled(const std::string& playgroundName);
+        void playgroundToggle(const std::string& playgroundName);
 
         float heightAtPoint(Eend::Point2D point);
         Eend::Point positionAtTile(Tile tile);

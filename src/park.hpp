@@ -38,8 +38,10 @@ class Park {
 
         void setTerrain(std::filesystem::path parkPath);
 
-        void enablePlayground(const std::string& playgroundName);
-        void disablePlayground(const std::string& playgroundName);
+        void playgroundEnable(const std::string& playgroundName);
+        void playgroundDisable(const std::string& playgroundName);
+        bool playgroundIsEnabled(const std::string& playgroundName);
+        void playgroundToggle(const std::string& playgroundName);
         // just give pointer to terrain
 
     private:

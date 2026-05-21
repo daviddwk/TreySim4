@@ -51,12 +51,20 @@ unsigned int Park::numDogsKilled() { return m_puppyMill->getNumKilled(); }
 
 void Park::setTerrain(std::filesystem::path parkPath) { m_nextParkPath = parkPath; }
 
-void Park::enablePlayground(const std::string& playgroundName) {
-    m_terrain->enablePlayground(playgroundName);
+void Park::playgroundEnable(const std::string& playgroundName) {
+    m_terrain->playgroundEnable(playgroundName);
 }
 
-void Park::disablePlayground(const std::string& playgroundName) {
-    m_terrain->disablePlayground(playgroundName);
+void Park::playgroundDisable(const std::string& playgroundName) {
+    m_terrain->playgroundDisable(playgroundName);
+}
+
+bool Park::playgroundIsEnabled(const std::string& playgroundName) {
+    return m_terrain->playgroundIsEnabled(playgroundName);
+}
+
+void Park::playgroundToggle(const std::string& playgroundName) {
+    m_terrain->playgroundToggle(playgroundName);
 }
 
 bool Park::colliding(Eend::Point2D point) { return m_terrain->colliding(point); };
