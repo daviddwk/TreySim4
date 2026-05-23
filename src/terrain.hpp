@@ -53,6 +53,11 @@ class Terrain {
         Eend::StatueId statueFromJson(Json::Value statueJson);
         std::tuple<Eend::DollId, float> dollFromJson(Json::Value dollJson);
         Portal portalFromJson(Json::Value portalJson);
+        void
+        collisionFromJson(Json::Value collisionJson, std::vector<Eend::Rectangle>& collisionVec);
+
+        void collisionFromMap(
+            std::filesystem::path collisionMap, std::vector<Eend::Rectangle>& collisionVec);
 
         const std::filesystem::path m_path;
         int m_height;

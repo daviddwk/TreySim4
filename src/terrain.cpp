@@ -38,8 +38,6 @@ Terrain::Terrain(const std::filesystem::path path)
     // height map from image
     std::filesystem::path pngHeightMap = "resources" / m_path / "generate/heightMap.png";
     std::filesystem::path pngCollisionMap = "resources" / m_path / "generate/collisionMap.png";
-    int collisionHeight = 0;
-    int collisionWidth = 0;
     int channels = 0;
 
     Json::Value rootJson;
@@ -157,31 +155,9 @@ Terrain::Terrain(const std::filesystem::path path)
         }
     }
     stbi_image_free(imageData);
-    channels = 1;
-    imageData = stbi_load(pngCollisionMap.c_str(), &collisionWidth, &collisionHeight, &channels, 0);
-    if (imageData == NULL) {
-        Eend::fatalError(
-            "unable to load image " + pngCollisionMap.generic_string() + " for terrain generation");
-    }
-    for (int h = 0; h < collisionHeight; ++h) {
-        for (int w = 0; w < collisionWidth; ++w) {
-            const size_t currentIdx = w + (h * collisionWidth);
-            if (imageData[currentIdx] == 0) {
 
-                const float upperLeftX = (w * m_scale.x);
-                const float upperLeftY = -((h + 1) * m_scale.y);
-                const float lowerRightX = ((w + 1) * m_scale.x);
-                const float lowerRightY = -(h * m_scale.y);
+    Terrain::collisionFromMap(pngCollisionMap, m_collisionRectangles);
 
-                const Eend::Point2D upperLeft(upperLeftX, upperLeftY);
-                const Eend::Point2D lowerRight(lowerRightX, lowerRightY);
-
-                m_collisionRectangles.emplace_back(upperLeft, lowerRight);
-            }
-        }
-    }
-    stbi_image_free(imageData);
-    //
     if (rootJson["Boards"].isArray()) {
         for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
             m_boards.push_back(boardFromJson(rootJson["Boards"][boardIdx]));
@@ -537,6 +513,42 @@ Portal Terrain::portalFromJson(Json::Value portalJson) {
     std::filesystem::path terrainPath = jsonString(portalJson, "path", metadataPath);
 
     return Portal(position, toCorner, terrainPath);
+}
+
+void Terrain::collisionFromJson(
+    Json::Value collisionJson, std::vector<Eend::Rectangle>& collisionVec) {}
+
+// must call after m_scale is determined
+void Terrain::collisionFromMap(
+    const std::filesystem::path collisionMap, std::vector<Eend::Rectangle>& collisionVec) {
+
+    int collisionHeight = 0;
+    int collisionWidth = 0;
+    int channels = 1;
+    unsigned char* imageData =
+        stbi_load(collisionMap.c_str(), &collisionWidth, &collisionHeight, &channels, 0);
+    if (imageData == NULL) {
+        Eend::fatalError(
+            "unable to load image " + collisionMap.generic_string() + " for terrain generation");
+    }
+    for (int h = 0; h < collisionHeight; ++h) {
+        for (int w = 0; w < collisionWidth; ++w) {
+            const size_t currentIdx = w + (h * collisionWidth);
+            if (imageData[currentIdx] == 0) {
+
+                const float upperLeftX = (w * m_scale.x);
+                const float upperLeftY = -((h + 1) * m_scale.y);
+                const float lowerRightX = ((w + 1) * m_scale.x);
+                const float lowerRightY = -(h * m_scale.y);
+
+                const Eend::Point2D upperLeft(upperLeftX, upperLeftY);
+                const Eend::Point2D lowerRight(lowerRightX, lowerRightY);
+
+                collisionVec.emplace_back(upperLeft, lowerRight);
+            }
+        }
+    }
+    stbi_image_free(imageData);
 }
 
 glm::vec3
