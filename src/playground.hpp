@@ -20,7 +20,7 @@ class Playground {
                 Eend::Entities::dolls().erase(std::get<Eend::DollId>(doll));
         }
 
-        std::vector<Eend::Rectangle> collisionRectangles;
+        std::vector<Eend::Rectangle> collision;
         std::vector<Portal> portals;
         std::vector<std::tuple<Eend::BoardId, float>> boards;
         std::vector<Eend::StatueId> statues;

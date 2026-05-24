@@ -300,13 +300,18 @@ bool Terrain::colliding(const Eend::Point2D point) {
             }
         }
     };
+    handlePortals(m_portals);
+    for (auto& [key, playground] : m_playgrounds) {
+        handlePortals(playground.portals);
+    }
 
     for (auto& rectangle : m_collisionRectangles) {
         if (pointOnRectangle(point, rectangle)) return true;
     }
-    handlePortals(m_portals);
     for (auto& [key, playground] : m_playgrounds) {
-        handlePortals(playground.portals);
+        for (auto& rectangle : playground.collision) {
+            if (pointOnRectangle(point, rectangle)) return true;
+        }
     }
     return false;
 }
@@ -355,6 +360,13 @@ void Terrain::playgroundEnable(const std::string& playgroundName) {
             for (unsigned int portalIdx = 0; portalIdx < pgJson["Portals"].size(); ++portalIdx) {
                 m_playgrounds[playgroundName].portals.push_back(
                     portalFromJson(pgJson["Portals"][portalIdx]));
+            }
+        }
+        if (pgJson["Collision"].isArray()) {
+            for (unsigned int portalIdx = 0; portalIdx < pgJson["Collision"].size(); ++portalIdx) {
+                collisionFromJson(
+                    pgJson["Collision"][portalIdx],
+                    m_playgrounds[playgroundName].collision);
             }
         }
     }
@@ -516,7 +528,16 @@ Portal Terrain::portalFromJson(Json::Value portalJson) {
 }
 
 void Terrain::collisionFromJson(
-    Json::Value collisionJson, std::vector<Eend::Rectangle>& collisionVec) {}
+    Json::Value collisionJson, std::vector<Eend::Rectangle>& collisionVec) {
+    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
+    std::filesystem::path collisionMap;
+
+    if (collisionJson.isMember("map")) {
+        std::string collisionName = jsonString(collisionJson, "map", metadataPath);
+        collisionMap = "resources" / m_path / "collision" / (collisionName + ".png");
+    }
+    collisionFromMap(collisionMap, collisionVec);
+}
 
 // must call after m_scale is determined
 void Terrain::collisionFromMap(
