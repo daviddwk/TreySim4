@@ -59,6 +59,11 @@ class Terrain {
         void collisionFromMap(
             std::filesystem::path collisionMap, std::vector<Eend::Rectangle>& collisionVec);
 
+        void loadEntities(
+            Json::Value rootJson, std::vector<std::tuple<Eend::BoardId, float>>& boards,
+            std::vector<Eend::StatueId>& statues,
+            std::vector<std::tuple<Eend::DollId, float>> dolls,
+            std::vector<std::vector<float>> heightMap);
         void loadHeightMap(std::vector<std::vector<float>>& heightMap);
 
         void createTerrainObj(const std::vector<std::vector<float>>& heightMap);

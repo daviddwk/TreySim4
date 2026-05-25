@@ -9,6 +9,17 @@
     20.0
   ],
   "Portals": [
+    {
+      "position": [
+        30,
+        19
+      ],
+      "scale": [
+        1,
+        1
+      ],
+      "path": "grassy2"
+    }
   ],
   "Playgrounds": {
     "tree1" : {

@@ -22,6 +22,7 @@
 
 namespace Eend = Eendgine;
 
+// TODO pull these out into json util cpp file
 glm::vec3
 jsonVec3(const Json::Value& json, const std::string key, const std::filesystem::path path);
 glm::vec2 jsonVec2(const Json::Value json, const std::string key, const std::filesystem::path path);
@@ -60,17 +61,7 @@ Terrain::Terrain(const std::filesystem::path path)
     // optional
     if (rootJson["Portals"].isArray()) {
         for (unsigned int portalIdx = 0; portalIdx < rootJson["Portals"].size(); ++portalIdx) {
-            Json::Value portalJson = rootJson["Portals"][portalIdx];
-            Tile tilePosition = jsonVec2(portalJson, "position", metadataPath);
-            TileScale tileScale = jsonVec2(portalJson, "scale", metadataPath);
-
-            Eend::Point2D position =
-                glm::vec2(tilePosition.x * m_scale.x, -tilePosition.y * m_scale.y);
-            Eend::Vector2D toCorner = glm::vec2(tileScale.x * m_scale.x, tileScale.y * m_scale.y);
-
-            std::filesystem::path terrainPath = jsonString(portalJson, "path", metadataPath);
-
-            m_portals.emplace_back(position, toCorner, terrainPath);
+            m_portals.push_back(Terrain::portalFromJson(rootJson["Portals"][portalIdx]));
         }
     }
 
@@ -80,21 +71,7 @@ Terrain::Terrain(const std::filesystem::path path)
     const std::filesystem::path collisionMapPath = m_path / collisionMapSubPath;
     Terrain::collisionFromMap(collisionMapPath, m_collisionRectangles);
 
-    if (rootJson["Boards"].isArray()) {
-        for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
-            m_boards.push_back(boardFromJson(rootJson["Boards"][boardIdx]));
-        }
-    }
-    if (rootJson["Statues"].isArray()) {
-        for (unsigned int statueIdx = 0; statueIdx < rootJson["Statues"].size(); ++statueIdx) {
-            m_statues.push_back(statueFromJson(rootJson["Statues"][statueIdx]));
-        }
-    }
-    if (rootJson["Dolls"].isArray()) {
-        for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
-            m_dolls.push_back(dollFromJson(rootJson["Dolls"][dollIdx]));
-        }
-    }
+    Terrain::loadEntities(rootJson, m_boards, m_statues, m_dolls, m_heightMap);
 
     // TODO make this conditional or a seperate util
     Terrain::createTerrainObj(m_heightMap);
@@ -192,25 +169,12 @@ void Terrain::playgroundEnable(const std::string& playgroundName) {
     if (rootJson["Playgrounds"].isObject()) {
         Json::Value pgJson = rootJson["Playgrounds"][playgroundName];
         assert(pgJson.isObject());
-        // TODO ADD COLLISION but using pngs
-        if (pgJson["Boards"].isArray()) {
-            for (unsigned int boardIdx = 0; boardIdx < pgJson["Boards"].size(); ++boardIdx) {
-                m_playgrounds[playgroundName].boards.push_back(
-                    boardFromJson(pgJson["Boards"][boardIdx]));
-            }
-        }
-        if (pgJson["Statues"].isArray()) {
-            for (unsigned int statueIdx = 0; statueIdx < pgJson["Statues"].size(); ++statueIdx) {
-                m_playgrounds[playgroundName].statues.push_back(
-                    statueFromJson(pgJson["Statues"][statueIdx]));
-            }
-        }
-        if (pgJson["Dolls"].isArray()) {
-            for (unsigned int dollIdx = 0; dollIdx < pgJson["Dolls"].size(); ++dollIdx) {
-                m_playgrounds[playgroundName].dolls.push_back(
-                    dollFromJson(pgJson["Dolls"][dollIdx]));
-            }
-        }
+        Terrain::loadEntities(
+            pgJson,
+            m_playgrounds[playgroundName].boards,
+            m_playgrounds[playgroundName].statues,
+            m_playgrounds[playgroundName].dolls,
+            m_heightMap);
         if (pgJson["Portals"].isArray()) {
             for (unsigned int portalIdx = 0; portalIdx < pgJson["Portals"].size(); ++portalIdx) {
                 m_playgrounds[playgroundName].portals.push_back(
@@ -418,6 +382,30 @@ void Terrain::loadHeightMap(std::vector<std::vector<float>>& heightMap) {
     for (auto& line : heightMap) {
         if ((int)line.size() != (m_width + 1)) {
             Eend::fatalError("height map unexpected line width");
+        }
+    }
+}
+
+void Terrain::loadEntities(
+    Json::Value rootJson, std::vector<std::tuple<Eend::BoardId, float>>& boards,
+    std::vector<Eend::StatueId>& statues, std::vector<std::tuple<Eend::DollId, float>> dolls,
+    const std::vector<std::vector<float>> heightMap) {
+
+    // TODO i want to encapsulate this and make it clear that it's using the height map
+
+    if (rootJson["Boards"].isArray()) {
+        for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
+            boards.push_back(boardFromJson(rootJson["Boards"][boardIdx]));
+        }
+    }
+    if (rootJson["Statues"].isArray()) {
+        for (unsigned int statueIdx = 0; statueIdx < rootJson["Statues"].size(); ++statueIdx) {
+            statues.push_back(statueFromJson(rootJson["Statues"][statueIdx]));
+        }
+    }
+    if (rootJson["Dolls"].isArray()) {
+        for (unsigned int dollIdx = 0; dollIdx < rootJson["Dolls"].size(); ++dollIdx) {
+            dolls.push_back(dollFromJson(rootJson["Dolls"][dollIdx]));
         }
     }
 }
