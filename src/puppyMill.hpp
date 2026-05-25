@@ -17,15 +17,19 @@ class PuppyMill {
                 Tile tile;
                 Dog::Type dogType;
                 std::chrono::milliseconds frequency;
-                std::optional<std::chrono::milliseconds> duration;
 
                 std::chrono::time_point<std::chrono::steady_clock> nextSpawn;
                 int dogsSpawned = 0;
         };
         class Wave {
             public:
-                int duration;
+                Wave(std::optional<std::chrono::seconds> duration) : end(std::nullopt) {
+                    if (duration.has_value()) {
+                        end = std::chrono::steady_clock::now() + duration.value();
+                    }
+                };
                 std::vector<Spawn> spawns;
+                std::optional<std::chrono::time_point<std::chrono::steady_clock>> end;
         };
 
     public:

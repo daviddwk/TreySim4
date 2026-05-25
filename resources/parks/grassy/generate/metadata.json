@@ -51,45 +51,52 @@
     }
   },
 	"Waves": [
-    [
-      {
-        "position": [
-          10,
-          10
-        ],
-        "type": "classic",
-        "frequency": 2000
-      },
-      {
-        "position": [
-          20,
-          10
-        ],
-        "type": "snow",
-        "frequency": 1000
-      }
-    ],
-    [
-      
-    ],
-    [
-      {
-        "position": [
-          5,
-          5
-        ],
-        "type": "classic",
-        "frequency": 3000
-      },
-      {
-        "position": [
-          20,
-          30
-        ],
-        "type": "snow",
-        "frequency": 4000
-      }
-    ]
+	  {
+      "duration" : 10,
+      "spawns" : [
+        {
+          "position": [
+            10,
+            10
+          ],
+          "type": "classic",
+          "frequency": 2000
+        },
+        {
+          "position": [
+            20,
+            10
+          ],
+          "type": "snow",
+          "frequency": 1000
+        }
+      ],
+    },
+    {
+      "spawns" : [
+      ],
+    },
+    {
+      "duration" : 20,
+      "spawns" : [
+        {
+          "position": [
+            5,
+            5
+          ],
+          "type": "classic",
+          "frequency": 3000
+        },
+        {
+          "position": [
+            20,
+            30
+          ],
+          "type": "snow",
+          "frequency": 4000
+        }
+      ]
+    }
   ],
   "Boards": [
     {

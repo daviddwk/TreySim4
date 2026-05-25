@@ -62,6 +62,13 @@ unsigned int PuppyMill::getNumKilled() { return m_numKilled; }
 void PuppyMill::spawn() {
     if (m_spawnWaves.size() == 0) return;
     auto now = std::chrono::steady_clock::now();
+
+    if (m_spawnWaves[m_waveIdx].end.has_value()) {
+        if (now > m_spawnWaves[m_waveIdx].end) {
+            PuppyMill::nextWave();
+        }
+    }
+
     for (Spawn& spawn : m_spawnWaves[m_waveIdx].spawns) {
         if (now > spawn.nextSpawn) {
             m_dogs.emplace_back(
@@ -127,13 +134,17 @@ void PuppyMill::wavesFromJson(
     Json::Value dogWavesJson = rootJson["Waves"];
     if (!dogWavesJson.isArray()) Eend::fatalError("No Dog waves array");
     for (int dogWaveIdx = 0; dogWaveIdx < dogWavesJson.size(); ++dogWaveIdx) {
-        Json::Value dogSpawnsJson = dogWavesJson[dogWaveIdx];
-        Json::Value durationJson = dogWavesJson[dogWaveIdx];
+        Json::Value durationJson = dogWavesJson[dogWaveIdx]["duration"];
+        Json::Value dogSpawnsJson = dogWavesJson[dogWaveIdx]["spawns"];
 
-        if (!dogSpawnsJson.isArray()) Eend::fatalError("Dog duration not a number");
         if (!dogSpawnsJson.isArray()) Eend::fatalError("Dog spawns json not array");
 
-        m_spawnWaves.emplace_back();
+        std::optional<std::chrono::seconds> duration = std::nullopt;
+        if (durationJson.isNumeric()) {
+            duration = std::chrono::seconds(durationJson.asInt());
+        }
+
+        m_spawnWaves.emplace_back(duration);
         for (int dogSpawnIdx = 0; dogSpawnIdx < dogSpawnsJson.size(); ++dogSpawnIdx) {
             Json::Value dogSpawnJson = dogSpawnsJson[dogSpawnIdx];
             processSpawnJson(dogSpawnJson, m_spawnWaves[dogWaveIdx].spawns);
