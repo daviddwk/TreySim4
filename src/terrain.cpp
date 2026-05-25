@@ -10,6 +10,7 @@
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/fatalError.hpp>
 #include <Eendgine/frameLimiter.hpp>
+#include <Eendgine/jsonUtils.hpp>
 #include <Eendgine/types.hpp>
 
 #include <stb/stb_image.h>
@@ -22,13 +23,7 @@
 
 namespace Eend = Eendgine;
 
-// TODO pull these out into json util cpp file
-glm::vec3
-jsonVec3(const Json::Value& json, const std::string key, const std::filesystem::path path);
-glm::vec2 jsonVec2(const Json::Value json, const std::string key, const std::filesystem::path path);
-float jsonFloat(const Json::Value json, const std::string key, const std::filesystem::path path);
-std::string
-jsonString(const Json::Value json, const std::string key, const std::filesystem::path path);
+Json::Value jsonLoadFile(std::filesystem::path filePath);
 
 const std::filesystem::path metadataSubPath("generate/metadata.json");
 const std::filesystem::path heightMapSubPath("generate/heightMap.png");
@@ -38,24 +33,15 @@ Terrain::Terrain(const std::filesystem::path path)
     : m_path(path), m_height(0), m_width(0), m_animationSpeed(0), m_statueId(0), m_spawn(0.0f) {
     // TODO this is possibly the worst code in this whole project
 
-    Json::Value rootJson;
-    std::filesystem::path metadataPath = m_path / metadataSubPath;
-    std::ifstream metadata(metadataPath);
-    if (!metadata.is_open()) {
-        Eend::fatalError("could not open: " + metadataPath.string());
-    }
-    try {
-        metadata >> rootJson;
-    } catch (...) {
-        Eend::fatalError("improper json: " + metadataPath.string());
-    }
+    std::filesystem::path metadataPath = path / metadataSubPath;
+    Json::Value rootJson = Eend::jsonLoadFile(metadataPath);
 
-    m_scale = jsonVec3(rootJson, "Scale", metadataPath);
-    m_spawn = jsonVec2(rootJson, "Spawn", metadataPath);
+    m_scale = Eend::jsonVec3(rootJson, "Scale", metadataPath);
+    m_spawn = Eend::jsonVec2(rootJson, "Spawn", metadataPath);
 
     // optional
     if (rootJson["Pace"].isNumeric()) {
-        m_animationSpeed = jsonFloat(rootJson, "Pace", metadataPath);
+        m_animationSpeed = Eend::jsonFloat(rootJson, "Pace", metadataPath);
     }
 
     // optional
@@ -149,20 +135,10 @@ bool Terrain::colliding(const Eend::Point2D point) {
 }
 
 void Terrain::playgroundEnable(const std::string& playgroundName) {
-    // TODO make this a function
     assert(m_playgrounds.count(playgroundName) == 0); // TODO idk but handle better
-    Json::Value rootJson;
+
     std::filesystem::path metadataPath = m_path / metadataSubPath;
-    std::ifstream metadata(metadataPath);
-    if (!metadata.is_open()) {
-        Eend::fatalError("could not open: " + metadataPath.string());
-    }
-    try {
-        metadata >> rootJson;
-    } catch (...) {
-        Eend::fatalError("improper json: " + metadataPath.string());
-    }
-    // TODO see prev
+    Json::Value rootJson = Eend::jsonLoadFile(metadataPath);
 
     m_playgrounds[playgroundName];
 
@@ -471,58 +447,58 @@ void Terrain::createTerrainObj(const std::vector<std::vector<float>>& heightMap)
 
 std::tuple<Eend::BoardId, float> Terrain::boardFromJson(Json::Value boardJson) {
     std::filesystem::path metadataPath = m_path / metadataSubPath;
-    std::filesystem::path boardPath = m_path / jsonString(boardJson, "path", metadataPath);
+    std::filesystem::path boardPath = m_path / Eend::jsonString(boardJson, "path", metadataPath);
     Eend::BoardId id = Eend::Entities::boards().insert(boardPath);
     Eend::Board* boardRef = Eend::Entities::boards().getRef(id);
     float pace = 0;
-    if (boardJson.isMember("pace")) pace = jsonFloat(boardJson, "pace", metadataPath);
+    if (boardJson.isMember("pace")) pace = Eend::jsonFloat(boardJson, "pace", metadataPath);
 
-    glm::vec3 position = jsonVec3(boardJson, "position", metadataPath);
+    glm::vec3 position = Eend::jsonVec3(boardJson, "position", metadataPath);
     boardRef->setPosition(positionAtTile(Tile(position.x, position.y), position.z));
-    boardRef->setRotation(jsonFloat(boardJson, "rotation", metadataPath));
-    boardRef->setScale(jsonVec3(boardJson, "scale", metadataPath));
+    boardRef->setRotation(Eend::jsonFloat(boardJson, "rotation", metadataPath));
+    boardRef->setScale(Eend::jsonVec3(boardJson, "scale", metadataPath));
     return std::tie(id, pace);
 }
 
 Eend::StatueId Terrain::statueFromJson(Json::Value statueJson) {
     std::filesystem::path metadataPath = m_path / metadataSubPath;
-    std::filesystem::path statuePath = m_path / jsonString(statueJson, "path", metadataPath);
+    std::filesystem::path statuePath = m_path / Eend::jsonString(statueJson, "path", metadataPath);
     Eend::StatueId id = Eend::Entities::statues().insert(statuePath);
     Eend::Statue* statueRef = Eend::Entities::statues().getRef(id);
 
-    glm::vec3 position = jsonVec3(statueJson, "position", metadataPath);
+    glm::vec3 position = Eend::jsonVec3(statueJson, "position", metadataPath);
     statueRef->setPosition(positionAtTile(Tile(position.x, position.y), position.z));
-    statueRef->setRotation(jsonVec3(statueJson, "rotation", metadataPath));
-    statueRef->setScale(jsonVec3(statueJson, "scale", metadataPath));
+    statueRef->setRotation(Eend::jsonVec3(statueJson, "rotation", metadataPath));
+    statueRef->setScale(Eend::jsonVec3(statueJson, "scale", metadataPath));
     return id;
 }
 
 std::tuple<Eend::DollId, float> Terrain::dollFromJson(Json::Value dollJson) {
     std::filesystem::path metadataPath = m_path / metadataSubPath;
-    std::filesystem::path dollPath = m_path / jsonString(dollJson, "path", metadataPath);
+    std::filesystem::path dollPath = m_path / Eend::jsonString(dollJson, "path", metadataPath);
     Eend::DollId id = Eend::Entities::dolls().insert(dollPath);
     Eend::Doll* dollRef = Eend::Entities::dolls().getRef(id);
     float pace = 0;
-    if (dollJson.isMember("pace")) pace = jsonFloat(dollJson, "pace", metadataPath);
+    if (dollJson.isMember("pace")) pace = Eend::jsonFloat(dollJson, "pace", metadataPath);
 
-    glm::vec3 position = jsonVec3(dollJson, "position", metadataPath);
+    glm::vec3 position = Eend::jsonVec3(dollJson, "position", metadataPath);
     dollRef->setPosition(positionAtTile(Tile(position.x, position.y), position.z));
-    dollRef->setRotation(jsonVec3(dollJson, "rotation", metadataPath));
-    dollRef->setScale(jsonVec3(dollJson, "scale", metadataPath));
+    dollRef->setRotation(Eend::jsonVec3(dollJson, "rotation", metadataPath));
+    dollRef->setScale(Eend::jsonVec3(dollJson, "scale", metadataPath));
     if (dollJson.isMember("animation"))
-        dollRef->setAnimation(jsonString(dollJson, "animation", metadataPath));
+        dollRef->setAnimation(Eend::jsonString(dollJson, "animation", metadataPath));
     return std::tie(id, pace);
 }
 
 Portal Terrain::portalFromJson(Json::Value portalJson) {
     std::filesystem::path metadataPath = m_path / metadataSubPath;
-    Tile tilePosition = jsonVec2(portalJson, "position", metadataPath);
-    TileScale tileScale = jsonVec2(portalJson, "scale", metadataPath);
+    Tile tilePosition = Eend::jsonVec2(portalJson, "position", metadataPath);
+    TileScale tileScale = Eend::jsonVec2(portalJson, "scale", metadataPath);
 
     Eend::Point2D position = glm::vec2(tilePosition.x * m_scale.x, -tilePosition.y * m_scale.y);
     Eend::Vector2D toCorner = glm::vec2(tileScale.x * m_scale.x, tileScale.y * m_scale.y);
 
-    std::filesystem::path terrainPath = jsonString(portalJson, "path", metadataPath);
+    std::filesystem::path terrainPath = Eend::jsonString(portalJson, "path", metadataPath);
 
     return Portal(position, toCorner, terrainPath);
 }
@@ -533,7 +509,7 @@ void Terrain::collisionFromJson(
     std::filesystem::path collisionMap;
 
     if (collisionJson.isMember("map")) {
-        std::string collisionName = jsonString(collisionJson, "map", metadataPath);
+        std::string collisionName = Eend::jsonString(collisionJson, "map", metadataPath);
         collisionMap = m_path / "collision" / (collisionName + ".png");
     }
     collisionFromMap(collisionMap, collisionVec);
@@ -570,45 +546,4 @@ void Terrain::collisionFromMap(
         }
     }
     stbi_image_free(imageData);
-}
-
-glm::vec3
-jsonVec3(const Json::Value& json, const std::string key, const std::filesystem::path path) {
-    if (!json[key].isArray()) {
-        Eend::fatalError("Missing \"" + key + "\" array: " + path.string());
-    }
-    for (int i = 0; i < 2; ++i) {
-        if (!json[key][i].isNumeric()) {
-            Eend::fatalError("\"" + key + "\" array incorrect: " + path.string());
-        }
-    }
-    return glm::vec3(json[key][0].asFloat(), json[key][1].asFloat(), json[key][2].asFloat());
-}
-
-glm::vec2
-jsonVec2(const Json::Value json, const std::string key, const std::filesystem::path path) {
-    if (!json[key].isArray()) {
-        Eend::fatalError("Missing \"" + key + "\" array: " + path.string());
-    }
-    for (int i = 0; i < 2; ++i) {
-        if (!json[key][i].isNumeric()) {
-            Eend::fatalError("\"" + key + "\" array incorrect: " + path.string());
-        }
-    }
-    return glm::vec2(json[key][0].asFloat(), json[key][1].asFloat());
-}
-
-float jsonFloat(const Json::Value json, const std::string key, const std::filesystem::path path) {
-    if (!json[key].isNumeric()) {
-        Eend::fatalError("\"" + key + "\" not a string: " + path.string());
-    }
-    return json[key].asFloat();
-}
-
-std::string
-jsonString(const Json::Value json, const std::string key, const std::filesystem::path path) {
-    if (!json[key].isString()) {
-        Eend::fatalError("\"" + key + "\" not a string: " + path.string());
-    }
-    return json[key].asString();
 }

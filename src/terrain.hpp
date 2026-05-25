@@ -6,6 +6,7 @@
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
 
+#include <glm/glm.hpp>
 #include <json/json.h>
 
 #include <chrono>

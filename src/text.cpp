@@ -1,4 +1,5 @@
 #include <Eendgine/fatalError.hpp>
+#include <Eendgine/jsonUtils.hpp>
 
 #include <filesystem>
 #include <fstream>
@@ -23,17 +24,8 @@ Text::Text(Font font, std::string text, Eend::Point position, float scale, float
     m_texture = Eend::TextureCache::getTexture(m_fontPath / "font.png");
 
     // open json
-    Json::Value root;
     std::filesystem::path metadataPath = m_fontPath / "metadata.json";
-    std::ifstream metadata(metadataPath);
-    if (!metadata.is_open()) {
-        Eend::fatalError("could not open: " + metadataPath.string());
-    }
-    try {
-        metadata >> root;
-    } catch (...) {
-        Eend::fatalError("improper json: " + metadataPath.string());
-    }
+    Json::Value root = Eend::jsonLoadFile(metadataPath);
 
     // ' ' to '~' see https://www.ascii-code.com/
     for (char ch = 32; ch < 127; ++ch) {

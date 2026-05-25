@@ -4,6 +4,7 @@
 #include "trey.hpp"
 
 #include <Eendgine/fatalError.hpp>
+#include <Eendgine/jsonUtils.hpp>
 #include <Eendgine/random.hpp>
 
 #include <fstream>
@@ -119,17 +120,8 @@ void PuppyMill::damage() {
 void PuppyMill::wavesFromJson(
     const std::filesystem::path& parkPath, std::vector<Wave>& spawnWaves) {
 
-    Json::Value rootJson;
     std::filesystem::path metadataPath = parkPath / "generate/metadata.json";
-    std::ifstream metadata(metadataPath);
-    if (!metadata.is_open()) {
-        Eend::fatalError("could not open: " + metadataPath.string());
-    }
-    try {
-        metadata >> rootJson;
-    } catch (...) {
-        Eend::fatalError("improper json: " + metadataPath.string());
-    }
+    Json::Value rootJson = Eend::jsonLoadFile(metadataPath);
 
     Json::Value dogWavesJson = rootJson["Waves"];
     if (!dogWavesJson.isArray()) Eend::fatalError("No Dog waves array");
