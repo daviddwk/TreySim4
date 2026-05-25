@@ -14,17 +14,17 @@ Text::Text(Font font, std::string text, Eend::Point position, float scale, float
       m_charColumns({std::nullopt}) {
 
     // auto rootPath = std::filesystem::path("resources") / std::filesystem::path("fonts");
-    m_fontPath = std::filesystem::path("fonts");
+    m_fontPath = std::filesystem::path("resources/fonts");
     switch (font) {
     case Font::daniel:
         m_fontPath = m_fontPath / std::filesystem::path("daniel");
         break;
     }
-    m_texture = Eend::TextureCache::getTexture("resources" / m_fontPath / "font.png");
+    m_texture = Eend::TextureCache::getTexture(m_fontPath / "font.png");
 
     // open json
     Json::Value root;
-    std::filesystem::path metadataPath = "resources" / m_fontPath / "metadata.json";
+    std::filesystem::path metadataPath = m_fontPath / "metadata.json";
     std::ifstream metadata(metadataPath);
     if (!metadata.is_open()) {
         Eend::fatalError("could not open: " + metadataPath.string());

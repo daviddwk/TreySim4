@@ -16,11 +16,12 @@
 //
 
 Trey::Trey()
-    : m_headId(Eend::Entities::statues().insert(std::filesystem::path("Trey/head"))),
-      m_hairId(Eend::Entities::statues().insert(std::filesystem::path("Trey/hair"))),
-      m_hairOutterId(Eend::Entities::statues().insert(std::filesystem::path("Trey/hair"))),
-      m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("Trey/body"))),
-      m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("Trey/eye"))),
+    : m_headId(Eend::Entities::statues().insert(std::filesystem::path("resources/Trey/head"))),
+      m_hairId(Eend::Entities::statues().insert(std::filesystem::path("resources/Trey/hair"))),
+      m_hairOutterId(
+          Eend::Entities::statues().insert(std::filesystem::path("resources/Trey/hair"))),
+      m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/body"))),
+      m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)),
       m_targetRotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false), m_upVelocity(0.0f),
       m_height(0.0f), m_direction(Direction::up), m_alive(true), m_facingForward(true) {

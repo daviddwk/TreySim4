@@ -29,7 +29,7 @@ Hud& Hud::get() {
 Hud::Hud()
     : m_deathText(Font::daniel, "", Eend::Point(500.0f, 300.0f, 0.0f), 200.0f, INFINITY),
       m_testText(Font::daniel, "", Eend::Point(20.0f), 50.0f, INFINITY),
-      m_exitPanel(Eend::Entities::panels().insert("exit")) {
+      m_exitPanel(Eend::Entities::panels().insert("resources/exit")) {
 
     Eend::Panel* exitRef = Eend::Entities::panels().getRef(m_exitPanel);
     exitRef->setScale(Eend::Scale2D(50.0f, 50.0f));

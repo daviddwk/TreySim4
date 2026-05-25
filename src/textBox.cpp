@@ -3,9 +3,11 @@
 TextBoxQueue::TextBox::TextBox(
     std::string thumbnail, Font font, std::string text, float seconds, bool clickToContinue)
     : duration(seconds), clickToContinue(clickToContinue),
-      arrow(Eend::Entities::panels().insert(std::filesystem::path("textbox/arrow"))),
-      m_background(Eend::Entities::panels().insert(std::filesystem::path("textbox/background"))),
-      m_thumbnail(Eend::Entities::panels().insert(std::filesystem::path("textbox/thumbnail"))),
+      arrow(Eend::Entities::panels().insert(std::filesystem::path("resources/textbox/arrow"))),
+      m_background(
+          Eend::Entities::panels().insert(std::filesystem::path("resources/textbox/background"))),
+      m_thumbnail(
+          Eend::Entities::panels().insert(std::filesystem::path("resources/textbox/thumbnail"))),
       m_font(font), m_text(font, text, Eend::Point(300.0f, 750.0f, 0.0f), 50.0f, 800.0f) {
 
     Eend::Panel* backgroundRef = Eend::Entities::panels().getRef(m_background);

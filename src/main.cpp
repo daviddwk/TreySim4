@@ -63,12 +63,12 @@ int main() {
     bool menu = true;
 
     // menu init
-    Eend::PanelId startButton = Eend::Entities::panels().insert("menu/startButton");
+    Eend::PanelId startButton = Eend::Entities::panels().insert("resources/menu/startButton");
     Eend::Panel* startRef = Eend::Entities::panels().getRef(startButton);
     startRef->setScale(Eend::Scale2D(250.0f, 100.0f));
     startRef->setPosition(Eend::Point(140.0f, 500.0f, 0.0f));
     startRef->setTexture("none");
-    Eend::PanelId exitButton = Eend::Entities::panels().insert("menu/exitButton");
+    Eend::PanelId exitButton = Eend::Entities::panels().insert("resources/menu/exitButton");
     Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitButton);
     exitRef->setScale(Eend::Scale2D(250.0f, 100.0f));
     exitRef->setPosition(Eend::Point(890.0f, 500.0f, 0.0f));
@@ -115,7 +115,7 @@ int main() {
             // could wrap in a loading screen if it was slow enough
             Trey::construct();
             // TODO build the scale into the format silly
-            Park::construct("terrain/grassy");
+            Park::construct("grassy");
             Hud::construct();
             TextBoxQueue::construct();
 
@@ -152,12 +152,12 @@ int main() {
             Trey::destruct();
             Park::destruct();
             // menu init
-            startButton = Eend::Entities::panels().insert("menu/startButton");
+            startButton = Eend::Entities::panels().insert("resources/menu/startButton");
             startRef = Eend::Entities::panels().getRef(startButton);
             startRef->setScale(Eend::Scale2D(250.0f, 100.0f));
             startRef->setPosition(Eend::Point(140.0f, 500.0f, 0.0f));
             startRef->setTexture("none");
-            exitButton = Eend::Entities::panels().insert("menu/exitButton");
+            exitButton = Eend::Entities::panels().insert("resources/menu/exitButton");
             exitRef = Eend::Entities::panels().getRef(exitButton);
             exitRef->setScale(Eend::Scale2D(250.0f, 100.0f));
             exitRef->setPosition(Eend::Point(890.0f, 500.0f, 0.0f));

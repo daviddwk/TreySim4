@@ -1,8 +1,9 @@
 #include "healthBar.hpp"
 
 HealthBar::HealthBar()
-    : m_background(Eend::Entities::panels().insert(std::filesystem::path("healthbar/background"))),
-      m_bar(Eend::Entities::panels().insert(std::filesystem::path("healthbar/bar"))),
+    : m_background(
+          Eend::Entities::panels().insert(std::filesystem::path("resources/healthbar/background"))),
+      m_bar(Eend::Entities::panels().insert(std::filesystem::path("resources/healthbar/bar"))),
       m_health(100) {
     Eend::Panel* backgroundRef = Eend::Entities::panels().getRef(m_background);
     Eend::Panel* barRef = Eend::Entities::panels().getRef(m_bar);

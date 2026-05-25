@@ -114,9 +114,10 @@ void PuppyMill::wavesFromJson(
     const std::filesystem::path& parkPath, std::vector<std::vector<Spawn>>& spawnWaves) {
 
     Json::Value rootJson;
-    std::filesystem::path metadataPath = "resources" / parkPath / "generate/metadata.json";
+    std::filesystem::path metadataPath = parkPath / "generate/metadata.json";
     std::ifstream metadata(metadataPath);
     if (!metadata.is_open()) {
+        std::print("3\n");
         Eend::fatalError("could not open: " + metadataPath.string());
     }
     try {

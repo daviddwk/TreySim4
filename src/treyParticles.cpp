@@ -46,12 +46,12 @@ Eend::Particles::Properties getJumpParticleProperties() {
         }
         return std::nullopt;
     };
-    return Eend::Particles::Properties("Trey/particles/poo", behavior);
+    return Eend::Particles::Properties("resources/Trey/particles/poo", behavior);
 }
 
 Eend::Particles::Properties getKickParticleProperties(Trey::Direction direction) {
 
-    const std::filesystem::path boardPath("Trey/particles/kick");
+    const std::filesystem::path boardPath("resources/Trey/particles/kick");
 
     // clang-format off
     Eend::Vector2D directionVector = Eend::Vector2D(0.0f);

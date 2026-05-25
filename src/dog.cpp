@@ -166,5 +166,5 @@ std::filesystem::path Dog::getDogPath(Type type) {
     default:
         dogPath = "dog";
     }
-    return dogPath;
+    return "resources" / dogPath;
 }

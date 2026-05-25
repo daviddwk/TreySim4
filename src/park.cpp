@@ -5,7 +5,8 @@
 // should be path to park format, not png height map
 Park::Park(std::filesystem::path parkPath)
     : m_terrain(std::make_shared<Terrain>(parkPath)),
-      m_puppyMill(std::make_unique<PuppyMill>(m_terrain, parkPath)), m_path(parkPath) {}
+      m_puppyMill(std::make_unique<PuppyMill>(m_terrain, "resources/parks" / parkPath)),
+      m_path("resources/parks" / parkPath) {}
 
 void Park::construct(std::filesystem::path parkPath) {
     assert(m_instance == nullptr);

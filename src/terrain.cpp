@@ -29,21 +29,23 @@ float jsonFloat(const Json::Value json, const std::string key, const std::filesy
 std::string
 jsonString(const Json::Value json, const std::string key, const std::filesystem::path path);
 
-// TODO horrible math :c
+const std::filesystem::path metadataSubPath("generate/metadata.json");
+const std::filesystem::path heightMapSubPath("generate/heightMap.png");
+const std::filesystem::path collisionMapSubPath("generate/collisionMap.png");
 
 Terrain::Terrain(const std::filesystem::path path)
-    : m_path(path), m_height(0), m_width(0), m_animationSpeed(0), m_statueId(0), m_spawn(0.0f) {
+    : m_path("resources/parks" / path), m_height(0), m_width(0), m_animationSpeed(0), m_statueId(0),
+      m_spawn(0.0f) {
     // TODO this is possibly the worst code in this whole project
 
     // height map from image
-    std::filesystem::path pngHeightMap = "resources" / m_path / "generate/heightMap.png";
-    std::filesystem::path pngCollisionMap = "resources" / m_path / "generate/collisionMap.png";
     int channels = 0;
 
     Json::Value rootJson;
-    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
+    std::filesystem::path metadataPath = m_path / metadataSubPath;
     std::ifstream metadata(metadataPath);
     if (!metadata.is_open()) {
+        std::print("1\n");
         Eend::fatalError("could not open: " + metadataPath.string());
     }
     try {
@@ -77,12 +79,13 @@ Terrain::Terrain(const std::filesystem::path path)
         }
     }
 
-    unsigned char* imageData = stbi_load(pngHeightMap.c_str(), &m_width, &m_height, &channels, 0);
+    const std::filesystem::path heightMapPath = m_path / heightMapSubPath;
+    unsigned char* imageData = stbi_load(heightMapPath.c_str(), &m_width, &m_height, &channels, 0);
     float IMAGE_DATA_MAX_VALUE = 256.0f;
 
     if (imageData == NULL) {
         Eend::fatalError(
-            "unable to load image " + pngHeightMap.generic_string() + " for terrain generation");
+            "unable to load image " + heightMapPath.generic_string() + " for terrain generation");
     }
 
     for (int h = 0; h < (m_height - 1); ++h) {
@@ -156,7 +159,8 @@ Terrain::Terrain(const std::filesystem::path path)
     }
     stbi_image_free(imageData);
 
-    Terrain::collisionFromMap(pngCollisionMap, m_collisionRectangles);
+    const std::filesystem::path collisionMapPath = m_path / collisionMapSubPath;
+    Terrain::collisionFromMap(collisionMapPath, m_collisionRectangles);
 
     if (rootJson["Boards"].isArray()) {
         for (unsigned int boardIdx = 0; boardIdx < rootJson["Boards"].size(); ++boardIdx) {
@@ -186,10 +190,9 @@ Terrain::Terrain(const std::filesystem::path path)
         }
     }
     // make obj
-    std::string fileName = pngHeightMap.stem().string();
+    std::string fileName = heightMapPath.stem().string();
 
-    std::filesystem::path objPath =
-        "resources" / m_path / m_path.filename().string().append(".obj");
+    std::filesystem::path objPath = m_path / m_path.filename().string().append(".obj");
     std::ofstream objFile;
     objFile.open(objPath);
     if (!objFile.is_open())
@@ -320,9 +323,10 @@ void Terrain::playgroundEnable(const std::string& playgroundName) {
     // TODO make this a function
     assert(m_playgrounds.count(playgroundName) == 0); // TODO idk but handle better
     Json::Value rootJson;
-    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
+    std::filesystem::path metadataPath = m_path / metadataSubPath;
     std::ifstream metadata(metadataPath);
     if (!metadata.is_open()) {
+        std::print("2\n");
         Eend::fatalError("could not open: " + metadataPath.string());
     }
     try {
@@ -472,8 +476,9 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
 }
 
 std::tuple<Eend::BoardId, float> Terrain::boardFromJson(Json::Value boardJson) {
-    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
-    Eend::BoardId id = Eend::Entities::boards().insert(jsonString(boardJson, "path", metadataPath));
+    std::filesystem::path metadataPath = m_path / metadataSubPath;
+    std::filesystem::path boardPath = m_path / jsonString(boardJson, "path", metadataPath);
+    Eend::BoardId id = Eend::Entities::boards().insert(boardPath);
     Eend::Board* boardRef = Eend::Entities::boards().getRef(id);
     float pace = 0;
     if (boardJson.isMember("pace")) pace = jsonFloat(boardJson, "pace", metadataPath);
@@ -486,9 +491,9 @@ std::tuple<Eend::BoardId, float> Terrain::boardFromJson(Json::Value boardJson) {
 }
 
 Eend::StatueId Terrain::statueFromJson(Json::Value statueJson) {
-    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
-    Eend::StatueId id =
-        Eend::Entities::statues().insert(jsonString(statueJson, "path", metadataPath));
+    std::filesystem::path metadataPath = m_path / metadataSubPath;
+    std::filesystem::path statuePath = m_path / jsonString(statueJson, "path", metadataPath);
+    Eend::StatueId id = Eend::Entities::statues().insert(statuePath);
     Eend::Statue* statueRef = Eend::Entities::statues().getRef(id);
 
     glm::vec3 position = jsonVec3(statueJson, "position", metadataPath);
@@ -499,8 +504,9 @@ Eend::StatueId Terrain::statueFromJson(Json::Value statueJson) {
 }
 
 std::tuple<Eend::DollId, float> Terrain::dollFromJson(Json::Value dollJson) {
-    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
-    Eend::DollId id = Eend::Entities::dolls().insert(jsonString(dollJson, "path", metadataPath));
+    std::filesystem::path metadataPath = m_path / metadataSubPath;
+    std::filesystem::path dollPath = m_path / jsonString(dollJson, "path", metadataPath);
+    Eend::DollId id = Eend::Entities::dolls().insert(dollPath);
     Eend::Doll* dollRef = Eend::Entities::dolls().getRef(id);
     float pace = 0;
     if (dollJson.isMember("pace")) pace = jsonFloat(dollJson, "pace", metadataPath);
@@ -515,7 +521,7 @@ std::tuple<Eend::DollId, float> Terrain::dollFromJson(Json::Value dollJson) {
 }
 
 Portal Terrain::portalFromJson(Json::Value portalJson) {
-    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
+    std::filesystem::path metadataPath = m_path / metadataSubPath;
     Tile tilePosition = jsonVec2(portalJson, "position", metadataPath);
     TileScale tileScale = jsonVec2(portalJson, "scale", metadataPath);
 
@@ -529,12 +535,12 @@ Portal Terrain::portalFromJson(Json::Value portalJson) {
 
 void Terrain::collisionFromJson(
     Json::Value collisionJson, std::vector<Eend::Rectangle>& collisionVec) {
-    std::filesystem::path metadataPath = "resources" / m_path / "generate/metadata.json";
+    std::filesystem::path metadataPath = m_path / metadataSubPath;
     std::filesystem::path collisionMap;
 
     if (collisionJson.isMember("map")) {
         std::string collisionName = jsonString(collisionJson, "map", metadataPath);
-        collisionMap = "resources" / m_path / "collision" / (collisionName + ".png");
+        collisionMap = m_path / "collision" / (collisionName + ".png");
     }
     collisionFromMap(collisionMap, collisionVec);
 }

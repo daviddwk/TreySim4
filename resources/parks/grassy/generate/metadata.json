@@ -25,7 +25,7 @@
           ],
           "pace": 1.0,
           "rotation": 0.0,
-          "path": "terrain/grassy/boards/tree"
+          "path": "boards/tree"
         }
       ],
       "Portals" : [
@@ -38,7 +38,7 @@
             1,
             1
           ],
-          "path": "terrain/grassy2"
+          "path": "grassy2"
         }
       ],
       "Statues" : [],
@@ -124,7 +124,7 @@
       ],
       "pace": 1.1,
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/tree"
+      "path": "boards/tree"
     },
     {
       "position": [
@@ -138,7 +138,7 @@
       ],
       "rotation": 0.0,
       "pace": 0.9,
-      "path": "terrain/grassy/boards/tree"
+      "path": "boards/tree"
     },
     {
       "position": [
@@ -152,7 +152,7 @@
       ],
       "pace": 1.02,
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/tree"
+      "path": "boards/tree"
     },
     {
       "position": [
@@ -166,7 +166,7 @@
       ],
       "pace": 1.3,
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/tree"
+      "path": "boards/tree"
     },
     {
       "position": [
@@ -180,7 +180,7 @@
       ],
       "pace": 1.03,
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/tree"
+      "path": "boards/tree"
     },
     {
       "position": [
@@ -193,7 +193,7 @@
         10.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/tree"
+      "path": "boards/tree"
     },
     {
       "position": [
@@ -206,7 +206,7 @@
         10.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/tree"
+      "path": "boards/tree"
     },
     {
       "position": [
@@ -219,7 +219,7 @@
         2.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/grass"
+      "path": "boards/grass"
     },
     {
       "position": [
@@ -232,7 +232,7 @@
         2.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/grass"
+      "path": "boards/grass"
     },
     {
       "position": [
@@ -245,7 +245,7 @@
         2.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/grass"
+      "path": "boards/grass"
     },
     {
       "position": [
@@ -258,7 +258,7 @@
         2.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/grass"
+      "path": "boards/grass"
     },
     {
       "position": [
@@ -271,7 +271,7 @@
         2.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/rocks"
+      "path": "boards/rocks"
     },
     {
       "position": [
@@ -284,7 +284,7 @@
         2.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/rocks"
+      "path": "boards/rocks"
     },
     {
       "position": [
@@ -297,7 +297,7 @@
         2.0
       ],
       "rotation": 0.0,
-      "path": "terrain/grassy/boards/rocks"
+      "path": "boards/rocks"
     }
   ]
 }

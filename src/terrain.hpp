@@ -60,6 +60,7 @@ class Terrain {
             std::filesystem::path collisionMap, std::vector<Eend::Rectangle>& collisionVec);
 
         const std::filesystem::path m_path;
+        const std::filesystem::path m_metadataPath;
         int m_height;
         int m_width;
         float m_animationSpeed;
