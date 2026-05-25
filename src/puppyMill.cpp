@@ -34,6 +34,7 @@ bool PuppyMill::setWaveIdx(std::vector<Dog>::size_type waveIdx) {
     m_waveIdx = waveIdx;
     return overflowed;
 }
+
 // returns true if end of waves
 bool PuppyMill::nextWave() {
     auto nextWaveIdx = m_waveIdx + 1;
@@ -61,19 +62,17 @@ unsigned int PuppyMill::getNumKilled() { return m_numKilled; }
 void PuppyMill::spawn() {
     if (m_spawnWaves.size() == 0) return;
     auto now = std::chrono::steady_clock::now();
-    for (Spawn& spawn : m_spawnWaves[m_waveIdx]) {
-        for (auto& [dogType, timing] : spawn.timing) {
-            auto& [frequency, next] = timing;
-            if (now > next) {
-                m_dogs.emplace_back(
-                    m_terrain.lock().get()->positionAtTile(spawn.tile),
-                    Eend::Scale2D(5.0f, 5.0f),
-                    0.0f,
-                    dogType);
-                next = now + frequency;
-                // no drift but I get a large backlog of dogs for future waves atm
-                // next = next + frequency;
-            }
+    for (Spawn& spawn : m_spawnWaves[m_waveIdx].spawns) {
+        if (now > spawn.nextSpawn) {
+            m_dogs.emplace_back(
+                m_terrain.lock().get()->positionAtTile(spawn.tile),
+                Eend::Scale2D(5.0f, 5.0f),
+                0.0f,
+                spawn.dogType);
+            spawn.nextSpawn = now + spawn.frequency;
+            spawn.dogsSpawned++;
+            // no drift but I get a large backlog of dogs for future waves atm
+            // next = next + frequency;
         }
     }
 }
@@ -111,13 +110,12 @@ void PuppyMill::damage() {
 }
 
 void PuppyMill::wavesFromJson(
-    const std::filesystem::path& parkPath, std::vector<std::vector<Spawn>>& spawnWaves) {
+    const std::filesystem::path& parkPath, std::vector<Wave>& spawnWaves) {
 
     Json::Value rootJson;
     std::filesystem::path metadataPath = parkPath / "generate/metadata.json";
     std::ifstream metadata(metadataPath);
     if (!metadata.is_open()) {
-        std::print("3\n");
         Eend::fatalError("could not open: " + metadataPath.string());
     }
     try {
@@ -130,46 +128,33 @@ void PuppyMill::wavesFromJson(
     if (!dogWavesJson.isArray()) Eend::fatalError("No Dog waves array");
     for (int dogWaveIdx = 0; dogWaveIdx < dogWavesJson.size(); ++dogWaveIdx) {
         Json::Value dogSpawnsJson = dogWavesJson[dogWaveIdx];
+        Json::Value durationJson = dogWavesJson[dogWaveIdx];
+
+        if (!dogSpawnsJson.isArray()) Eend::fatalError("Dog duration not a number");
         if (!dogSpawnsJson.isArray()) Eend::fatalError("Dog spawns json not array");
+
         m_spawnWaves.emplace_back();
         for (int dogSpawnIdx = 0; dogSpawnIdx < dogSpawnsJson.size(); ++dogSpawnIdx) {
             Json::Value dogSpawnJson = dogSpawnsJson[dogSpawnIdx];
-            Json::Value dogTimingsJson = processSpawnJson(dogSpawnJson, m_spawnWaves[dogWaveIdx]);
-            for (int dogTimingIdx = 0; dogTimingIdx < dogTimingsJson.size(); ++dogTimingIdx) {
-                Json::Value dogTimingJson = dogTimingsJson[dogTimingIdx];
-                processTimingJson(dogTimingJson, m_spawnWaves[dogWaveIdx][dogSpawnIdx].timing);
-            }
+            processSpawnJson(dogSpawnJson, m_spawnWaves[dogWaveIdx].spawns);
         }
     }
 }
 
-Json::Value
-PuppyMill::processSpawnJson(const Json::Value& dogSpawnJson, std::vector<Spawn>& spawns) {
+void PuppyMill::processSpawnJson(const Json::Value& dogSpawnJson, std::vector<Spawn>& spawns) {
     Json::Value dogPositionJson = dogSpawnJson["position"];
+    Json::Value dogTypeJson = dogSpawnJson["type"];
+    Json::Value dogFrequencyJson = dogSpawnJson["frequency"];
 
     if (!dogPositionJson.isArray()) Eend::fatalError("Dog spawn position not array");
     if (dogPositionJson.size() != 2) Eend::fatalError("Dog spawn position not size 2");
     if (!dogPositionJson[0].isNumeric()) Eend::fatalError("Dog spawn position x not a number");
     if (!dogPositionJson[1].isNumeric()) Eend::fatalError("Dog spawn position y not a number");
-
-    Tile position = Tile(dogPositionJson[0].asFloat(), dogPositionJson[1].asFloat());
-    spawns.emplace_back(position);
-
-    Json::Value dogTimingsJson = dogSpawnJson["timing"];
-    if (!dogTimingsJson.isArray()) Eend::fatalError("Dog timing not array");
-    return dogTimingsJson;
-}
-
-void PuppyMill::processTimingJson(const Json::Value& dogTimingJson, Spawn::Timing& timing) {
-
-    Json::Value dogTypeJson = dogTimingJson["type"];
-    Json::Value dogFrequencyJson = dogTimingJson["frequency"];
-
     if (!dogTypeJson.isString()) Eend::fatalError("Dog type not string");
     if (!dogFrequencyJson.isNumeric()) Eend::fatalError("Dog frequency not a number");
 
-    timing[Dog::stringToType(dogTypeJson.asString())] = std::make_tuple(
-        std::chrono::milliseconds(dogFrequencyJson.asInt()),
-        std::chrono::steady_clock::now());
-    // having to insert now is mehh but I don't want to make another object
+    Tile position = Tile(dogPositionJson[0].asFloat(), dogPositionJson[1].asFloat());
+    Dog::Type dogType = Dog::stringToType(dogTypeJson.asString());
+    std::chrono::milliseconds frequency = std::chrono::milliseconds(dogFrequencyJson.asInt());
+    spawns.emplace_back(position, dogType, frequency);
 }

@@ -44,7 +44,6 @@ Terrain::Terrain(const std::filesystem::path path)
     std::filesystem::path metadataPath = m_path / metadataSubPath;
     std::ifstream metadata(metadataPath);
     if (!metadata.is_open()) {
-        std::print("1\n");
         Eend::fatalError("could not open: " + metadataPath.string());
     }
     try {
@@ -325,7 +324,6 @@ void Terrain::playgroundEnable(const std::string& playgroundName) {
     std::filesystem::path metadataPath = m_path / metadataSubPath;
     std::ifstream metadata(metadataPath);
     if (!metadata.is_open()) {
-        std::print("2\n");
         Eend::fatalError("could not open: " + metadataPath.string());
     }
     try {
