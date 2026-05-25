@@ -44,6 +44,7 @@ bool PuppyMill::nextWave() {
         nextWaveIdx = m_spawnWaves.size() - 1;
         reachedEnd = true;
     }
+    std::print("wave {} out of {}\n", nextWaveIdx + 1, m_spawnWaves.size());
     m_waveIdx = nextWaveIdx;
     return reachedEnd;
 }
@@ -52,7 +53,6 @@ void PuppyMill::update() {
     for (Dog& dog : m_dogs) {
         dog.update();
     }
-
     damage();
     spawn();
 }

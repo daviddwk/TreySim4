@@ -59,6 +59,10 @@ class Terrain {
         void collisionFromMap(
             std::filesystem::path collisionMap, std::vector<Eend::Rectangle>& collisionVec);
 
+        void loadHeightMap(std::vector<std::vector<float>>& heightMap);
+
+        void createTerrainObj(const std::vector<std::vector<float>>& heightMap);
+
         const std::filesystem::path m_path;
         const std::filesystem::path m_metadataPath;
         int m_height;

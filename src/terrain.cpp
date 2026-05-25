@@ -37,9 +37,6 @@ Terrain::Terrain(const std::filesystem::path path)
     : m_path(path), m_height(0), m_width(0), m_animationSpeed(0), m_statueId(0), m_spawn(0.0f) {
     // TODO this is possibly the worst code in this whole project
 
-    // height map from image
-    int channels = 0;
-
     Json::Value rootJson;
     std::filesystem::path metadataPath = m_path / metadataSubPath;
     std::ifstream metadata(metadataPath);
@@ -77,86 +74,9 @@ Terrain::Terrain(const std::filesystem::path path)
         }
     }
 
-    const std::filesystem::path heightMapPath = m_path / heightMapSubPath;
-    unsigned char* imageData = stbi_load(heightMapPath.c_str(), &m_width, &m_height, &channels, 0);
-    float IMAGE_DATA_MAX_VALUE = 256.0f;
+    Terrain::loadHeightMap(m_heightMap);
 
-    if (imageData == NULL) {
-        Eend::fatalError(
-            "unable to load image " + heightMapPath.generic_string() + " for terrain generation");
-    }
-
-    for (int h = 0; h < (m_height - 1); ++h) {
-        // handling edge cases looks horrible ugly, i'll admit
-        m_heightMap.emplace_back();
-        if (h == 0) m_heightMap.emplace_back();
-        if (h == (m_height - 2)) m_heightMap.emplace_back();
-        for (int w = 0; w < (m_width - 1); ++w) {
-            unsigned int averageHeight = 0;
-
-            const size_t currentIdx = w + (h * m_width);
-            const size_t rightIdx = (w + 1) + (h * m_width);
-            const size_t downIdx = w + ((h + 1) * m_width);
-            const size_t rightDownIdx = downIdx + 1;
-
-            const bool isEdgeXLeft = (w == 0);
-            const bool isEdgeXRight = (w == (m_width - 2));
-            const bool isEdgeYTop = (h == 0);
-            const bool isEdgeYBottom = (h == (m_height - 2));
-
-            const unsigned char currentHeight = imageData[currentIdx];
-            const unsigned char rightHeight = imageData[rightIdx];
-            const unsigned char downHeight = imageData[downIdx];
-            const unsigned char rightDownHeight = imageData[rightDownIdx];
-
-            auto scaleHeight = [&](unsigned int height) {
-                return (height / IMAGE_DATA_MAX_VALUE) * m_scale.z;
-            };
-
-            if (isEdgeYTop) {
-                if (isEdgeXLeft) {
-                    averageHeight = currentHeight;
-                    m_heightMap[h].push_back(scaleHeight(averageHeight));
-                }
-
-                averageHeight = (currentHeight + rightHeight) / 2;
-                m_heightMap[h].push_back(scaleHeight(averageHeight));
-
-                if (isEdgeXRight) {
-                    averageHeight = currentHeight;
-                    m_heightMap[h].push_back(scaleHeight(averageHeight));
-                }
-            }
-            if (isEdgeYBottom) {
-                if (isEdgeXLeft) {
-                    averageHeight = downHeight;
-                    m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
-                }
-
-                averageHeight = (downHeight + rightDownHeight) / 2;
-                m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
-
-                if (isEdgeXRight) {
-                    averageHeight = downHeight;
-                    m_heightMap[h + 2].push_back(scaleHeight(averageHeight));
-                }
-            }
-            if (isEdgeXLeft) {
-                averageHeight = (currentHeight + downHeight) / 2;
-                m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
-            }
-
-            averageHeight = ((currentHeight + rightHeight + downHeight + rightDownHeight) / 4);
-            m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
-
-            if (isEdgeXRight) {
-                averageHeight = (currentHeight + downHeight) / 2;
-                m_heightMap[h + 1].push_back(scaleHeight(averageHeight));
-            }
-        }
-    }
-    stbi_image_free(imageData);
-
+    // TODO i want to encapsulate this and make it clear that it's using the height map
     const std::filesystem::path collisionMapPath = m_path / collisionMapSubPath;
     Terrain::collisionFromMap(collisionMapPath, m_collisionRectangles);
 
@@ -176,74 +96,8 @@ Terrain::Terrain(const std::filesystem::path path)
         }
     }
 
-    if ((int)m_heightMap.size() == 0) {
-        Eend::fatalError("height map is empty");
-    }
-    if ((int)m_heightMap.size() != (m_height + 1)) {
-        Eend::fatalError("height map unexpected height");
-    }
-    for (auto& line : m_heightMap) {
-        if ((int)line.size() != (m_width + 1)) {
-            Eend::fatalError("height map unexpected line width");
-        }
-    }
-    // make obj
-    std::string fileName = heightMapPath.stem().string();
-
-    std::filesystem::path objPath = m_path / m_path.filename().string().append(".obj");
-    std::ofstream objFile;
-    objFile.open(objPath);
-    if (!objFile.is_open())
-        Eend::fatalError(std::format("unable to open file {}\n", objPath.generic_string()));
-
-    objFile << "# TreySim4" << std::endl;
-    objFile << "mtllib " << fileName << ".mtl" << std::endl;
-    objFile << "o " << fileName << std::endl;
-
-    float xPos = 0.0f;
-    float yPos = 0.0f;
-    // vert positions
-    for (auto& line : m_heightMap) {
-        for (float& height : line) {
-            // x and y Pos also UV map?
-            objFile << "v " << xPos * m_scale.x << " " << yPos * m_scale.y << " " << height
-                    << std::endl; // height << std::endl;
-            xPos += 1.0f;
-        }
-        xPos = 0.0f;
-        yPos -= 1.0f;
-    }
-    // uv mapping
-    for (size_t lineIdx = 0; lineIdx < m_heightMap.size(); ++lineIdx) {
-        float heightRatio = 1.0f - ((float)lineIdx / (float)(m_heightMap.size() - 1.0f));
-        for (unsigned int eleIdx = 0; eleIdx < m_heightMap[lineIdx].size(); ++eleIdx) {
-            float widthRatio = (float)eleIdx / (float)(m_heightMap[lineIdx].size() - 1.0f);
-            objFile << "vt " << widthRatio << " " << heightRatio << std::endl;
-        }
-    }
-
-    objFile << "s 0" << std::endl; // I have no idea
-    objFile << "usemtl Material" << std::endl;
-    // tris by vert index
-    for (size_t lineIdx = 0; lineIdx < (m_heightMap.size() - 1); ++lineIdx) {
-        for (unsigned int eleIdx = 0; eleIdx < (m_heightMap[lineIdx].size() - 1); ++eleIdx) {
-            // I think this is 1 indexed :c
-            unsigned int flatIdx = eleIdx + (lineIdx * m_heightMap[lineIdx].size()) + 1;
-            unsigned int rightIdx = flatIdx + 1;
-            unsigned int downIdx = flatIdx + m_heightMap[lineIdx].size();
-            unsigned int rightDownIdx = downIdx + 1;
-
-            objFile << "f " << rightIdx << '/' << rightIdx << '/' << rightIdx << ' ';
-            objFile << flatIdx << '/' << flatIdx << '/' << flatIdx << ' ';
-            objFile << rightDownIdx << '/' << rightDownIdx << '/' << rightDownIdx << std::endl;
-
-            objFile << "f " << flatIdx << '/' << flatIdx << '/' << flatIdx << ' ';
-            objFile << downIdx << '/' << downIdx << '/' << downIdx << ' ';
-            objFile << rightDownIdx << '/' << rightDownIdx << '/' << rightDownIdx << std::endl;
-        }
-    }
-    objFile.close();
-
+    // TODO make this conditional or a seperate util
+    Terrain::createTerrainObj(m_heightMap);
     m_statueId = Eend::Entities::statues().insert(m_path);
 }
 
@@ -470,6 +324,161 @@ float Terrain::heightAtPoint(Eend::Point2D point) {
         triangle = Eend::Triangle(topLeftPoint, bottomLeftPoint, bottomRightPoint);
     }
     return pointHeightOnTri(triangle, point);
+}
+
+void Terrain::loadHeightMap(std::vector<std::vector<float>>& heightMap) {
+    // create height map
+    const std::filesystem::path heightMapPath = m_path / heightMapSubPath;
+    int channels = 0;
+    unsigned char* imageData = stbi_load(heightMapPath.c_str(), &m_width, &m_height, &channels, 0);
+    constexpr float IMAGE_DATA_MAX_VALUE = 256.0f;
+
+    if (imageData == NULL) {
+        Eend::fatalError(
+            "unable to load image " + heightMapPath.generic_string() + " for terrain generation");
+    }
+
+    for (int h = 0; h < (m_height - 1); ++h) {
+        // handling edge cases looks horrible ugly, i'll admit
+        heightMap.emplace_back();
+        if (h == 0) heightMap.emplace_back();
+        if (h == (m_height - 2)) heightMap.emplace_back();
+        for (int w = 0; w < (m_width - 1); ++w) {
+            unsigned int averageHeight = 0;
+
+            const size_t currentIdx = w + (h * m_width);
+            const size_t rightIdx = (w + 1) + (h * m_width);
+            const size_t downIdx = w + ((h + 1) * m_width);
+            const size_t rightDownIdx = downIdx + 1;
+
+            const bool isEdgeXLeft = (w == 0);
+            const bool isEdgeXRight = (w == (m_width - 2));
+            const bool isEdgeYTop = (h == 0);
+            const bool isEdgeYBottom = (h == (m_height - 2));
+
+            const unsigned char currentHeight = imageData[currentIdx];
+            const unsigned char rightHeight = imageData[rightIdx];
+            const unsigned char downHeight = imageData[downIdx];
+            const unsigned char rightDownHeight = imageData[rightDownIdx];
+
+            auto scaleHeight = [&](unsigned int height) {
+                return (height / IMAGE_DATA_MAX_VALUE) * m_scale.z;
+            };
+
+            if (isEdgeYTop) {
+                if (isEdgeXLeft) {
+                    averageHeight = currentHeight;
+                    heightMap[h].push_back(scaleHeight(averageHeight));
+                }
+
+                averageHeight = (currentHeight + rightHeight) / 2;
+                heightMap[h].push_back(scaleHeight(averageHeight));
+
+                if (isEdgeXRight) {
+                    averageHeight = currentHeight;
+                    heightMap[h].push_back(scaleHeight(averageHeight));
+                }
+            }
+            if (isEdgeYBottom) {
+                if (isEdgeXLeft) {
+                    averageHeight = downHeight;
+                    heightMap[h + 2].push_back(scaleHeight(averageHeight));
+                }
+
+                averageHeight = (downHeight + rightDownHeight) / 2;
+                heightMap[h + 2].push_back(scaleHeight(averageHeight));
+
+                if (isEdgeXRight) {
+                    averageHeight = downHeight;
+                    heightMap[h + 2].push_back(scaleHeight(averageHeight));
+                }
+            }
+            if (isEdgeXLeft) {
+                averageHeight = (currentHeight + downHeight) / 2;
+                heightMap[h + 1].push_back(scaleHeight(averageHeight));
+            }
+
+            averageHeight = ((currentHeight + rightHeight + downHeight + rightDownHeight) / 4);
+            heightMap[h + 1].push_back(scaleHeight(averageHeight));
+
+            if (isEdgeXRight) {
+                averageHeight = (currentHeight + downHeight) / 2;
+                heightMap[h + 1].push_back(scaleHeight(averageHeight));
+            }
+        }
+    }
+    stbi_image_free(imageData);
+    // verify height map
+    if ((int)heightMap.size() == 0) {
+        Eend::fatalError("height map is empty");
+    }
+    if ((int)heightMap.size() != (m_height + 1)) {
+        Eend::fatalError("height map unexpected height");
+    }
+    for (auto& line : heightMap) {
+        if ((int)line.size() != (m_width + 1)) {
+            Eend::fatalError("height map unexpected line width");
+        }
+    }
+}
+
+void Terrain::createTerrainObj(const std::vector<std::vector<float>>& heightMap) {
+    std::filesystem::path heightMapPath = m_path / heightMapSubPath;
+    std::string fileName = heightMapPath.stem().string();
+
+    std::filesystem::path objPath = m_path / m_path.filename().string().append(".obj");
+    std::ofstream objFile;
+    objFile.open(objPath);
+    if (!objFile.is_open())
+        Eend::fatalError(std::format("unable to open file {}\n", objPath.generic_string()));
+
+    objFile << "# TreySim4" << std::endl;
+    objFile << "mtllib " << fileName << ".mtl" << std::endl;
+    objFile << "o " << fileName << std::endl;
+
+    float xPos = 0.0f;
+    float yPos = 0.0f;
+    // vert positions
+    for (auto& line : heightMap) {
+        for (const float& height : line) {
+            // x and y Pos also UV map?
+            objFile << "v " << xPos * m_scale.x << " " << yPos * m_scale.y << " " << height
+                    << std::endl; // height << std::endl;
+            xPos += 1.0f;
+        }
+        xPos = 0.0f;
+        yPos -= 1.0f;
+    }
+    // uv mapping
+    for (size_t lineIdx = 0; lineIdx < heightMap.size(); ++lineIdx) {
+        float heightRatio = 1.0f - ((float)lineIdx / (float)(heightMap.size() - 1.0f));
+        for (unsigned int eleIdx = 0; eleIdx < heightMap[lineIdx].size(); ++eleIdx) {
+            float widthRatio = (float)eleIdx / (float)(heightMap[lineIdx].size() - 1.0f);
+            objFile << "vt " << widthRatio << " " << heightRatio << std::endl;
+        }
+    }
+
+    objFile << "s 0" << std::endl; // I have no idea
+    objFile << "usemtl Material" << std::endl;
+    // tris by vert index
+    for (size_t lineIdx = 0; lineIdx < (heightMap.size() - 1); ++lineIdx) {
+        for (unsigned int eleIdx = 0; eleIdx < (heightMap[lineIdx].size() - 1); ++eleIdx) {
+            // I think this is 1 indexed :c
+            unsigned int flatIdx = eleIdx + (lineIdx * heightMap[lineIdx].size()) + 1;
+            unsigned int rightIdx = flatIdx + 1;
+            unsigned int downIdx = flatIdx + heightMap[lineIdx].size();
+            unsigned int rightDownIdx = downIdx + 1;
+
+            objFile << "f " << rightIdx << '/' << rightIdx << '/' << rightIdx << ' ';
+            objFile << flatIdx << '/' << flatIdx << '/' << flatIdx << ' ';
+            objFile << rightDownIdx << '/' << rightDownIdx << '/' << rightDownIdx << std::endl;
+
+            objFile << "f " << flatIdx << '/' << flatIdx << '/' << flatIdx << ' ';
+            objFile << downIdx << '/' << downIdx << '/' << downIdx << ' ';
+            objFile << rightDownIdx << '/' << rightDownIdx << '/' << rightDownIdx << std::endl;
+        }
+    }
+    objFile.close();
 }
 
 std::tuple<Eend::BoardId, float> Terrain::boardFromJson(Json::Value boardJson) {

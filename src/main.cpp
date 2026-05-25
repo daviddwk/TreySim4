@@ -251,9 +251,7 @@ static void onUnpause() {
     Park::get().playgroundToggle("tree1"); // DEBUG
 }
 
-static void onPause() {
-    Park::get().nextWave(); // DEBUG
-}
+static void onPause() {}
 
 static void pausedUpdate() {}
 
@@ -261,6 +259,16 @@ static void unpausedUpdate() {
     float dt = Eend::FrameLimiter::get().deltaTime;
 
     Trey::get().update();
+
+    static bool nextWavePressed = false;
+    if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_W)) {
+        if (nextWavePressed == false) {
+            Park::get().nextWave();
+        }
+        nextWavePressed = true;
+    } else {
+        nextWavePressed = false;
+    }
 
     Eend::Point treyPosition = Trey::get().getPosition();
     float terrainHeight = Park::get().heightAtPoint(Eend::Point2D(treyPosition.x, treyPosition.y));
