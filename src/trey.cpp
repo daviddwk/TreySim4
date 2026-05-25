@@ -95,7 +95,7 @@ void Trey::update() {
     float heightAtPoint = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
 
     m_kicking = false;
-    if (Eend::InputManager::get().getSpacePress() && !m_inAir && m_alive) {
+    if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir && m_alive) {
         m_kicking = true;
         m_inAir = true;
         m_upVelocity = -M_GRAVITY * 20.0f;
@@ -133,11 +133,11 @@ void Trey::update() {
     // TODO improve this
     static float lastStep = 0.0f;
 
-    bool waddlingSide =
-        Eend::InputManager::get().getLeftPress() || Eend::InputManager::get().getRightPress();
+    bool waddlingSide = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_LEFT) ||
+                        Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_RIGHT);
 
-    const bool waddlingForward = Eend::InputManager::get().getDownPress();
-    const bool waddlingBackward = Eend::InputManager::get().getUpPress();
+    const bool waddlingForward = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_UP);
+    const bool waddlingBackward = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_DOWN);
 
     if (waddlingForward) {
         m_facingForward = true;
@@ -147,10 +147,10 @@ void Trey::update() {
 
     bool waddling = waddlingSide || waddlingForward || waddlingBackward;
 
-    if (Eend::InputManager::get().getLeftPress()) {
+    if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_LEFT)) {
         body->setStripFlip(true);
     }
-    if (Eend::InputManager::get().getRightPress()) {
+    if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_RIGHT)) {
         body->setStripFlip(false);
     }
 
@@ -216,10 +216,10 @@ void Trey::update() {
 bool Trey::isKicking() { return m_kicking; }
 
 std::optional<Trey::Direction> Trey::getDirection() {
-    const bool upPress = Eend::InputManager::get().getUpPress();
-    const bool rightPress = Eend::InputManager::get().getRightPress();
-    const bool downPress = Eend::InputManager::get().getDownPress();
-    const bool leftPress = Eend::InputManager::get().getLeftPress();
+    const bool upPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_UP);
+    const bool rightPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_RIGHT);
+    const bool downPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_DOWN);
+    const bool leftPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_LEFT);
 
     if (upPress) {
         if (rightPress) return Direction::upRight;

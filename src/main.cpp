@@ -209,7 +209,7 @@ static void pauseLatch(bool& paused, bool& dead) {
     }
 
     if (paused || dead) {
-        bool escapePressed = Eend::InputManager::get().getEscapePress();
+        bool escapePressed = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_ESCAPE);
         if (!escapePressed) escapeReleased = true;
         if (escapeReleased && escapePressed) {
             escapeReleased = false;
@@ -223,7 +223,7 @@ static void pauseLatch(bool& paused, bool& dead) {
             }
         }
     } else {
-        bool escapePressed = Eend::InputManager::get().getEscapePress();
+        bool escapePressed = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_ESCAPE);
         if (!escapePressed) escapeReleased = true;
         if (escapeReleased && escapePressed) {
             paused = true;
@@ -249,7 +249,6 @@ static void onRespawn() {
 static void onUnpause() {
     // Park::get().setTerrain("terrain/grassy"); // DEBUG
     Park::get().playgroundToggle("tree1"); // DEBUG
-    std::print("is enabled {}\n", Park::get().playgroundIsEnabled("tree1"));
 }
 
 static void onPause() {
