@@ -2,11 +2,13 @@
 #include "puppyMill.hpp"
 #include "trey.hpp"
 
+const std::filesystem::path parksPath = std::filesystem::path("resources/parks");
+
 // should be path to park format, not png height map
 Park::Park(std::filesystem::path parkPath)
-    : m_terrain(std::make_shared<Terrain>(parkPath)),
-      m_puppyMill(std::make_unique<PuppyMill>(m_terrain, "resources/parks" / parkPath)),
-      m_path("resources/parks" / parkPath) {}
+    : m_terrain(std::make_shared<Terrain>(parksPath / parkPath)),
+      m_puppyMill(std::make_unique<PuppyMill>(m_terrain, parksPath / parkPath)),
+      m_path(parksPath / parkPath) {}
 
 void Park::construct(std::filesystem::path parkPath) {
     assert(m_instance == nullptr);
@@ -30,7 +32,7 @@ void Park::update() {
     m_terrain->update();
 
     if (m_nextParkPath) {
-        m_terrain.reset(new Terrain(*m_nextParkPath));
+        m_terrain.reset(new Terrain(parksPath / *m_nextParkPath));
         // after because then the new spawn is set
         reset();
     }

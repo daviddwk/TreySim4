@@ -34,8 +34,7 @@ const std::filesystem::path heightMapSubPath("generate/heightMap.png");
 const std::filesystem::path collisionMapSubPath("generate/collisionMap.png");
 
 Terrain::Terrain(const std::filesystem::path path)
-    : m_path("resources/parks" / path), m_height(0), m_width(0), m_animationSpeed(0), m_statueId(0),
-      m_spawn(0.0f) {
+    : m_path(path), m_height(0), m_width(0), m_animationSpeed(0), m_statueId(0), m_spawn(0.0f) {
     // TODO this is possibly the worst code in this whole project
 
     // height map from image
