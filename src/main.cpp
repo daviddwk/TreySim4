@@ -16,6 +16,7 @@
 
 #include <filesystem>
 
+#include "duck.hpp"
 #include "hud.hpp"
 #include "park.hpp"
 #include "text.hpp"
@@ -114,6 +115,7 @@ int main() {
             // menu destroy
             // could wrap in a loading screen if it was slow enough
             Trey::construct();
+            Duck::construct();
             // TODO build the scale into the format silly
             Park::construct("grassy");
             Hud::construct();
@@ -150,6 +152,7 @@ int main() {
             TextBoxQueue::destruct();
             Hud::destruct();
             Trey::destruct();
+            Duck::destruct();
             Park::destruct();
             // menu init
             startButton = Eend::Entities::panels().insert("resources/menu/startButton");
@@ -183,6 +186,7 @@ int main() {
 static void onStart() {
 
     Trey::get().setPosition(Park::get().getSpawn());
+    Duck::get().setPosition(Park::get().positionAtTile(Tile(15.0f, 15.0f)));
 
     TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
     TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
@@ -259,6 +263,7 @@ static void unpausedUpdate() {
     float dt = Eend::FrameLimiter::get().deltaTime;
 
     Trey::get().update();
+    Duck::get().update();
 
     static bool nextWavePressed = false;
     if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_W)) {
