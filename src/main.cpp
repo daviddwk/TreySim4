@@ -267,30 +267,12 @@ static void unpausedUpdate() {
 
     float duckDistance = glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
     float interactDistance = 5.0f;
-
-    if ((duckDistance < interactDistance)) {
-        // TODO make this switch logic a util build into input handler
-        static bool talkDuck = false;
-        if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_E)) {
-            if (talkDuck == false) {
-                TextBoxQueue::get().clear();
-                TextBoxQueue::get().queue("duck", Font::daniel, "Hey man.", 3.0f, true);
-            }
-            talkDuck = true;
-        } else {
-            talkDuck = false;
-        }
+    if ((duckDistance < interactDistance) && Eend::InputManager::get().onKeyUp(SDL_SCANCODE_E)) {
+        TextBoxQueue::get().clear();
+        TextBoxQueue::get().queue("duck", Font::daniel, "Hey man.", 3.0f, true);
     }
 
-    static bool nextWavePressed = false;
-    if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_W)) {
-        if (nextWavePressed == false) {
-            Park::get().nextWave();
-        }
-        nextWavePressed = true;
-    } else {
-        nextWavePressed = false;
-    }
+    if (Eend::InputManager::get().onKeyDown(SDL_SCANCODE_W)) Park::get().nextWave(); // DEBUG
 
     Eend::Point treyPosition = Trey::get().getPosition();
     float terrainHeight = Park::get().heightAtPoint(Eend::Point2D(treyPosition.x, treyPosition.y));
