@@ -15,6 +15,7 @@ class TextBoxQueue {
         void queue(
             std::string thumbnail, Font font, std::string text, float seconds,
             bool clickToContinue);
+        void clear();
         void update();
 
     private:
@@ -54,6 +55,8 @@ class TextBoxQueue {
         TextBoxQueue& operator=(TextBoxQueue&& other) = delete;
 
         inline static TextBoxQueue* m_instance = nullptr;
+
+        void clearTextBox();
 
         bool m_continue = false;
         std::chrono::steady_clock::time_point m_startTime;

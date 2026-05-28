@@ -265,6 +265,23 @@ static void unpausedUpdate() {
     Trey::get().update();
     Duck::get().update();
 
+    float duckDistance = glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
+    float interactDistance = 5.0f;
+
+    if ((duckDistance < interactDistance)) {
+        // TODO make this switch logic a util build into input handler
+        static bool talkDuck = false;
+        if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_E)) {
+            if (talkDuck == false) {
+                TextBoxQueue::get().clear();
+                TextBoxQueue::get().queue("duck", Font::daniel, "Hey man.", 3.0f, true);
+            }
+            talkDuck = true;
+        } else {
+            talkDuck = false;
+        }
+    }
+
     static bool nextWavePressed = false;
     if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_W)) {
         if (nextWavePressed == false) {

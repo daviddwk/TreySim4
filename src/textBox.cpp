@@ -57,6 +57,11 @@ void TextBoxQueue::queue(
     m_textBoxQueue.push(TextBoxParams(thumbnail, font, text, seconds, clickToContinue));
 }
 
+void TextBoxQueue::clear() {
+    TextBoxQueue::clearTextBox();
+    m_textBoxQueue = std::queue<TextBoxParams>();
+}
+
 TextBoxQueue::TextBoxQueue() {}
 TextBoxQueue::~TextBoxQueue() { delete m_textBox; }
 
@@ -99,5 +104,12 @@ void TextBoxQueue::update() {
                 params.duration,
                 params.clickToContinue);
         }
+    }
+}
+
+void TextBoxQueue::clearTextBox() {
+    if (m_textBox) {
+        delete m_textBox;
+        m_textBox = NULL;
     }
 }
