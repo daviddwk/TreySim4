@@ -84,8 +84,8 @@ void Hud::update() {
             Eend::InputManager::get().getDeltaMouseX(),
             Eend::InputManager::get().getMouseY(),
             Eend::InputManager::get().getDeltaMouseY(),
-            Eend::InputManager::get().getLeftClick(),
-            Eend::InputManager::get().getRightClick(),
-            Eend::InputManager::get().getMiddleClick(),
+            Eend::InputManager::get().isLeftClicked(),
+            Eend::InputManager::get().isRightClicked(),
+            Eend::InputManager::get().isMiddleClicked(),
             Park::get().numDogsKilled()));
 }
