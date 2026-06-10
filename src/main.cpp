@@ -18,6 +18,7 @@
 
 #include "duck.hpp"
 #include "hud.hpp"
+#include "menu.hpp"
 #include "park.hpp"
 #include "text.hpp"
 #include "textBox.hpp"
@@ -63,18 +64,7 @@ int main() {
 
     bool menu = true;
 
-    // menu init
-    Eend::PanelId startButton = Eend::Entities::panels().insert("resources/menu/startButton");
-    Eend::Panel* startRef = Eend::Entities::panels().getRef(startButton);
-    startRef->setScale(Eend::Scale2D(250.0f, 100.0f));
-    startRef->setPosition(Eend::Point(140.0f, 500.0f, 0.0f));
-    startRef->setTexture("none");
-    Eend::PanelId exitButton = Eend::Entities::panels().insert("resources/menu/exitButton");
-    Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitButton);
-    exitRef->setScale(Eend::Scale2D(250.0f, 100.0f));
-    exitRef->setPosition(Eend::Point(890.0f, 500.0f, 0.0f));
-    exitRef->setTexture("none");
-    //  menu init
+    Menu::construct();
     while (menu && !Eend::InputManager::get().getShouldClose()) { // exit menu
         bool start = false;
         Eend::FrameLimiter::get().startInterval();
@@ -82,26 +72,7 @@ int main() {
         Eend::InputManager::get().processInput();
         Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
 
-        // menu update
-        Eend::Panel* startRef = Eend::Entities::panels().getRef(startButton);
-        auto startButtonStatus = startRef->isClicked();
-        if (startButtonStatus == Eend::Panel::MouseStatus::click) {
-            start = true;
-        } else if (startButtonStatus == Eend::Panel::MouseStatus::hover) {
-            startRef->setTexture("hover");
-        } else {
-            startRef->setTexture("none");
-        }
-        Eend::Panel* exitRef = Eend::Entities::panels().getRef(exitButton);
-        auto exitButtonStatus = exitRef->isClicked();
-        if (exitButtonStatus == Eend::Panel::MouseStatus::click) {
-            menu = false;
-        } else if (exitButtonStatus == Eend::Panel::MouseStatus::hover) {
-            exitRef->setTexture("hover");
-        } else {
-            exitRef->setTexture("none");
-        }
-        // menu update
+        Menu::get().update(start, menu);
 
         Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
         Eend::Screen::get().render();
@@ -109,10 +80,7 @@ int main() {
         Eend::FrameLimiter::get().stopInterval();
 
         if (start) {
-            // menu destroy
-            Eend::Entities::panels().erase(startButton);
-            Eend::Entities::panels().erase(exitButton);
-            // menu destroy
+            Menu::destruct();
             // could wrap in a loading screen if it was slow enough
             Trey::construct();
             Duck::construct();
@@ -154,24 +122,11 @@ int main() {
             Trey::destruct();
             Duck::destruct();
             Park::destruct();
-            // menu init
-            startButton = Eend::Entities::panels().insert("resources/menu/startButton");
-            startRef = Eend::Entities::panels().getRef(startButton);
-            startRef->setScale(Eend::Scale2D(250.0f, 100.0f));
-            startRef->setPosition(Eend::Point(140.0f, 500.0f, 0.0f));
-            startRef->setTexture("none");
-            exitButton = Eend::Entities::panels().insert("resources/menu/exitButton");
-            exitRef = Eend::Entities::panels().getRef(exitButton);
-            exitRef->setScale(Eend::Scale2D(250.0f, 100.0f));
-            exitRef->setPosition(Eend::Point(890.0f, 500.0f, 0.0f));
-            exitRef->setTexture("none");
-            //  menu init
+
+            Menu::construct();
         }
     }
-    // menu destroy
-    Eend::Entities::panels().erase(startButton);
-    Eend::Entities::panels().erase(exitButton);
-    // menu destroy
+    Menu::destruct();
 
     Eend::Shaders::destruct();
     Eend::Particles::destruct();
