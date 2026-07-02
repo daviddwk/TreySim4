@@ -4,8 +4,11 @@
 #include <Eendgine/types.hpp>
 #include <GL/gl.h>
 
+#include <optional>
+
 #include "dog.hpp"
 #include "healthBar.hpp"
+#include "items.hpp"
 #include "terrain.hpp"
 
 namespace Eend = Eendgine;
@@ -78,4 +81,5 @@ class Trey {
         Direction m_direction;
         bool m_alive;
         bool m_facingForward;
+        std::optional<Item> m_item;
 };

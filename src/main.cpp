@@ -84,7 +84,6 @@ int main() {
             // could wrap in a loading screen if it was slow enough
             Trey::construct();
             Duck::construct();
-            // TODO build the scale into the format silly
             Park::construct("grassy");
             Hud::construct();
             TextBoxQueue::construct();
@@ -220,7 +219,7 @@ static void unpausedUpdate() {
     Trey::get().update();
     Duck::get().update();
 
-    float duckDistance = glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
+    float duckDistance =   glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
     float interactDistance = 5.0f;
     if ((duckDistance < interactDistance) && Eend::InputManager::get().onKeyUp(SDL_SCANCODE_E)) {
         TextBoxQueue::get().clear();
