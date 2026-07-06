@@ -65,6 +65,8 @@ class Trey {
         void updatePosition(float dt);
         void handleCollision(Eend::Point& oldPosition);
 
+        Trey::Direction oppositeDirection(Trey::Direction direction);
+
         Eend::StatueId m_headId;
         Eend::StatueId m_hairId;
         Eend::StatueId m_hairOutterId;

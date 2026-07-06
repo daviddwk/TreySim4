@@ -100,12 +100,30 @@ void Trey::update() {
     if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir && m_alive) {
         m_kicking = true;
         m_inAir = true;
-        m_upVelocity = -M_GRAVITY * 20.0f;
-        m_height = heightAtPoint + 0.1f;
+        if (m_item) {
+            if (*m_item == Item::doubleKick) {
+                m_upVelocity = -M_GRAVITY * 20.0f;
+                m_height = heightAtPoint + 0.1f;
 
-        Eend::Particles::get().create(m_position, 2, getKickParticleProperties(m_direction));
-        Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
-        Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+                Eend::Particles::get().create(
+                    m_position,
+                    2,
+                    getKickParticleProperties(m_direction));
+                Eend::Particles::get().create(
+                    m_position,
+                    2,
+                    getKickParticleProperties(Trey::oppositeDirection(m_direction)));
+                Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
+                Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+            }
+        } else {
+            m_upVelocity = -M_GRAVITY * 20.0f;
+            m_height = heightAtPoint + 0.1f;
+
+            Eend::Particles::get().create(m_position, 2, getKickParticleProperties(m_direction));
+            Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
+            Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+        }
     } else if (m_inAir) {
         m_upVelocity += M_GRAVITY;
         m_height += (m_upVelocity * dt);
@@ -236,6 +254,29 @@ std::optional<Trey::Direction> Trey::getDirection() {
     if (rightPress) return Direction::right;
     if (leftPress) return Direction::left;
     return std::nullopt;
+}
+
+// TODO make direction it's own class and this is the negate operator
+// and use composition for it to be used by Trey
+Trey::Direction Trey::oppositeDirection(Trey::Direction direction) {
+    switch (direction) {
+    case Direction::up:
+        return Direction::down;
+    case Direction::upRight:
+        return Direction::downLeft;
+    case Direction::right:
+        return Direction::left;
+    case Direction::downRight:
+        return Direction::upLeft;
+    case Direction::down:
+        return Direction::up;
+    case Direction::downLeft:
+        return Direction::upRight;
+    case Direction::left:
+        return Direction::right;
+    case Direction::upLeft:
+        return Direction::downRight;
+    }
 }
 
 void Trey::updatePosition(float dt) {
