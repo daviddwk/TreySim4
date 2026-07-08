@@ -7,6 +7,7 @@
 #include <optional>
 
 #include "dog.hpp"
+#include "facing.hpp"
 #include "healthBar.hpp"
 #include "items.hpp"
 #include "terrain.hpp"
@@ -35,7 +36,6 @@ class Trey {
         void update();
 
         HealthBar health;
-        enum class Direction { up, upRight, right, downRight, down, downLeft, left, upLeft };
 
     private:
         Trey();
@@ -59,13 +59,14 @@ class Trey {
         const std::filesystem::path M_JUMP_NOISE_PATH =
             std::filesystem::path("resources/noises/Quack_Fart_Noise_44k.wav");
 
-        std::optional<Direction> getDirection();
+        void updateDirection();
+        void updateBody();
 
-        void handleMovement(float dt, std::optional<Trey::Direction> direction);
+        void handleMovement(float dt, std::optional<Direction> direction);
         void updatePosition(float dt);
         void handleCollision(Eend::Point& oldPosition);
 
-        Trey::Direction oppositeDirection(Trey::Direction direction);
+        Direction oppositeDirection(Direction direction);
 
         Eend::StatueId m_headId;
         Eend::StatueId m_hairId;
@@ -80,8 +81,8 @@ class Trey {
         bool m_inAir;
         float m_upVelocity;
         float m_height;
-        Direction m_direction;
+        Facing m_facing;
+        bool m_moving;
         bool m_alive;
-        bool m_facingForward;
         std::optional<Item> m_item;
 };

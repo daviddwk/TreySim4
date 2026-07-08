@@ -8,8 +8,9 @@
 #include "collision.hpp"
 #include "park.hpp"
 
-#include "trey.hpp"
 #include "treyParticles.hpp"
+
+#include "trey.hpp"
 // have static last direction in update function
 // use this to get new diruction if there is one, and know that keys are actually being pressed
 //
@@ -24,8 +25,7 @@ Trey::Trey()
       m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)),
       m_targetRotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false), m_upVelocity(0.0f),
-      m_height(0.0f), m_direction(Direction::up), m_alive(true), m_facingForward(true),
-      m_item(Item::doubleKick) {
+      m_height(0.0f), m_alive(true), m_item(Item::doubleKick) {
 
     Eend::Board* const body = Eend::Entities::boards().getRef(m_bodyId);
     Eend::Board* const eye = Eend::Entities::boards().getRef(m_eyeId);
@@ -85,12 +85,11 @@ void Trey::update() {
     float dt = Eend::FrameLimiter::get().deltaTime;
     Eend::Point oldTreyPosition = getPosition();
 
-    std::optional<Direction> currentDirection = getDirection();
-    if (currentDirection && m_alive) {
-        m_direction = *currentDirection;
-        updatePosition(dt);
-    } else {
-        // m_rotation = m_rotation + Eend::Angle(100 * dt);
+    if (m_alive) {
+        Trey::updateDirection();
+        if (m_moving) {
+            Trey::updatePosition(dt);
+        }
     }
     handleCollision(oldTreyPosition);
 
@@ -108,11 +107,11 @@ void Trey::update() {
                 Eend::Particles::get().create(
                     m_position,
                     2,
-                    getKickParticleProperties(m_direction));
+                    getKickParticleProperties(m_facing.getDirection()));
                 Eend::Particles::get().create(
                     m_position,
                     2,
-                    getKickParticleProperties(Trey::oppositeDirection(m_direction)));
+                    getKickParticleProperties(m_facing.getOpposite()));
                 Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
                 Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
             }
@@ -120,7 +119,10 @@ void Trey::update() {
             m_upVelocity = -M_GRAVITY * 20.0f;
             m_height = heightAtPoint + 0.1f;
 
-            Eend::Particles::get().create(m_position, 2, getKickParticleProperties(m_direction));
+            Eend::Particles::get().create(
+                m_position,
+                2,
+                getKickParticleProperties(m_facing.getDirection()));
             Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
             Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
         }
@@ -144,73 +146,12 @@ void Trey::update() {
     Eend::Board* body = Eend::Entities::boards().getRef(m_bodyId);
     Eend::Board* eye = Eend::Entities::boards().getRef(m_eyeId);
 
-    if (m_position.y < oldTreyPosition.y) {
-        // headRef->setStrip("eyesOpen");
-    } else if (m_position.y > oldTreyPosition.y) {
-        // headRef->setStrip("eyesClose");
-    }
+    Trey::updateBody();
 
     // TODO improve this
     static float lastStep = 0.0f;
 
-    bool waddlingSide = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_LEFT) ||
-                        Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_RIGHT);
-
-    const bool waddlingForward = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_UP);
-    const bool waddlingBackward = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_DOWN);
-
-    if (waddlingForward) {
-        m_facingForward = true;
-    } else if (waddlingBackward) {
-        m_facingForward = false;
-    }
-
-    bool waddling = waddlingSide || waddlingForward || waddlingBackward;
-
-    if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_LEFT)) {
-        body->setStripFlip(true);
-    }
-    if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_RIGHT)) {
-        body->setStripFlip(false);
-    }
-
-    if (m_inAir) {
-        if (waddlingSide) {
-            if (m_facingForward) {
-                body->setStrip("kickSideForward");
-            } else {
-                body->setStrip("kickSideBackward");
-            }
-        } else {
-            if (m_facingForward) {
-                body->setStrip("kickForward");
-            } else {
-                body->setStrip("kickBackward");
-            }
-        }
-    } else {
-        if (waddlingSide) {
-            if (m_facingForward) {
-                body->setStrip("walkSideForward");
-            } else {
-                body->setStrip("walkSideBackward");
-            }
-        } else if (waddling) {
-            if (m_facingForward) {
-                body->setStrip("walkForward");
-            } else {
-                body->setStrip("walkBackward");
-            }
-        } else {
-            if (m_facingForward) {
-                body->setStrip("standForward");
-            } else {
-                body->setStrip("standBackward");
-            }
-        }
-    }
-
-    m_rotation = getAngle();
+    m_rotation = m_facing.getAngle();
 
     lastStep += dt;
     eye->setRotation(eye->getRotation() + (1.0f * dt));
@@ -233,55 +174,98 @@ void Trey::update() {
     hairOutter->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
 }
 
+void Trey::updateBody() {
+    Eend::Board* body = Eend::Entities::boards().getRef(m_bodyId);
+    Direction direction = m_facing.getDirection();
+    std::string prefix;
+
+    if (m_inAir) {
+        prefix = "kick";
+    } else if (m_moving) {
+        prefix = "walk";
+    } else {
+        prefix = "stand";
+    }
+
+    if (direction == Direction::up) {
+        body->setStrip(prefix + "Backward");
+        body->setStripFlip(false);
+    } else if (direction == Direction::upRight) {
+        body->setStrip(prefix + "SideBackward");
+        body->setStripFlip(false);
+    } else if (direction == Direction::right) {
+        if (m_facing.getUpOrDown() == Direction::up) {
+            body->setStrip(prefix + "SideBackward");
+        } else {
+            body->setStrip(prefix + "SideForward");
+        }
+        body->setStripFlip(false);
+    } else if (direction == Direction::downRight) {
+        body->setStrip(prefix + "SideForward");
+        body->setStripFlip(false);
+    } else if (direction == Direction::down) {
+        body->setStrip(prefix + "Forward");
+        body->setStripFlip(false);
+    } else if (direction == Direction::downLeft) {
+        body->setStrip(prefix + "SideForward");
+        body->setStripFlip(true);
+    } else if (direction == Direction::left) {
+        if (m_facing.getUpOrDown() == Direction::up) {
+            body->setStrip(prefix + "SideBackward");
+        } else {
+            body->setStrip(prefix + "SideForward");
+        }
+        body->setStripFlip(true);
+    } else /*  direction == Direction::upLeft */ {
+        body->setStrip(prefix + "SideBackward");
+        body->setStripFlip(true);
+    }
+}
+
 bool Trey::isKicking() { return m_kicking; }
 
-std::optional<Trey::Direction> Trey::getDirection() {
+void Trey::updateDirection() {
+
+    std::optional<Direction> direction = std::nullopt;
+
     const bool upPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_UP);
     const bool rightPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_RIGHT);
     const bool downPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_DOWN);
     const bool leftPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_LEFT);
 
     if (upPress) {
-        if (rightPress) return Direction::upRight;
-        if (leftPress) return Direction::upLeft;
-        return Direction::up;
+        if (rightPress) {
+            direction = Direction::upRight;
+        } else if (leftPress) {
+            direction = Direction::upLeft;
+        } else {
+            direction = Direction::up;
+        }
+    } else if (downPress) {
+        if (rightPress) {
+            direction = Direction::downRight;
+        } else if (leftPress) {
+            direction = Direction::downLeft;
+        } else {
+            direction = Direction::down;
+        }
+    } else if (rightPress) {
+        direction = Direction::right;
+    } else if (leftPress) {
+        direction = Direction::left;
     }
-    if (downPress) {
-        if (rightPress) return Direction::downRight;
-        if (leftPress) return Direction::downLeft;
-        return Direction::down;
-    }
-    if (rightPress) return Direction::right;
-    if (leftPress) return Direction::left;
-    return std::nullopt;
-}
 
-// TODO make direction it's own class and this is the negate operator
-// and use composition for it to be used by Trey
-Trey::Direction Trey::oppositeDirection(Trey::Direction direction) {
-    switch (direction) {
-    case Direction::up:
-        return Direction::down;
-    case Direction::upRight:
-        return Direction::downLeft;
-    case Direction::right:
-        return Direction::left;
-    case Direction::downRight:
-        return Direction::upLeft;
-    case Direction::down:
-        return Direction::up;
-    case Direction::downLeft:
-        return Direction::upRight;
-    case Direction::left:
-        return Direction::right;
-    case Direction::upLeft:
-        return Direction::downRight;
+    if (direction) {
+        m_facing.setDirection(*direction);
+        m_moving = true;
+    } else {
+        m_moving = false;
     }
 }
 
 void Trey::updatePosition(float dt) {
 
-    switch (m_direction) {
+    switch (m_facing.getDirection()) {
     case Direction::up:
         m_position.y += M_MOVE_SPEED * dt;
         break;
@@ -325,26 +309,7 @@ void Trey::handleCollision(Eend::Point& oldPosition) {
     }
 }
 
-Eend::Angle Trey::getAngle() {
-    switch (m_direction) {
-    case Direction::up:
-        return Eend::Angle(45.0f) * 0.0f;
-    case Direction::upRight:
-        return Eend::Angle(45.0f) * 1.0f;
-    case Direction::right:
-        return Eend::Angle(45.0f) * 2.0f;
-    case Direction::downRight:
-        return Eend::Angle(45.0f) * 3.0f;
-    case Direction::down:
-        return Eend::Angle(45.0f) * 4.0f;
-    case Direction::downLeft:
-        return Eend::Angle(45.0f) * 5.0f;
-    case Direction::left:
-        return Eend::Angle(45.0f) * 6.0f;
-    case Direction::upLeft:
-        return Eend::Angle(45.0f) * 7.0f;
-    }
-}
+Eend::Angle Trey::getAngle() { return m_facing.getAngle(); }
 
 bool Trey::kick(Dog& dog) {
     bool dies = false;

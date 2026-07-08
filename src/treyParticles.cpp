@@ -49,35 +49,35 @@ Eend::Particles::Properties getJumpParticleProperties() {
     return Eend::Particles::Properties("resources/Trey/particles/poo", behavior);
 }
 
-Eend::Particles::Properties getKickParticleProperties(Trey::Direction direction) {
+Eend::Particles::Properties getKickParticleProperties(Direction direction) {
 
     const std::filesystem::path boardPath("resources/Trey/particles/kick");
 
     // clang-format off
     Eend::Vector2D directionVector = Eend::Vector2D(0.0f);
     switch (direction) {
-    case Trey::Direction::up:
+    case Direction::up:
         directionVector = Eend::Vector2D(                0.0f,                1.0f);
         break;
-    case Trey::Direction::upRight:
+    case Direction::upRight:
         directionVector = Eend::Vector2D(  Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
         break;
-    case Trey::Direction::right:
+    case Direction::right:
         directionVector = Eend::Vector2D(                1.0f,                0.0f);
         break;
-    case Trey::Direction::downRight:
+    case Direction::downRight:
         directionVector = Eend::Vector2D(  Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
         break;
-    case Trey::Direction::down:
+    case Direction::down:
         directionVector = Eend::Vector2D(                0.0f,               -1.0f);
         break;
-    case Trey::Direction::downLeft:
+    case Direction::downLeft:
         directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
         break;
-    case Trey::Direction::left:
+    case Direction::left:
         directionVector = Eend::Vector2D(               -1.0f,                0.0f);
         break;
-    case Trey::Direction::upLeft:
+    case Direction::upLeft:
         directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
         break;
     }
