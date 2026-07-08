@@ -7,24 +7,32 @@ void Facing::setDirection(Direction direction) {
     switch (m_direction) {
     case Direction::up:
         m_lastUp = true;
+        break;
     case Direction::upRight:
         m_lastUp = true;
         m_lastRight = true;
+        break;
     case Direction::right:
         m_lastRight = true;
+        break;
     case Direction::downRight:
         m_lastUp = false;
         m_lastRight = true;
+        break;
     case Direction::down:
         m_lastUp = false;
+        break;
     case Direction::downLeft:
         m_lastUp = false;
         m_lastRight = false;
+        break;
     case Direction::left:
         m_lastRight = false;
+        break;
     case Direction::upLeft:
         m_lastUp = true;
         m_lastRight = false;
+        break;
     }
 }
 

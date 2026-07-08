@@ -224,9 +224,10 @@ void Trey::updateBody() {
 
 bool Trey::isKicking() { return m_kicking; }
 
-void Trey::updateDirection() {
+bool Trey::updateDirection() {
 
     std::optional<Direction> direction = std::nullopt;
+    bool newDirection = false;
 
     const bool upPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_UP);
     const bool rightPress = Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_RIGHT);
@@ -256,11 +257,13 @@ void Trey::updateDirection() {
     }
 
     if (direction) {
+        if (m_facing.getDirection() == *direction) newDirection = true;
         m_facing.setDirection(*direction);
         m_moving = true;
     } else {
         m_moving = false;
     }
+    return newDirection;
 }
 
 void Trey::updatePosition(float dt) {
