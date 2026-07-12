@@ -87,5 +87,5 @@ class Trey {
         Facing m_facing;
         bool m_moving;
         bool m_alive;
-        std::optional<Item> m_item;
+        std::optional<ItemType> m_item;
 };

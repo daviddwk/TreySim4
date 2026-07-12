@@ -24,6 +24,8 @@
 #include "textBox.hpp"
 #include "trey.hpp"
 
+#include "items.hpp" // TODO rm because it'll get in through park
+
 namespace Eend = Eendgine;
 
 static void onStart();
@@ -87,6 +89,8 @@ int main() {
             Park::construct("grassy");
             Hud::construct();
             TextBoxQueue::construct();
+
+            Item item(ItemType::doubleKick, Eend::Point2D(20.0f)); // DEBUG
 
             onStart();
             while (!Eend::InputManager::get().getShouldClose()) {
@@ -219,7 +223,7 @@ static void unpausedUpdate() {
     Trey::get().update();
     Duck::get().update();
 
-    float duckDistance =   glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
+    float duckDistance = glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
     float interactDistance = 5.0f;
     if ((duckDistance < interactDistance) && Eend::InputManager::get().onKeyUp(SDL_SCANCODE_E)) {
         TextBoxQueue::get().clear();

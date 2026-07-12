@@ -25,7 +25,7 @@ Trey::Trey()
       m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)),
       m_targetRotation(Eend::Angle(0.0f)), m_bodyTimer(0.075f), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_height(0.0f), m_alive(true), m_item(Item::doubleKick) {
+      m_upVelocity(0.0f), m_height(0.0f), m_alive(true), m_item(ItemType::doubleKick) {
 
     Eend::Board* const body = Eend::Entities::boards().getRef(m_bodyId);
     Eend::Board* const eye = Eend::Entities::boards().getRef(m_eyeId);
@@ -102,7 +102,7 @@ void Trey::update() {
         m_kicking = true;
         m_inAir = true;
         if (m_item) {
-            if (*m_item == Item::doubleKick) {
+            if (*m_item == ItemType::doubleKick) {
                 m_upVelocity = -M_GRAVITY * 20.0f;
                 m_height = heightAtPoint + 0.1f;
 
@@ -147,7 +147,7 @@ void Trey::update() {
 bool Trey::kick(Dog& dog) {
     bool dies = false;
     if (m_item) {
-        if (*m_item == Item::doubleKick) {
+        if (*m_item == ItemType::doubleKick) {
             std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
                 dog.getPosition3d(),
                 Eend::Sphere(getPosition(), M_KICK_RADIUS),
