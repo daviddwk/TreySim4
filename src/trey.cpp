@@ -47,6 +47,8 @@ Trey::Trey()
 
     hair->setStrip("hair");
     hairOutter->setStrip("hairOutter");
+    hair->setScale(Eend::Scale(1.1f));
+    hairOutter->setScale(Eend::Scale(1.2f));
 }
 
 Trey::~Trey() {
@@ -139,46 +141,59 @@ void Trey::update() {
 
     m_position.z = m_height;
 
-    // update entities
+    Trey::updateBody(dt);
+}
+
+bool Trey::kick(Dog& dog) {
+    bool dies = false;
+    if (m_item) {
+        if (*m_item == Item::doubleKick) {
+            std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
+                dog.getPosition3d(),
+                Eend::Sphere(getPosition(), M_KICK_RADIUS),
+                m_rotation,
+                M_KICK_SPREAD);
+            if (kick) {
+                // include the damage here also I think
+                dog.kick(*kick);
+                dies = dog.giveDamage(1);
+            }
+            kick = pointToSphereSliceEdgeRelative(
+                dog.getPosition3d(),
+                Eend::Sphere(getPosition(), M_KICK_RADIUS),
+                m_rotation + Eend::Angle(180.0f),
+                M_KICK_SPREAD);
+            if (kick) {
+                dog.kick(*kick);
+                dies = dog.giveDamage(1);
+            }
+        }
+    } else {
+        std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
+            dog.getPosition3d(),
+            Eend::Sphere(getPosition(), M_KICK_RADIUS),
+            m_rotation,
+            M_KICK_SPREAD);
+        if (kick) {
+            dog.kick(*kick);
+            dies = dog.giveDamage(1);
+        }
+    }
+    return dies;
+}
+
+void Trey::updateBody(float dt) {
+
     Eend::Statue* head = Eend::Entities::statues().getRef(m_headId);
     Eend::Statue* hair = Eend::Entities::statues().getRef(m_hairId);
     Eend::Statue* hairOutter = Eend::Entities::statues().getRef(m_hairOutterId);
     Eend::Board* body = Eend::Entities::boards().getRef(m_bodyId);
     Eend::Board* eye = Eend::Entities::boards().getRef(m_eyeId);
 
-    Trey::updateBody();
-
-    // TODO improve this
-    static float lastStep = 0.0f;
-
-    m_rotation = m_facing.getAngle();
-
-    lastStep += dt;
-    eye->setRotation(eye->getRotation() + (1.0f * dt));
-    if (lastStep > 0.075f) {
-        lastStep = 0.0f;
-        body->nextStripIdx();
-    }
-
-    body->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 3.0f));
-    head->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
-    hair->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
-    hairOutter->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
-    eye->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
-
-    hair->setScale(Eend::Scale(1.1f));
-    hairOutter->setScale(Eend::Scale(1.2f));
-
-    head->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
-    hair->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
-    hairOutter->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
-}
-
-void Trey::updateBody() {
-    Eend::Board* body = Eend::Entities::boards().getRef(m_bodyId);
     Direction direction = m_facing.getDirection();
     std::string prefix;
 
+    // update strip
     if (m_inAir) {
         prefix = "kick";
     } else if (m_moving) {
@@ -220,6 +235,31 @@ void Trey::updateBody() {
         body->setStrip(prefix + "SideBackward");
         body->setStripFlip(true);
     }
+
+    // TODO improve this
+    static float lastStep = 0.0f;
+
+    lastStep += dt;
+    if (lastStep > 0.075f) {
+        lastStep = 0.0f;
+        body->nextStripIdx();
+    }
+
+    // set head rotation
+    m_rotation = m_facing.getAngle();
+    head->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
+    hair->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
+    hairOutter->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
+
+    // set eye rotation
+    eye->setRotation(eye->getRotation() + (1.0f * dt));
+    eye->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
+
+    // set position
+    body->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 3.0f));
+    head->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
+    hair->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
+    hairOutter->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
 }
 
 bool Trey::isKicking() { return m_kicking; }
@@ -313,41 +353,3 @@ void Trey::handleCollision(Eend::Point& oldPosition) {
 }
 
 Eend::Angle Trey::getAngle() { return m_facing.getAngle(); }
-
-bool Trey::kick(Dog& dog) {
-    bool dies = false;
-    if (m_item) {
-        if (*m_item == Item::doubleKick) {
-            std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
-                dog.getPosition3d(),
-                Eend::Sphere(getPosition(), M_KICK_RADIUS),
-                m_rotation,
-                M_KICK_SPREAD);
-            if (kick) {
-                // include the damage here also I think
-                dog.kick(*kick);
-                dies = dog.giveDamage(1);
-            }
-            kick = pointToSphereSliceEdgeRelative(
-                dog.getPosition3d(),
-                Eend::Sphere(getPosition(), M_KICK_RADIUS),
-                m_rotation + Eend::Angle(180.0f),
-                M_KICK_SPREAD);
-            if (kick) {
-                dog.kick(*kick);
-                dies = dog.giveDamage(1);
-            }
-        }
-    } else {
-        std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
-            dog.getPosition3d(),
-            Eend::Sphere(getPosition(), M_KICK_RADIUS),
-            m_rotation,
-            M_KICK_SPREAD);
-        if (kick) {
-            dog.kick(*kick);
-            dies = dog.giveDamage(1);
-        }
-    }
-    return dies;
-}

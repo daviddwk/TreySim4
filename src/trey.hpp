@@ -60,7 +60,7 @@ class Trey {
             std::filesystem::path("resources/noises/Quack_Fart_Noise_44k.wav");
 
         bool updateDirection();
-        void updateBody();
+        void updateBody(float dt);
 
         void handleMovement(float dt, std::optional<Direction> direction);
         void updatePosition(float dt);
