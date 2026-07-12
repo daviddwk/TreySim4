@@ -24,8 +24,8 @@ Trey::Trey()
       m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/body"))),
       m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)),
-      m_targetRotation(Eend::Angle(0.0f)), m_kicking(true), m_inAir(false), m_upVelocity(0.0f),
-      m_height(0.0f), m_alive(true), m_item(Item::doubleKick) {
+      m_targetRotation(Eend::Angle(0.0f)), m_bodyTimer(0.075f), m_kicking(true), m_inAir(false),
+      m_upVelocity(0.0f), m_height(0.0f), m_alive(true), m_item(Item::doubleKick) {
 
     Eend::Board* const body = Eend::Entities::boards().getRef(m_bodyId);
     Eend::Board* const eye = Eend::Entities::boards().getRef(m_eyeId);
@@ -236,12 +236,8 @@ void Trey::updateBody(float dt) {
         body->setStripFlip(true);
     }
 
-    // TODO improve this
-    static float lastStep = 0.0f;
-
-    lastStep += dt;
-    if (lastStep > 0.075f) {
-        lastStep = 0.0f;
+    if (m_bodyTimer.update(dt)) {
+        m_bodyTimer.reset();
         body->nextStripIdx();
     }
 

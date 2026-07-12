@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Eendgine/entityBatches.hpp>
+#include <Eendgine/timer.hpp>
 #include <Eendgine/types.hpp>
 #include <GL/gl.h>
 
@@ -76,6 +77,8 @@ class Trey {
         Eend::Point m_position;
         Eend::Angle m_rotation;
         Eend::Angle m_targetRotation;
+
+        Eend::Timer m_bodyTimer;
 
         bool m_kicking;
         bool m_inAir;
