@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dropParty.hpp"
 #include "puppyMill.hpp"
 #include "terrain.hpp"
 
@@ -62,6 +63,7 @@ class Park {
         std::shared_ptr<Terrain> m_terrain;
         // part of park and dog spawns should be a part of the park format TODO
         std::unique_ptr<PuppyMill> m_puppyMill;
+        std::unique_ptr<DropParty> m_dropParty;
 
         std::filesystem::path m_path;
 };

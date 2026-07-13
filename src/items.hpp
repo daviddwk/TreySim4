@@ -1,7 +1,5 @@
 #pragma once
 
-enum class ItemType { doubleKick };
-
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/types.hpp>
 
@@ -9,7 +7,9 @@ namespace Eend = Eendgine;
 
 class Item {
     public:
-        Item(ItemType type, Eend::Point2D position);
+        enum class Type { doubleKick };
+
+        Item(Item::Type type, Eend::Point2D position);
         ~Item();
 
         Item(const Item& other) = delete;
@@ -20,10 +20,12 @@ class Item {
 
         Eend::Point getPosition();
 
-    private:
-        std::filesystem::path spritePath(ItemType type);
+        static Item::Type typeFromString(std::string typeString);
 
-        ItemType m_type;
+    private:
+        std::filesystem::path spritePath(Item::Type type);
+
+        Item::Type m_type;
         Eend::Point m_position;
         Eend::BoardId m_sprite;
 };

@@ -8,7 +8,8 @@ const std::filesystem::path parksPath = std::filesystem::path("resources/parks")
 Park::Park(std::filesystem::path parkPath)
     : m_terrain(std::make_shared<Terrain>(parksPath / parkPath)),
       m_puppyMill(std::make_unique<PuppyMill>(m_terrain, parksPath / parkPath)),
-      m_path(parksPath / parkPath) {}
+      m_dropParty(std::make_unique<DropParty>(parksPath / parkPath)), m_path(parksPath / parkPath) {
+}
 
 void Park::construct(std::filesystem::path parkPath) {
     assert(m_instance == nullptr);
@@ -29,18 +30,20 @@ Park& Park::get() {
 void Park::update() {
 
     m_puppyMill->update();
+    m_dropParty->update();
     m_terrain->update();
 
     if (m_nextParkPath) {
         m_terrain.reset(new Terrain(parksPath / *m_nextParkPath));
         // after because then the new spawn is set
-        reset();
+        Park::reset();
     }
     m_nextParkPath = std::nullopt;
 }
 
 void Park::reset() {
     m_puppyMill.reset(new PuppyMill(m_terrain, m_path));
+    m_dropParty.reset(new DropParty(m_path));
     Trey::get().setPosition(m_terrain->getSpawn());
 }
 

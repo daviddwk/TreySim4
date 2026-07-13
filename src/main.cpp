@@ -90,7 +90,7 @@ int main() {
             Hud::construct();
             TextBoxQueue::construct();
 
-            Item item(ItemType::doubleKick, Eend::Point2D(20.0f)); // DEBUG
+            Item item(Item::Type::doubleKick, Eend::Point2D(20.0f)); // DEBUG
 
             onStart();
             while (!Eend::InputManager::get().getShouldClose()) {
