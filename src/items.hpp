@@ -9,14 +9,14 @@ class Item {
     public:
         enum class Type { doubleKick };
 
-        Item(Item::Type type, Eend::Point2D position);
+        Item(Item::Type type, Eend::Point position);
         ~Item();
 
         Item(const Item& other) = delete;
         Item& operator=(const Item& other) = delete;
 
-        Item(Item&& other) = delete;
-        Item& operator=(Item&& other) = delete;
+        Item(Item&& other) noexcept;
+        Item& operator=(Item&& other) noexcept;
 
         Eend::Point getPosition();
 

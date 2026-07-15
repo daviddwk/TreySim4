@@ -61,6 +61,13 @@
       ]
     }
   },
+  "Items": [
+    {
+      "type" : "doubleKick",
+      "frequency" : 5000,
+      "position" : [12, 15]
+    }
+  ],
 	"Waves": [
 	  {
       "duration" : 10,
