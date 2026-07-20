@@ -90,7 +90,38 @@ int main() {
             Hud::construct();
             TextBoxQueue::construct();
 
-            Item item(Item::Type::doubleKick, Eend::Point2D(20.0f)); // DEBUG
+            // Item item(Item::Type::doubleKick, Eend::Point2D(20.0f)); // DEBUG
+            // Eend::BoardId testBoard =
+            //     Eend::Entities::boards().insert("resources/duck/statues/body");
+            // Eend::Board* testBoardRef = Eend::Entities::boards().getRef(testBoard);
+            // testBoardRef->setPosition(
+            //     Eend::Point(20.0f, -20.0f, Park::get().heightAtPoint(Eend::Point(20.0f))
+            //     + 5.0f));
+            // testBoardRef->setScale(Eend::Scale2D(5.0f));
+            // Eend::BoardId testBoardClone = Eend::Entities::boards().clone(testBoard);
+            // Eend::Board* testBoardCloneRef = Eend::Entities::boards().getRef(testBoardClone);
+            // testBoardCloneRef->setPosition(
+            //     testBoardCloneRef->getPosition() + Eend::Point(0.0f, 0.0f, 5.0f));
+
+            // Eend::PanelId testPanel =
+            //     Eend::Entities::panels().insert("resources/duck/statues/body");
+            // Eend::Panel* testPanelRef = Eend::Entities::panels().getRef(testPanel);
+            // testPanelRef->setPosition(Eend::Point(20.0f, 20.0f, 0.0f));
+            // testPanelRef->setScale(Eend::Scale2D(100.0f));
+            // Eend::PanelId testPanelClone = Eend::Entities::panels().clone(testPanel);
+            // Eend::Panel* testPanelCloneRef = Eend::Entities::panels().getRef(testPanelClone);
+            // testPanelCloneRef->setPosition(testPanelCloneRef->getPosition() -
+            // Eend::Point(20.0f));
+
+            // Eend::StatueId testStatue = Eend::Entities::statues().insert("resources/Trey/head");
+            // Eend::Statue* testStatueRef = Eend::Entities::statues().getRef(testStatue);
+            // testStatueRef->setPosition(
+            //     Eend::Point(20.0f, -20.0f, Park::get().heightAtPoint(Eend::Point(20.0f))
+            //     + 5.0f));
+            // Eend::StatueId testStatueClone = Eend::Entities::statues().clone(testStatue);
+            // Eend::Statue* testStatueCloneRef = Eend::Entities::statues().getRef(testStatueClone);
+            // testStatueCloneRef->setPosition(
+            //     testStatueCloneRef->getPosition() + Eend::Point(0.0f, 0.0f, 5.0f));
 
             onStart();
             while (!Eend::InputManager::get().getShouldClose()) {

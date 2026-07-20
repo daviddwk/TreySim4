@@ -15,34 +15,26 @@ Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Dog::Type typ
     : m_type(type), m_bodyId(Eend::Entities::boards().insert(getDogPath(type) / "boards")),
       m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_animTime(0.0f),
       m_health(M_HEALTH), m_deadTime(0.0f), m_delete(false) {
-    Eend::Board* boardRef = Eend::Entities::boards().getRef(*m_bodyId);
+    Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
     boardRef->setStrip("walk");
     boardRef->setScale(scale);
     boardRef->setPosition(Eend::Point(position.x, Park::get().heightAtPoint(position), position.y));
 }
-Dog::~Dog() {
-    if (m_bodyId) Eend::Entities::boards().erase(*m_bodyId);
-}
+Dog::~Dog() { Eend::Entities::boards().erase(m_bodyId); }
 
-Dog::Dog(Dog&& other) noexcept
-    : m_bodyId(std::move(other.m_bodyId)), m_position(std::move(other.m_position)),
-      m_speed(std::move(other.m_speed)), m_knockback(std::move(other.m_knockback)),
-      m_animTime(std::move(other.m_animTime)), m_health(std::move(other.m_health)),
-      m_deadTime(std::move(other.m_deadTime)), m_delete(std::move(other.m_delete))
+Dog::Dog(const Dog& other) noexcept
+    : m_bodyId(Eend::Entities::boards().clone(other.m_bodyId)), m_position(other.m_position),
+      m_speed(other.m_speed), m_knockback(other.m_knockback), m_animTime(other.m_animTime),
+      m_health(other.m_health), m_deadTime(other.m_deadTime), m_delete(other.m_delete) {}
 
-{
-    other.m_bodyId = std::nullopt;
-}
-
-Dog& Dog::operator=(Dog&& other) noexcept {
+Dog& Dog::operator=(const Dog& other) noexcept {
     // Self-assignment detection
     if (&other == this) return *this;
 
-    // delete entitiy
-    if (m_bodyId) Eend::Entities::boards().erase(*m_bodyId);
+    Eend::Entities::boards().erase(m_bodyId);
 
     // transfer ownership
-    m_bodyId = other.m_bodyId;
+    m_bodyId = Eend::Entities::boards().clone(other.m_bodyId);
     m_position = other.m_position;
     m_speed = other.m_speed;
     m_knockback = other.m_knockback;
@@ -51,11 +43,34 @@ Dog& Dog::operator=(Dog&& other) noexcept {
     m_deadTime = other.m_deadTime;
     m_delete = other.m_delete;
 
-    // release ownership
-    other.m_bodyId = std::nullopt;
+    return *this;
+}
+
+/*
+Dog::Dog(Dog&& other) noexcept
+    : m_bodyId(Eend::Entities::boards().clone(other.m_bodyId)), m_position(other.m_position),
+      m_speed(other.m_speed), m_knockback(other.m_knockback), m_animTime(other.m_animTime),
+      m_health(other.m_health), m_deadTime(other.m_deadTime), m_delete(other.m_delete) {}
+
+Dog& Dog::operator=(Dog&& other) noexcept {
+    // Self-assignment detection
+    if (&other == this) return *this;
+
+    Eend::Entities::boards().erase(m_bodyId);
+
+    // transfer ownership
+    m_bodyId = Eend::Entities::boards().clone(other.m_bodyId);
+    m_position = other.m_position;
+    m_speed = other.m_speed;
+    m_knockback = other.m_knockback;
+    m_animTime = other.m_animTime;
+    m_health = other.m_health;
+    m_deadTime = other.m_deadTime;
+    m_delete = other.m_delete;
 
     return *this;
 }
+*/
 
 void Dog::setSpeed(float speed) { m_speed = speed; }
 
@@ -70,8 +85,7 @@ unsigned int Dog::getDamage() { return M_DAMAGE; }
 bool Dog::giveDamage(unsigned int damage) {
     if (damage >= m_health) {
         m_health = 0;
-        assert(m_bodyId);
-        Eendgine::Board* board = Eend::Entities::boards().getRef(*m_bodyId);
+        Eendgine::Board* board = Eend::Entities::boards().getRef(m_bodyId);
         board->setStrip("dead");
         board->setStripIdx(0);
         m_knockback *= M_KNOCKBACK_DEAD_MULTIPLIER;
@@ -94,9 +108,8 @@ void Dog::kick(Eend::Point kick) {
 }
 
 void Dog::update() {
-    assert(m_bodyId);
 
-    Eend::Board* boardRef = Eend::Entities::boards().getRef(*m_bodyId);
+    Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
     float dt = Eend::FrameLimiter::get().deltaTime;
 
     m_animTime += dt;
