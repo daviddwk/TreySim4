@@ -13,11 +13,8 @@ class Dog {
         Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Dog::Type type);
         ~Dog();
 
-        Dog(const Dog& other) = delete;
-        Dog& operator=(const Dog& other) = delete;
-
-        Dog(Dog&& other) noexcept;
-        Dog& operator=(Dog&& other) noexcept;
+        Dog(const Dog& other) noexcept;
+        Dog& operator=(const Dog& other) noexcept;
 
         void setSpeed(float speed);
         Eend::Point2D getPosition();
@@ -60,7 +57,7 @@ class Dog {
         static constexpr float M_DELETE_AFTER_DEATH_TIME = 5.0f;
 
         Type m_type;
-        std::optional<Eend::BoardId> m_bodyId;
+        Eend::BoardId m_bodyId;
         Eend::Point2D m_position;
         float m_speed;
         Eend::Vector2D m_knockback;

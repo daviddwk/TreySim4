@@ -14,24 +14,19 @@ Item::Item(Item::Type type, Eend::Point position)
 
 Item::~Item() { Eend::Entities::boards().erase(m_sprite); }
 
-Item::Item(Item&& other) noexcept
-    : m_bodyId(/* copy entity using batch syfstem */), m_type(other.m_type),
-      m_position(other.m_position) {}
+Item::Item(const Item& other) noexcept
+    : m_type(other.m_type), m_position(other.m_position),
+      m_sprite(Eend::Entities::boards().clone(other.m_sprite)) {}
 
-Item& Item::operator=(Item&& other) noexcept {
-    // Self-assignment detection
+Item& Item::operator=(const Item& other) noexcept {
+
     if (&other == this) return *this;
 
-    // delete entitiy
-    // if (m_bodyId) Eend::Entities::boards().erase(*m_bodyId);
+    Eend::Entities::boards().erase(m_sprite);
 
-    // transfer ownership
     m_type = other.m_type;
     m_position = other.m_position;
-
-    // release ownership
-    // actually copy entity
-    // other.m_bodyId = std::nullopt;
+    m_sprite = Eend::Entities::boards().clone(other.m_sprite);
 
     return *this;
 }

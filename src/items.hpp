@@ -12,11 +12,8 @@ class Item {
         Item(Item::Type type, Eend::Point position);
         ~Item();
 
-        Item(const Item& other) = delete;
-        Item& operator=(const Item& other) = delete;
-
-        Item(Item&& other) noexcept;
-        Item& operator=(Item&& other) noexcept;
+        Item(const Item& other) noexcept;
+        Item& operator=(const Item& other) noexcept;
 
         Eend::Point getPosition();
 
