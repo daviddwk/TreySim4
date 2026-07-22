@@ -24,6 +24,7 @@ class Trey {
         void setRotation(Eend::Angle rotation);
         void setPosition(Eend::Point position);
         void setAlive(bool alive);
+        void setItem(Item::Type itemType);
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();

@@ -25,7 +25,7 @@ Trey::Trey()
       m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)),
       m_targetRotation(Eend::Angle(0.0f)), m_bodyTimer(0.075f), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_height(0.0f), m_alive(true), m_item(Item::Type::doubleKick) {
+      m_upVelocity(0.0f), m_height(0.0f), m_alive(true), m_item(std::nullopt) {
 
     Eend::Board* const body = Eend::Entities::boards().getRef(m_bodyId);
     Eend::Board* const eye = Eend::Entities::boards().getRef(m_eyeId);
@@ -77,6 +77,7 @@ Trey& Trey::get() {
 
 void Trey::setPosition(Eend::Point position) { m_position = position; }
 void Trey::setAlive(bool alive) { m_alive = alive; }
+void Trey::setItem(Item::Type itemType) { m_item = itemType; }
 
 Eend::Point Trey::getPosition() { return m_position; };
 Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };

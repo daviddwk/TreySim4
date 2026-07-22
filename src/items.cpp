@@ -9,7 +9,9 @@ constexpr Eend::Scale2D SCALE = Eend::Scale2D(5.0f);
 Item::Item(Item::Type type, Eend::Point position)
     : m_type(type), m_position(position),
       m_sprite(Eend::Entities::boards().insert(Item::spritePath(type))) {
-    Eend::Entities::boards().getRef(m_sprite)->setScale(Eend::Scale2D(SCALE));
+    Eend::Board* spriteRef = Eend::Entities::boards().getRef(m_sprite);
+    spriteRef->setScale(Eend::Scale2D(SCALE));
+    spriteRef->setPosition(position);
 }
 
 Item::~Item() { Eend::Entities::boards().erase(m_sprite); }
@@ -32,6 +34,8 @@ Item& Item::operator=(const Item& other) noexcept {
 }
 
 Eend::Point Item::getPosition() { return m_position; }
+
+Item::Type Item::getType() { return m_type; }
 
 std::filesystem::path Item::spritePath(Item::Type type) {
     switch (type) {

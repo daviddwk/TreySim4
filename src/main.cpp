@@ -11,7 +11,6 @@
 #include <Eendgine/types.hpp>
 #include <Eendgine/window.hpp>
 
-#include <cmath>
 #include <stb/stb_image.h>
 
 #include <filesystem>
@@ -23,8 +22,6 @@
 #include "text.hpp"
 #include "textBox.hpp"
 #include "trey.hpp"
-
-#include "items.hpp" // TODO rm because it'll get in through park
 
 namespace Eend = Eendgine;
 

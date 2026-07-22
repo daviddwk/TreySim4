@@ -16,6 +16,7 @@ class Item {
         Item& operator=(const Item& other) noexcept;
 
         Eend::Point getPosition();
+        Item::Type getType();
 
         static Item::Type typeFromString(std::string typeString);
 

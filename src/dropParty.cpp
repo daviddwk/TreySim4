@@ -1,5 +1,7 @@
 #include "dropParty.hpp"
 
+#include "trey.hpp"
+
 #include <Eendgine/fatalError.hpp>
 #include <Eendgine/jsonUtils.hpp>
 #include <Eendgine/random.hpp>
@@ -36,15 +38,28 @@ DropParty::DropParty(std::filesystem::path parkPath) {
 }
 
 void DropParty::update() {
-    // actually spawn things TODO
+    // spawn things
     for (Spawn& spawn : m_spawns) {
-        if (spawn.empty) {
+        if (!spawn.item) {
             Eend::Point2D position2d = Park::get().positionAtTile(spawn.tile);
             Eend::Point position = Eend::Point(
                 position2d.x,
                 position2d.y,
                 Park::get().heightAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
-            m_items.emplace_back(spawn.type, position);
+            spawn.item = Item(spawn.type, position);
+        }
+    }
+    // get item
+    for (Spawn& spawn : m_spawns) {
+        if (spawn.item) {
+            const Eend::Point treyPosition = Trey::get().getPosition();
+            const float treyRadius = Trey::get().getRadius();
+            const float distance = glm::length(spawn.item->getPosition() - treyPosition);
+            if (distance < treyRadius) {
+                // give trey power
+                Trey::get().setItem(spawn.item->getType());
+                spawn.item = std::nullopt;
+            }
         }
     }
 }
