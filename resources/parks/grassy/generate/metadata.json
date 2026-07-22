@@ -65,7 +65,7 @@
     {
       "type" : "doubleKick",
       "frequency" : 5000,
-      "position" : [15, 35]
+      "position" : [15, 15]
     }
   ],
 	"Waves": [

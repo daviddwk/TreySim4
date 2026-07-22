@@ -13,11 +13,12 @@ class DropParty {
         class Spawn {
             public:
                 Spawn(Tile position, Item::Type type, std::chrono::milliseconds frequency)
-                    : tile(position), type(type), item(std::nullopt), frequency(frequency) {};
-                Tile tile;
-                Item::Type type;
+                    : tile(position), type(type), frequency(frequency), item(std::nullopt),
+                      nextSpawn(std::chrono::steady_clock::now() + frequency) {};
+                const Tile tile;
+                const Item::Type type;
+                const std::chrono::milliseconds frequency;
                 std::optional<Item> item;
-                std::chrono::milliseconds frequency;
                 std::chrono::time_point<std::chrono::steady_clock> nextSpawn;
         };
 

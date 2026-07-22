@@ -6,6 +6,7 @@
 #include <Eendgine/jsonUtils.hpp>
 #include <Eendgine/random.hpp>
 
+#include <chrono>
 #include <glm/glm.hpp>
 #include <json/json.h>
 #include <print>
@@ -38,9 +39,10 @@ DropParty::DropParty(std::filesystem::path parkPath) {
 }
 
 void DropParty::update() {
+    auto now = std::chrono::steady_clock::now();
     // spawn things
     for (Spawn& spawn : m_spawns) {
-        if (!spawn.item) {
+        if (!spawn.item && (now >= spawn.nextSpawn)) {
             Eend::Point2D position2d = Park::get().positionAtTile(spawn.tile);
             Eend::Point position = Eend::Point(
                 position2d.x,
@@ -59,6 +61,7 @@ void DropParty::update() {
                 // give trey power
                 Trey::get().setItem(spawn.item->getType());
                 spawn.item = std::nullopt;
+                spawn.nextSpawn = now + spawn.frequency;
             }
         }
     }
