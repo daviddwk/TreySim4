@@ -33,7 +33,7 @@ class Trey {
 
         bool isKicking();
         // return true if dog dies
-        bool kick(Dog& dog);
+        bool hit(Dog& dog);
 
         void update();
 
@@ -64,6 +64,9 @@ class Trey {
         bool updateDirection();
         void updateBody(float dt);
 
+        void regularKick();
+        void doubleKick();
+
         void handleMovement(float dt, std::optional<Direction> direction);
         void updatePosition(float dt);
         void handleCollision(Eend::Point& oldPosition);
@@ -84,7 +87,6 @@ class Trey {
         bool m_kicking;
         bool m_inAir;
         float m_upVelocity;
-        float m_height;
         Facing m_facing;
         bool m_moving;
         bool m_alive;

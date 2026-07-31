@@ -105,7 +105,7 @@ void PuppyMill::damage() {
 
     if (Trey::get().isKicking()) {
         for (Dog& dog : m_dogs) {
-            bool dogDies = Trey::get().kick(dog);
+            bool dogDies = Trey::get().hit(dog);
             if (dogDies) m_numKilled++;
         }
     }

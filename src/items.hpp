@@ -7,7 +7,7 @@ namespace Eend = Eendgine;
 
 class Item {
     public:
-        enum class Type { doubleKick };
+        enum class Type { none, doubleKick };
 
         Item(Item::Type type, Eend::Point position);
         ~Item();

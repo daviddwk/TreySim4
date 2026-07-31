@@ -25,7 +25,7 @@ Trey::Trey()
       m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)),
       m_targetRotation(Eend::Angle(0.0f)), m_bodyTimer(0.075f), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_height(0.0f), m_alive(true), m_item(std::nullopt) {
+      m_upVelocity(0.0f), m_alive(true), m_item(std::nullopt) {
 
     Eend::Board* const body = Eend::Entities::boards().getRef(m_bodyId);
     Eend::Board* const eye = Eend::Entities::boards().getRef(m_eyeId);
@@ -93,59 +93,56 @@ void Trey::update() {
         if (m_moving) {
             Trey::updatePosition(dt);
         }
-    }
-    handleCollision(oldTreyPosition);
 
-    float heightAtPoint = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
+        float heightAtPoint = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
+        m_kicking = false;
 
-    m_kicking = false;
-    if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir && m_alive) {
-        m_kicking = true;
-        m_inAir = true;
-        if (m_item) {
-            if (*m_item == Item::Type::doubleKick) {
+        if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir) {
+            m_kicking = true;
+            m_inAir = true;
+            m_position.z = heightAtPoint + 0.1f;
+            if (m_item) {
+                if (*m_item == Item::Type::doubleKick) {
+                    m_upVelocity = -M_GRAVITY * 20.0f;
+
+                    Eend::Particles::get().create(
+                        m_position,
+                        2,
+                        getKickParticleProperties(m_facing.getDirection()));
+                    Eend::Particles::get().create(
+                        m_position,
+                        2,
+                        getKickParticleProperties(m_facing.getOpposite()));
+                    Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
+                    Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+                }
+            } else {
                 m_upVelocity = -M_GRAVITY * 20.0f;
-                m_height = heightAtPoint + 0.1f;
 
                 Eend::Particles::get().create(
                     m_position,
                     2,
                     getKickParticleProperties(m_facing.getDirection()));
-                Eend::Particles::get().create(
-                    m_position,
-                    2,
-                    getKickParticleProperties(m_facing.getOpposite()));
                 Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
                 Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
             }
+        } else if (m_inAir) {
+            m_upVelocity += M_GRAVITY;
+            m_position.z += (m_upVelocity * dt);
+            if (m_position.z < heightAtPoint) {
+                m_inAir = false;
+                m_position.z = heightAtPoint;
+            }
         } else {
-            m_upVelocity = -M_GRAVITY * 20.0f;
-            m_height = heightAtPoint + 0.1f;
-
-            Eend::Particles::get().create(
-                m_position,
-                2,
-                getKickParticleProperties(m_facing.getDirection()));
-            Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
-            Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+            m_position.z = heightAtPoint;
         }
-    } else if (m_inAir) {
-        m_upVelocity += M_GRAVITY;
-        m_height += (m_upVelocity * dt);
-        if (m_height < heightAtPoint) {
-            m_inAir = false;
-            m_height = heightAtPoint;
-        }
-    } else {
-        m_height = heightAtPoint;
     }
 
-    m_position.z = m_height;
-
+    Trey::handleCollision(oldTreyPosition);
     Trey::updateBody(dt);
 }
 
-bool Trey::kick(Dog& dog) {
+bool Trey::hit(Dog& dog) {
     bool dies = false;
     if (m_item) {
         if (*m_item == Item::Type::doubleKick) {
@@ -180,6 +177,7 @@ bool Trey::kick(Dog& dog) {
             dies = dog.giveDamage(1);
         }
     }
+    // TODO dies = dog.giveDamage(m_item.hit(dog, m_rotation, m_position));
     return dies;
 }
 

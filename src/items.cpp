@@ -42,9 +42,6 @@ std::filesystem::path Item::spritePath(Item::Type type) {
     case Item::Type::doubleKick:
         return std::filesystem::path("resources/duck/statues/body");
         break;
-    default:
-        return std::filesystem::path("resources/duck/statues/body");
-        break;
     }
 }
 
