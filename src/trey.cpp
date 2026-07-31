@@ -8,6 +8,7 @@
 #include "collision.hpp"
 #include "park.hpp"
 
+#include "treyFeet.hpp"
 #include "treyParticles.hpp"
 
 #include "trey.hpp"
@@ -123,28 +124,10 @@ void Trey::kick() {
     m_position.z = heightAtPoint + 0.1f;
     if (m_item) {
         if (*m_item == Item::Type::doubleKick) {
-            m_upVelocity = -M_GRAVITY * 20.0f;
-
-            Eend::Particles::get().create(
-                m_position,
-                2,
-                getKickParticleProperties(m_facing.getDirection()));
-            Eend::Particles::get().create(
-                m_position,
-                2,
-                getKickParticleProperties(m_facing.getOpposite()));
-            Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
-            Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+            doubleKick(m_position, m_facing, m_upVelocity);
         }
     } else {
-        m_upVelocity = -M_GRAVITY * 20.0f;
-
-        Eend::Particles::get().create(
-            m_position,
-            2,
-            getKickParticleProperties(m_facing.getDirection()));
-        Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
-        Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+        regularKick(m_position, m_facing, m_upVelocity);
     }
 }
 
@@ -152,36 +135,10 @@ bool Trey::hit(Dog& dog) {
     bool dies = false;
     if (m_item) {
         if (*m_item == Item::Type::doubleKick) {
-            std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
-                dog.getPosition3d(),
-                Eend::Sphere(getPosition(), M_KICK_RADIUS),
-                m_rotation,
-                M_KICK_SPREAD);
-            if (kick) {
-                // include the damage here also I think
-                dog.kick(*kick);
-                dies = dog.giveDamage(1);
-            }
-            kick = pointToSphereSliceEdgeRelative(
-                dog.getPosition3d(),
-                Eend::Sphere(getPosition(), M_KICK_RADIUS),
-                m_rotation + Eend::Angle(180.0f),
-                M_KICK_SPREAD);
-            if (kick) {
-                dog.kick(*kick);
-                dies = dog.giveDamage(1);
-            }
+            dies = doubleHit(m_position, m_rotation, dog);
         }
     } else {
-        std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
-            dog.getPosition3d(),
-            Eend::Sphere(getPosition(), M_KICK_RADIUS),
-            m_rotation,
-            M_KICK_SPREAD);
-        if (kick) {
-            dog.kick(*kick);
-            dies = dog.giveDamage(1);
-        }
+        dies = regularHit(m_position, m_rotation, dog);
     }
     // TODO dies = dog.giveDamage(m_item.hit(dog, m_rotation, m_position));
     return dies;

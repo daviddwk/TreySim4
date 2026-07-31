@@ -51,21 +51,12 @@ class Trey {
 
         inline static Trey* m_instance = nullptr;
 
-        static constexpr float M_MOVE_SPEED = 25.0f;
-        static constexpr float M_KICK_RADIUS = 15.0f;
-        static constexpr float M_KICK_OFFSET = 5.0f;
-        static constexpr float M_KICK_SPREAD = 120.0f;
         static constexpr float M_TREY_RADIUS = 5.0f;
+        static constexpr float M_MOVE_SPEED = 25.0f;
         static constexpr float M_GRAVITY = -1.0f; // only ducks believe in gravity
-
-        const std::filesystem::path M_JUMP_NOISE_PATH =
-            std::filesystem::path("resources/noises/Quack_Fart_Noise_44k.wav");
 
         bool updateDirection();
         void updateBody(float dt);
-
-        void regularKick();
-        void doubleKick();
 
         void handleMovement(float dt, std::optional<Direction> direction);
         void updatePosition(float dt);
