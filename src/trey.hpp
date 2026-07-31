@@ -70,6 +70,7 @@ class Trey {
         void handleMovement(float dt, std::optional<Direction> direction);
         void updatePosition(float dt);
         void handleCollision(Eend::Point& oldPosition);
+        void kick();
 
         Direction oppositeDirection(Direction direction);
 

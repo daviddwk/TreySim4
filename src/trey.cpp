@@ -94,39 +94,13 @@ void Trey::update() {
             Trey::updatePosition(dt);
         }
 
-        float heightAtPoint = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
         m_kicking = false;
 
         if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir) {
-            m_kicking = true;
-            m_inAir = true;
-            m_position.z = heightAtPoint + 0.1f;
-            if (m_item) {
-                if (*m_item == Item::Type::doubleKick) {
-                    m_upVelocity = -M_GRAVITY * 20.0f;
-
-                    Eend::Particles::get().create(
-                        m_position,
-                        2,
-                        getKickParticleProperties(m_facing.getDirection()));
-                    Eend::Particles::get().create(
-                        m_position,
-                        2,
-                        getKickParticleProperties(m_facing.getOpposite()));
-                    Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
-                    Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
-                }
-            } else {
-                m_upVelocity = -M_GRAVITY * 20.0f;
-
-                Eend::Particles::get().create(
-                    m_position,
-                    2,
-                    getKickParticleProperties(m_facing.getDirection()));
-                Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
-                Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
-            }
+            Trey::kick();
         } else if (m_inAir) {
+            float heightAtPoint =
+                Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
             m_upVelocity += M_GRAVITY;
             m_position.z += (m_upVelocity * dt);
             if (m_position.z < heightAtPoint) {
@@ -134,12 +108,44 @@ void Trey::update() {
                 m_position.z = heightAtPoint;
             }
         } else {
-            m_position.z = heightAtPoint;
+            m_position.z = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
         }
     }
 
     Trey::handleCollision(oldTreyPosition);
     Trey::updateBody(dt);
+}
+
+void Trey::kick() {
+    float heightAtPoint = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
+    m_kicking = true;
+    m_inAir = true;
+    m_position.z = heightAtPoint + 0.1f;
+    if (m_item) {
+        if (*m_item == Item::Type::doubleKick) {
+            m_upVelocity = -M_GRAVITY * 20.0f;
+
+            Eend::Particles::get().create(
+                m_position,
+                2,
+                getKickParticleProperties(m_facing.getDirection()));
+            Eend::Particles::get().create(
+                m_position,
+                2,
+                getKickParticleProperties(m_facing.getOpposite()));
+            Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
+            Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+        }
+    } else {
+        m_upVelocity = -M_GRAVITY * 20.0f;
+
+        Eend::Particles::get().create(
+            m_position,
+            2,
+            getKickParticleProperties(m_facing.getDirection()));
+        Eend::Particles::get().create(m_position, 5, getJumpParticleProperties());
+        Eend::Audio::get().playNoise(M_JUMP_NOISE_PATH, 100.0f);
+    }
 }
 
 bool Trey::hit(Dog& dog) {
