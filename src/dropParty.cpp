@@ -47,7 +47,7 @@ void DropParty::update() {
             Eend::Point position = Eend::Point(
                 position2d.x,
                 position2d.y,
-                Park::get().heightAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
+                Park::get().elevationAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
             spawn.item = Item(spawn.type, position);
         }
     }

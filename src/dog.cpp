@@ -18,7 +18,8 @@ Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Dog::Type typ
     Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
     boardRef->setStrip("walk");
     boardRef->setScale(scale);
-    boardRef->setPosition(Eend::Point(position.x, Park::get().heightAtPoint(position), position.y));
+    boardRef->setPosition(
+        Eend::Point(position.x, Park::get().elevationAtPoint(position), position.y));
 }
 Dog::~Dog() { Eend::Entities::boards().erase(m_bodyId); }
 
@@ -77,7 +78,7 @@ void Dog::setSpeed(float speed) { m_speed = speed; }
 Eend::Point2D Dog::getPosition() { return m_position; }
 
 Eend::Point Dog::getPosition3d() {
-    return Eend::Point(m_position.x, m_position.y, Park::get().heightAtPoint(m_position));
+    return Eend::Point(m_position.x, m_position.y, Park::get().elevationAtPoint(m_position));
 }
 
 unsigned int Dog::getDamage() { return M_DAMAGE; }
@@ -155,7 +156,7 @@ void Dog::update() {
         Eend::Point(
             m_position.x,
             m_position.y,
-            Park::get().heightAtPoint(m_position) + M_UP_OFFSET));
+            Park::get().elevationAtPoint(m_position) + M_UP_OFFSET));
 }
 
 Dog::Type Dog::stringToType(std::string string) {

@@ -26,7 +26,7 @@ class Park {
         float getWidth();
         Eend::Point getSpawn();
 
-        float heightAtPoint(Eend::Point2D point);
+        float elevationAtPoint(Eend::Point2D point);
         Eend::Point positionAtTile(Tile tile);
         Eend::Point positionAtTile(Tile tile, float heightOffset);
 

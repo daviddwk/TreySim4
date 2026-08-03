@@ -96,20 +96,19 @@ void Trey::update() {
         }
 
         m_kicking = false;
+        float elevationAtPosition = Park::get().elevationAtPoint(m_position);
 
         if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir) {
-            Trey::kick();
+            Trey::kick(elevationAtPosition);
         } else if (m_inAir) {
-            float heightAtPoint =
-                Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
             m_upVelocity += M_GRAVITY;
             m_position.z += (m_upVelocity * dt);
-            if (m_position.z < heightAtPoint) {
+            if (m_position.z < elevationAtPosition) {
                 m_inAir = false;
-                m_position.z = heightAtPoint;
+                m_position.z = elevationAtPosition;
             }
         } else {
-            m_position.z = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
+            m_position.z = elevationAtPosition;
         }
     }
 
@@ -117,11 +116,10 @@ void Trey::update() {
     Trey::updateBody(dt);
 }
 
-void Trey::kick() {
-    float heightAtPoint = Park::get().heightAtPoint(Eend::Point2D(m_position.x, m_position.y));
+void Trey::kick(float elevationAtPosition) {
     m_kicking = true;
     m_inAir = true;
-    m_position.z = heightAtPoint + 0.1f;
+    m_position.z = elevationAtPosition + 0.1f;
     if (m_item) {
         if (*m_item == Item::Type::doubleKick) {
             doubleKick(m_position, m_facing, m_upVelocity);
@@ -140,7 +138,6 @@ bool Trey::hit(Dog& dog) {
     } else {
         dies = regularHit(m_position, m_rotation, dog);
     }
-    // TODO dies = dog.giveDamage(m_item.hit(dog, m_rotation, m_position));
     return dies;
 }
 

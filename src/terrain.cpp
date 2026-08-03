@@ -189,10 +189,10 @@ Eend::Point Terrain::positionAtTile(const Tile tile, const float heightOffset) {
     return Eend::Point(
         (tile.x * m_scale.x) + (m_scale.x / 2.0),
         (tile.y * -m_scale.y) + (-m_scale.y / 2.0),
-        heightOffset + heightAtPoint(Eend::Point2D(tile.x * m_scale.x, tile.y * -m_scale.y)));
+        heightOffset + elevationAtPoint(Eend::Point2D(tile.x * m_scale.x, tile.y * -m_scale.y)));
 }
 
-float Terrain::heightAtPoint(Eend::Point2D point) {
+float Terrain::elevationAtPoint(Eend::Point2D point) {
 
     // TODO I'm flipping the y around randomly here
     // be more explicit about pixel coords vs 3d coords

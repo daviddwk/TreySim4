@@ -81,7 +81,7 @@ float Park::getWidth() { return m_terrain->getWidth(); }
 
 Eend::Point Park::getSpawn() { return m_terrain->getSpawn(); }
 
-float Park::heightAtPoint(Eend::Point2D point) { return m_terrain->heightAtPoint(point); }
+float Park::elevationAtPoint(Eend::Point2D point) { return m_terrain->elevationAtPoint(point); }
 
 Eend::Point Park::positionAtTile(Tile tile) { return m_terrain->positionAtTile(tile); }
 

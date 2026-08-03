@@ -45,7 +45,7 @@ class Terrain {
         bool playgroundIsEnabled(const std::string& playgroundName);
         void playgroundToggle(const std::string& playgroundName);
 
-        float heightAtPoint(Eend::Point2D point);
+        float elevationAtPoint(Eend::Point2D point);
         Eend::Point positionAtTile(Tile tile);
         Eend::Point positionAtTile(Tile tile, float heightOffset);
 

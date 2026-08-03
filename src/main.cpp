@@ -261,7 +261,7 @@ static void unpausedUpdate() {
     if (Eend::InputManager::get().onKeyDown(SDL_SCANCODE_W)) Park::get().nextWave(); // DEBUG
 
     Eend::Point treyPosition = Trey::get().getPosition();
-    float terrainHeight = Park::get().heightAtPoint(Eend::Point2D(treyPosition.x, treyPosition.y));
+    float terrainHeight = Park::get().elevationAtPoint(treyPosition);
 
     static Eend::Point lastCameraPosition =
         Eend::Point(treyPosition.x, treyPosition.y - 25.0f, terrainHeight + 12.5f);
