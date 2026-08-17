@@ -263,11 +263,14 @@ static void unpausedUpdate() {
     Eend::Point treyPosition = Trey::get().getPosition();
     float terrainHeight = Park::get().elevationAtPoint(treyPosition);
 
-    static Eend::Point lastCameraPosition =
-        Eend::Point(treyPosition.x, treyPosition.y - 25.0f, terrainHeight + 12.5f);
+    const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 12.5f);
+    // const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 20.0f); // DEBUG
+    const float cameraLag = (10.0f * dt);
+    // const float cameraLag = (10000.0f * dt); // DEBUG
+
+    Eend::Point lastCameraPosition = Eend::Cameras::getScene().getPosition();
     Eend::Point approachCameraPosition =
-        Eend::Point(treyPosition.x, treyPosition.y - 25.0f, terrainHeight + 12.5f);
-    float cameraLag = (10.0f * dt);
+        Eend::Point(treyPosition.x, treyPosition.y, terrainHeight) + cameraOffset;
     lastCameraPosition =
         (lastCameraPosition + (approachCameraPosition * cameraLag)) / (cameraLag + 1.0f);
     Eend::Cameras::getScene().setPosition(lastCameraPosition);
