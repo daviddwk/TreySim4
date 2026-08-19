@@ -15,6 +15,7 @@
 
 #include <filesystem>
 
+#include "cutscene.hpp"
 #include "duck.hpp"
 #include "hud.hpp"
 #include "menu.hpp"
@@ -132,11 +133,15 @@ int main() {
 
                 Hud::get().update();
 
-                pauseLatch(paused, dead);
-                if (paused) {
-                    pausedUpdate();
-                } else {
-                    unpausedUpdate();
+                bool cutscene = CutscenePlayer::update();
+
+                if (!cutscene) {
+                    pauseLatch(paused, dead);
+                    if (paused) {
+                        pausedUpdate();
+                    } else {
+                        unpausedUpdate();
+                    }
                 }
 
                 Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
@@ -263,10 +268,10 @@ static void unpausedUpdate() {
     Eend::Point treyPosition = Trey::get().getPosition();
     float terrainHeight = Park::get().elevationAtPoint(treyPosition);
 
-    const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 12.5f);
-    // const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 20.0f); // DEBUG
-    const float cameraLag = (10.0f * dt);
-    // const float cameraLag = (10000.0f * dt); // DEBUG
+    // const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 12.5f);
+    const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 50.0f); // DEBUG
+    // const float cameraLag = (10.0f * dt);
+    const float cameraLag = (10000.0f * dt); // DEBUG
 
     Eend::Point lastCameraPosition = Eend::Cameras::getScene().getPosition();
     Eend::Point approachCameraPosition =
