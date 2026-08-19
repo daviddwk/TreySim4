@@ -26,11 +26,13 @@
 
 namespace Eend = Eendgine;
 
+static void startFrame();
+static void endFrame();
+static void pauseLatch(bool& paused, bool& dead);
 static void onStart();
 static void pausedUpdate();
 static void onDeath();
 static void unpausedUpdate();
-static void pauseLatch(bool& paused, bool& dead);
 static void onRespawn();
 static void onPause();
 static void onUnpause();
@@ -49,11 +51,11 @@ int main() {
     Eend::Entities::construct();
     Eend::Particles::construct();
     Eend::Shaders::construct(
-        Eend::ShaderProgram("shaders/panel.vert", "shaders/panel.frag"),
-        Eend::ShaderProgram("shaders/board.vert", "shaders/board.frag"),
-        Eend::ShaderProgram("shaders/statue.vert", "shaders/statue.frag"),
-        Eend::ShaderProgram("shaders/doll.vert", "shaders/doll.frag"),
-        Eend::ShaderProgram("shaders/screen.vert", "shaders/screen.frag"));
+        Eend::ShaderProgram(Eend::SHADER_PATH_PANEL_VERT, Eend::SHADER_PATH_PANEL_FRAG),
+        Eend::ShaderProgram(Eend::SHADER_PATH_BOARD_VERT, Eend::SHADER_PATH_BOARD_FRAG),
+        Eend::ShaderProgram(Eend::SHADER_PATH_STATUE_VERT, Eend::SHADER_PATH_STATUE_FRAG),
+        Eend::ShaderProgram(Eend::SHADER_PATH_DOLL_VERT, Eend::SHADER_PATH_DOLL_FRAG),
+        Eend::ShaderProgram(Eend::SHADER_PATH_SCREEN_VERT, Eend::SHADER_PATH_SCREEN_FRAG));
     Eend::Cameras::construct(
         Eend::Camera2D(screenWidth, screenHeight),
         // starting position for menu
@@ -67,17 +69,12 @@ int main() {
     Menu::construct();
     while (menu && !Eend::InputManager::get().getShouldClose()) { // exit menu
         bool start = false;
-        Eend::FrameLimiter::get().startInterval();
-        Eend::Screen::get().bind();
-        Eend::InputManager::get().processInput();
-        Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
+
+        startFrame();
 
         Menu::get().update(start, menu);
 
-        Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
-        Eend::Screen::get().render();
-        Eend::Window::get().swapBuffers();
-        Eend::FrameLimiter::get().stopInterval();
+        endFrame();
 
         if (start) {
             Menu::destruct();
@@ -93,10 +90,7 @@ int main() {
                 static bool paused = false;
                 static bool dead = false;
 
-                Eend::FrameLimiter::get().startInterval();
-                Eend::Screen::get().bind();
-                Eend::InputManager::get().processInput();
-                Eend::Shaders::get().getShader(Eend::Shader::screen).setInt("pixelSize", 5);
+                startFrame();
 
                 Hud::get().update();
 
@@ -109,10 +103,7 @@ int main() {
                     }
                 }
 
-                Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
-                Eend::Screen::get().render();
-                Eend::Window::get().swapBuffers();
-                Eend::FrameLimiter::get().stopInterval();
+                endFrame();
             }
             Eend::InputManager::get().setShouldClose(false);
 
@@ -139,24 +130,20 @@ int main() {
     return 0;
 }
 
-static void onStart() {
+static void startFrame() {
+    Eend::FrameLimiter::get().startInterval();
+    Eend::Screen::get().bind();
+    Eend::InputManager::get().processInput();
+    Eend::Shaders::get()
+        .getShader(Eend::Shader::screen)
+        .setInt(Eend::SHADER_SCREEN_INT_PIXEL_SIZE, 5);
+}
 
-    Trey::get().setPosition(Park::get().getSpawn());
-    Duck::get().setPosition(Park::get().positionAtTile(Tile(15.0f, 15.0f)));
-
-    TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
-    TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
-    TextBoxQueue::get().queue(
-        "duck",
-        Font::daniel,
-        "What the duck did you just call me? You little quack! "
-        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
-        5.0f,
-        true);
-    // Eend::Audio::get().playTrack(
-    //     "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
-    //     50.0f);
-    Park::get().playgroundEnable("tree1"); // DEBUG
+static void endFrame() {
+    Eend::Entities::draw(Eend::Cameras::getHud(), Eend::Cameras::getScene());
+    Eend::Screen::get().render();
+    Eend::Window::get().swapBuffers();
+    Eend::FrameLimiter::get().stopInterval();
 }
 
 static void pauseLatch(bool& paused, bool& dead) {
@@ -192,6 +179,27 @@ static void pauseLatch(bool& paused, bool& dead) {
         }
     }
 }
+
+static void onStart() {
+
+    Trey::get().setPosition(Park::get().getSpawn());
+    Duck::get().setPosition(Park::get().positionAtTile(Tile(15.0f, 15.0f)));
+
+    TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
+    TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
+    TextBoxQueue::get().queue(
+        "duck",
+        Font::daniel,
+        "What the duck did you just call me? You little quack! "
+        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
+        5.0f,
+        true);
+    // Eend::Audio::get().playTrack(
+    //     "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
+    //     50.0f);
+    Park::get().playgroundEnable("tree1"); // DEBUG
+}
+
 static void onDeath() {
     Hud::get().setDeathText(true);
     Trey::get().setAlive(false);
