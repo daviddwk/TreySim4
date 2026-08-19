@@ -1,3 +1,5 @@
+#include "cutscene.hpp"
+
 #include <Eendgine/audio.hpp>
 #include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/inputManager.hpp>

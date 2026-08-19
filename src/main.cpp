@@ -100,9 +100,7 @@ int main() {
 
                 Hud::get().update();
 
-                bool cutscene = CutscenePlayer::update();
-
-                if (!cutscene) {
+                if (!CutscenePlayer::update()) {
                     pauseLatch(paused, dead);
                     if (paused) {
                         pausedUpdate();
@@ -226,8 +224,10 @@ static void unpausedUpdate() {
     float duckDistance = glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
     float interactDistance = 5.0f;
     if ((duckDistance < interactDistance) && Eend::InputManager::get().onKeyUp(SDL_SCANCODE_E)) {
-        TextBoxQueue::get().clear();
-        TextBoxQueue::get().queue("duck", Font::daniel, "Hey man.", 3.0f, true);
+        // TextBoxQueue::get().clear();
+        // TextBoxQueue::get().queue("duck", Font::daniel, "Hey man.", 3.0f, true);
+
+        CutscenePlayer::start(CutsceneType::testOne);
     }
 
     if (Eend::InputManager::get().onKeyDown(SDL_SCANCODE_W)) Park::get().nextWave(); // DEBUG
