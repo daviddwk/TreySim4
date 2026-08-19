@@ -33,6 +33,7 @@ static void onStart();
 static void pausedUpdate();
 static void onDeath();
 static void unpausedUpdate();
+static void cutsceneUpdate();
 static void onRespawn();
 static void onPause();
 static void onUnpause();
@@ -101,6 +102,8 @@ int main() {
                     } else {
                         unpausedUpdate();
                     }
+                } else {
+                    cutsceneUpdate();
                 }
 
                 endFrame();
@@ -261,6 +264,12 @@ static void unpausedUpdate() {
     Eend::Particles::get().update();
     // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
     Park::get().update();
+}
+
+static void cutsceneUpdate() {
+    TextBoxQueue::get().update();
+    Eend::Particles::get().update();
+    // Park::get().update();
 }
 
 static void onEnd() {}
