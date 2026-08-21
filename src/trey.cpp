@@ -84,37 +84,41 @@ Eend::Point Trey::getPosition() { return m_position; };
 Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
 float Trey::getRadius() { return M_TREY_RADIUS; }
 
-void Trey::update() {
+void Trey::update(bool activeCutscene) {
 
     float dt = Eend::FrameLimiter::get().deltaTime;
-    Eend::Point oldTreyPosition = getPosition();
+    if (!activeCutscene) {
+        Eend::Point oldTreyPosition = getPosition();
 
-    if (m_alive) {
-        Trey::updateDirection();
-        if (m_moving) {
-            Trey::updatePosition(dt);
-        }
+        if (m_alive) {
+            Trey::updateDirection();
+            if (m_moving) {
+                Trey::updatePosition(dt);
+            }
 
-        m_kicking = false;
-        float elevationAtPosition = Park::get().elevationAtPoint(m_position);
+            m_kicking = false;
+            float elevationAtPosition = Park::get().elevationAtPoint(m_position);
 
-        if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir) {
-            Trey::kick(elevationAtPosition);
-        } else if (m_inAir) {
-            m_upVelocity += M_GRAVITY;
-            m_position.z += (m_upVelocity * dt);
-            if (m_position.z < elevationAtPosition) {
-                m_inAir = false;
+            if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir) {
+                Trey::kick(elevationAtPosition);
+            } else if (m_inAir) {
+                m_upVelocity += M_GRAVITY;
+                m_position.z += (m_upVelocity * dt);
+                if (m_position.z < elevationAtPosition) {
+                    m_inAir = false;
+                    m_position.z = elevationAtPosition;
+                }
+            } else {
                 m_position.z = elevationAtPosition;
             }
-        } else {
-            m_position.z = elevationAtPosition;
         }
-    }
 
-    Trey::handleCollision(oldTreyPosition);
+        Trey::handleCollision(oldTreyPosition);
+    }
     Trey::updateBody(dt);
 }
+
+void Trey::cutsceneUpdate() { Trey::updateBody(Eend::FrameLimiter::get().deltaTime); }
 
 void Trey::kick(float elevationAtPosition) {
     m_kicking = true;

@@ -1,12 +1,10 @@
 #include "trey.hpp"
 
-#include <Eendgine/timer.hpp>
-
 #include <memory>
 #include <optional>
 #include <print>
 
-enum class CutsceneType { testOne };
+enum class CutsceneType { intro };
 
 namespace Eend = Eendgine;
 
@@ -27,6 +25,7 @@ class CutscenePlayer {
         inline static std::optional<std::unique_ptr<Cutscene>> activeCutscene = std::nullopt;
 };
 
+/*
 class TestOne : public Cutscene {
     public:
         TestOne() : m_timer(Eend::Timer(3.0f)) {
@@ -41,6 +40,17 @@ class TestOne : public Cutscene {
             if (m_timer.update(dt)) return false;
             return true;
         };
+
+    private:
+        Eend::Timer m_timer;
+};
+*/
+
+class Intro : public Cutscene {
+    public:
+        Intro();
+        ~Intro();
+        bool update(float dt);
 
     private:
         Eend::Timer m_timer;

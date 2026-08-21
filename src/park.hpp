@@ -17,7 +17,7 @@ class Park {
         static Park& get();
 
         // maybe have an update function so that this actually gets set at end of frame
-        void update();
+        void update(bool activeCutscene);
         void reset();
 
         bool colliding(Eend::Point2D point);

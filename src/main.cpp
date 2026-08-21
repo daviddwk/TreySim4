@@ -32,8 +32,7 @@ static void pauseLatch(bool& paused, bool& dead);
 static void onStart();
 static void pausedUpdate();
 static void onDeath();
-static void unpausedUpdate();
-static void cutsceneUpdate();
+static void unpausedUpdate(bool activeCutscene);
 static void onRespawn();
 static void onPause();
 static void onUnpause();
@@ -95,15 +94,11 @@ int main() {
 
                 Hud::get().update();
 
-                if (!CutscenePlayer::update()) {
-                    pauseLatch(paused, dead);
-                    if (paused) {
-                        pausedUpdate();
-                    } else {
-                        unpausedUpdate();
-                    }
+                pauseLatch(paused, dead);
+                if (paused) {
+                    pausedUpdate();
                 } else {
-                    cutsceneUpdate();
+                    unpausedUpdate(CutscenePlayer::update());
                 }
 
                 endFrame();
@@ -185,22 +180,8 @@ static void pauseLatch(bool& paused, bool& dead) {
 
 static void onStart() {
 
-    Trey::get().setPosition(Park::get().getSpawn());
-    Duck::get().setPosition(Park::get().positionAtTile(Tile(15.0f, 15.0f)));
-
-    TextBoxQueue::get().queue("duck", Font::daniel, "Help meeeee!", 3.0f, true);
-    TextBoxQueue::get().queue("dog", Font::daniel, "It's over for you bucko.", 3.0f, false);
-    TextBoxQueue::get().queue(
-        "duck",
-        Font::daniel,
-        "What the duck did you just call me? You little quack! "
-        "Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaahhhhhhhhhhhh",
-        5.0f,
-        true);
-    // Eend::Audio::get().playTrack(
-    //     "resources/music/829534__josefpres__piano-loops-192-octave-long-loop-120-bpm.wav",
-    //     50.0f);
-    Park::get().playgroundEnable("tree1"); // DEBUG
+    // using this cutscene to set initial positions i guess
+    CutscenePlayer::start(CutsceneType::intro);
 }
 
 static void onDeath() {
@@ -226,50 +207,45 @@ static void onPause() {}
 
 static void pausedUpdate() {}
 
-static void unpausedUpdate() {
+static void unpausedUpdate(bool activeCutscene) {
     float dt = Eend::FrameLimiter::get().deltaTime;
 
-    Trey::get().update();
-    Duck::get().update();
+    Trey::get().update(activeCutscene);
+    Duck::get().update(activeCutscene);
+    Park::get().update(activeCutscene);
 
-    float duckDistance = glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
-    float interactDistance = 5.0f;
-    if ((duckDistance < interactDistance) && Eend::InputManager::get().onKeyUp(SDL_SCANCODE_E)) {
-        // TextBoxQueue::get().clear();
-        // TextBoxQueue::get().queue("duck", Font::daniel, "Hey man.", 3.0f, true);
+    if (!activeCutscene) {
+        float duckDistance =
+            glm::distance(Trey::get().getPosition2D(), Duck::get().getPosition2D());
+        float interactDistance = 5.0f;
+        if ((duckDistance < interactDistance) &&
+            Eend::InputManager::get().onKeyUp(SDL_SCANCODE_E)) {
+            // TextBoxQueue::get().clear();
+            // TextBoxQueue::get().queue("duck", Font::daniel, "Hey man.", 3.0f, true);
+        }
 
-        CutscenePlayer::start(CutsceneType::testOne);
+        if (Eend::InputManager::get().onKeyDown(SDL_SCANCODE_W)) Park::get().nextWave(); // DEBUG
+
+        Eend::Point treyPosition = Trey::get().getPosition();
+        float terrainHeight = Park::get().elevationAtPoint(treyPosition);
+
+        const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 12.5f);
+        // const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 50.0f); // DEBUG
+        const float cameraLag = (100.0f * dt);
+        // const float cameraLag = (10000.0f * dt); // DEBUG
+
+        Eend::Point lastCameraPosition = Eend::Cameras::getScene().getPosition();
+        Eend::Point approachCameraPosition =
+            Eend::Point(treyPosition.x, treyPosition.y, terrainHeight) + cameraOffset;
+        lastCameraPosition =
+            (lastCameraPosition + (approachCameraPosition * cameraLag)) / (cameraLag + 1.0f);
+        Eend::Cameras::getScene().setPosition(lastCameraPosition);
+        Eend::Cameras::getScene().setTarget(
+            Eend::Point(treyPosition.x, treyPosition.y, terrainHeight + 3.0f));
     }
 
-    if (Eend::InputManager::get().onKeyDown(SDL_SCANCODE_W)) Park::get().nextWave(); // DEBUG
-
-    Eend::Point treyPosition = Trey::get().getPosition();
-    float terrainHeight = Park::get().elevationAtPoint(treyPosition);
-
-    // const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 12.5f);
-    const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 50.0f); // DEBUG
-    // const float cameraLag = (10.0f * dt);
-    const float cameraLag = (10000.0f * dt); // DEBUG
-
-    Eend::Point lastCameraPosition = Eend::Cameras::getScene().getPosition();
-    Eend::Point approachCameraPosition =
-        Eend::Point(treyPosition.x, treyPosition.y, terrainHeight) + cameraOffset;
-    lastCameraPosition =
-        (lastCameraPosition + (approachCameraPosition * cameraLag)) / (cameraLag + 1.0f);
-    Eend::Cameras::getScene().setPosition(lastCameraPosition);
-    Eend::Cameras::getScene().setTarget(
-        Eend::Point(treyPosition.x, treyPosition.y, terrainHeight + 3.0f));
-
     TextBoxQueue::get().update();
     Eend::Particles::get().update();
-    // Eend::Entities::dolls().getRef(testDollId)->setAnim(testAnimScale);
-    Park::get().update();
-}
-
-static void cutsceneUpdate() {
-    TextBoxQueue::get().update();
-    Eend::Particles::get().update();
-    // Park::get().update();
 }
 
 static void onEnd() {}

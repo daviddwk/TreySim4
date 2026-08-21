@@ -49,6 +49,8 @@ void Hud::setDeathText(bool set) {
 void Hud::update() {
     float dt = Eend::FrameLimiter::get().deltaTime;
     Eend::Point treyPosition = Trey::get().getPosition();
+    Eend::Point cameraPosition = Eend::Cameras::getScene().getPosition();
+    Eend::Point cameraTarget = Eend::Cameras::getScene().getTarget();
 
     Eend::Panel::MouseStatus exitMouseStatus =
         Eend::Entities::panels().getRef(m_exitPanel)->isClicked();
@@ -68,9 +70,10 @@ void Hud::update() {
     m_testText.setText(
         std::format(
             "FPS:{:.4f} DT:{:.4f}\n"
-            "X:{:.4f} Y:{:.4f} Z:{:.4f}\n"
-            "duck:{} mouse:{} \n"
-            "mouseX:{} dx:{} mouseY:{} dy:{}\n"
+            "Trey X:{:.4f} Y:{:.4f} Z:{:.4f}\n"
+            "Camera X:{:.4f} Y:{:.4f} Z:{:.4f}\n"
+            "Target X:{:.4f} Y:{:.4f} Z:{:.4f}\n"
+            "mouse:{} mouseX:{} dx:{} mouseY:{} dy:{}\n"
             "left:{} right:{} mid:{}\n"
             "dogs slain:{}",
             1.0f / dt,
@@ -78,7 +81,12 @@ void Hud::update() {
             treyPosition.x,
             treyPosition.y,
             treyPosition.z,
-            false,
+            cameraPosition.x,
+            cameraPosition.y,
+            cameraPosition.z,
+            cameraTarget.x,
+            cameraTarget.y,
+            cameraTarget.z,
             exitMouseString,
             Eend::InputManager::get().getMouseX(),
             Eend::InputManager::get().getDeltaMouseX(),

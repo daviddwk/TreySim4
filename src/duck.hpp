@@ -20,7 +20,7 @@ class Duck {
         float getRadius();
         Eend::Angle getAngle();
 
-        void update();
+        void update(bool activeCutscene);
 
     private:
         Duck();

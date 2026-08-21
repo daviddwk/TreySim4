@@ -52,7 +52,7 @@ Eend::Point Duck::getPosition() { return m_position; };
 Eend::Point2D Duck::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
 float Duck::getRadius() { return M_DUCK_RADIUS; }
 
-void Duck::update() {
+void Duck::update(bool activeCutscene) {
 
     float dt = Eend::FrameLimiter::get().deltaTime;
     m_rotation = m_rotation + Eend::Angle(100 * dt);

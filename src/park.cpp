@@ -27,18 +27,23 @@ Park& Park::get() {
     return *m_instance;
 }
 
-void Park::update() {
+void Park::update(bool activeCutscene) {
 
-    m_puppyMill->update();
-    m_dropParty->update();
     m_terrain->update();
 
-    if (m_nextParkPath) {
-        m_terrain.reset(new Terrain(parksPath / *m_nextParkPath));
-        // after because then the new spawn is set
-        Park::reset();
+    if (!activeCutscene) {
+
+        m_puppyMill->update();
+        m_dropParty->update();
+
+        if (m_nextParkPath) {
+            m_terrain.reset(new Terrain(parksPath / *m_nextParkPath));
+            // after because then the new spawn is set
+            Park::reset();
+        }
+
+        m_nextParkPath = std::nullopt;
     }
-    m_nextParkPath = std::nullopt;
 }
 
 void Park::reset() {

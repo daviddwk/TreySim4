@@ -35,7 +35,8 @@ class Trey {
         // return true if dog dies
         bool hit(Dog& dog);
 
-        void update();
+        void update(bool activeCutscene);
+        void cutsceneUpdate();
 
         HealthBar health;
 
