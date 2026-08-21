@@ -4,6 +4,7 @@
 #include "trey.hpp"
 
 #include <Eendgine/fatalError.hpp>
+#include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/jsonUtils.hpp>
 #include <Eendgine/random.hpp>
 
@@ -60,24 +61,29 @@ void PuppyMill::update() {
 
 unsigned int PuppyMill::getNumKilled() { return m_numKilled; }
 
+int PuppyMill::getNumDogs() { return m_dogs.size(); };
+
+int PuppyMill::getWaveIdx() { return m_waveIdx; };
+
 void PuppyMill::spawn() {
     if (m_spawnWaves.size() == 0) return;
-    auto now = std::chrono::steady_clock::now();
+
+    float dt = Eend::FrameLimiter::get().deltaTime;
 
     if (m_spawnWaves[m_waveIdx].end.has_value()) {
-        if (now > m_spawnWaves[m_waveIdx].end) {
+        if ((*m_spawnWaves[m_waveIdx].end).update(dt)) {
             PuppyMill::nextWave();
         }
     }
 
     for (Spawn& spawn : m_spawnWaves[m_waveIdx].spawns) {
-        if (now > spawn.nextSpawn) {
+        if (spawn.nextSpawn.update(dt)) {
             m_dogs.emplace_back(
                 m_terrain.lock().get()->positionAtTile(spawn.tile),
                 Eend::Scale2D(5.0f, 5.0f),
                 0.0f,
                 spawn.dogType);
-            spawn.nextSpawn = now + spawn.frequency;
+            spawn.nextSpawn = Eend::Timer(spawn.frequency.count() / 1000.0f);
             spawn.dogsSpawned++;
             // no drift but I get a large backlog of dogs for future waves atm
             // next = next + frequency;

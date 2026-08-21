@@ -58,7 +58,11 @@ bool Park::setWaveIdx(std::vector<Dog>::size_type waveIdx) {
 
 bool Park::nextWave() { return m_puppyMill->nextWave(); }
 
-unsigned int Park::numDogsKilled() { return m_puppyMill->getNumKilled(); }
+unsigned int Park::getNumDogsKilled() { return m_puppyMill->getNumKilled(); }
+
+int Park::getNumDogs() { return m_puppyMill->getNumDogs(); }
+
+int Park::getWaveIdx() { return m_puppyMill->getWaveIdx(); }
 
 void Park::setTerrain(std::filesystem::path parkPath) { m_nextParkPath = parkPath; }
 

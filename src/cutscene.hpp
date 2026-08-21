@@ -4,7 +4,7 @@
 #include <optional>
 #include <print>
 
-enum class CutsceneType { intro };
+enum class CutsceneType { intro, newKicks };
 
 namespace Eend = Eendgine;
 
@@ -51,7 +51,16 @@ class Intro : public Cutscene {
         Intro();
         ~Intro();
         bool update(float dt);
+};
+
+class NewKicks : public Cutscene {
+        enum class Subscene { start, duck };
+
+    public:
+        NewKicks();
+        ~NewKicks();
+        bool update(float dt);
 
     private:
-        Eend::Timer m_timer;
+        Subscene m_subscene = Subscene::start;
 };

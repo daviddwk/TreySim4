@@ -95,5 +95,5 @@ void Hud::update() {
             Eend::InputManager::get().isLeftClicked(),
             Eend::InputManager::get().isRightClicked(),
             Eend::InputManager::get().isMiddleClicked(),
-            Park::get().numDogsKilled()));
+            Park::get().getNumDogsKilled()));
 }

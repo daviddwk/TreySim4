@@ -3,6 +3,8 @@
 #include "dog.hpp"
 #include "terrain.hpp"
 
+#include <Eendgine/timer.hpp>
+
 #include <chrono>
 #include <filesystem>
 #include <json/json.h>
@@ -13,23 +15,24 @@ class PuppyMill {
         class Spawn {
             public:
                 Spawn(Tile tile, Dog::Type dogType, std::chrono::milliseconds frequency)
-                    : tile(tile), dogType(dogType), frequency(frequency) {};
+                    : tile(tile), dogType(dogType), frequency(frequency),
+                      nextSpawn(frequency.count() / 1000.0f) {};
                 Tile tile;
                 Dog::Type dogType;
                 std::chrono::milliseconds frequency;
 
-                std::chrono::time_point<std::chrono::steady_clock> nextSpawn;
+                Eend::Timer nextSpawn;
                 int dogsSpawned = 0;
         };
         class Wave {
             public:
                 Wave(std::optional<std::chrono::seconds> duration) : end(std::nullopt) {
                     if (duration.has_value()) {
-                        end = std::chrono::steady_clock::now() + duration.value();
+                        end = static_cast<float>(duration.value().count());
                     }
                 };
                 std::vector<Spawn> spawns;
-                std::optional<std::chrono::time_point<std::chrono::steady_clock>> end;
+                std::optional<Eend::Timer> end;
         };
 
     public:
@@ -43,6 +46,8 @@ class PuppyMill {
         void update();
 
         unsigned int getNumKilled();
+        int getNumDogs();
+        int getWaveIdx();
 
     private:
         void damage();

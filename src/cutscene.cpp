@@ -23,6 +23,9 @@ bool CutscenePlayer::update() {
         case CutsceneType::intro:
             activeCutscene = std::make_unique<Intro>();
             break;
+        case CutsceneType::newKicks:
+            activeCutscene = std::make_unique<NewKicks>();
+            break;
         }
         nextCutscene = std::nullopt;
         return true;
@@ -30,7 +33,7 @@ bool CutscenePlayer::update() {
     return false;
 }
 
-Intro::Intro() : m_timer(3.0f) {
+Intro::Intro() {
     std::print("position set\n");
     Eend::Point duckPosition = Park::get().positionAtTile(Tile(15.0f, 15.0f));
     Duck::get().setPosition(duckPosition);
@@ -56,6 +59,40 @@ bool Intro::update(float dt) {
 
     Eend::Point cameraPosition = Eend::Cameras::getScene().getPosition();
     Eend::Cameras::getScene().setPosition(cameraPosition + Eend::Point(dt));
-    if (m_timer.update(TextBoxQueue::get().isEmpty())) return false;
+
+    if (TextBoxQueue::get().isEmpty()) return false;
+    return true;
+}
+
+NewKicks::NewKicks() {
+    std::print("position set\n");
+    Eend::Cameras::getScene().setPosition(Eend::Point(45.0f, -75.0f, 15.0f));
+    Eend::Cameras::getScene().setTarget(Trey::get().getPosition());
+
+    TextBoxQueue::get().clear();
+    TextBoxQueue::get().queue("duck", Font::daniel, "Nice work chump.", 5.0f, false);
+}
+
+NewKicks::~NewKicks() {
+    // spawn kicks
+}
+
+bool NewKicks::update(float dt) {
+
+    Eend::Point cameraPosition = Eend::Cameras::getScene().getPosition();
+    Eend::Cameras::getScene().setPosition(cameraPosition + Eend::Point(dt));
+
+    if (TextBoxQueue::get().isEmpty()) {
+        switch (m_subscene) {
+        case Subscene::start:
+            TextBoxQueue::get().queue("duck", Font::daniel, "Now try these.", 5.0f, true);
+            Eend::Cameras::getScene().setTarget(Duck::get().getPosition());
+            // spawn kicks
+            m_subscene = Subscene::duck;
+            break;
+        case Subscene::duck:
+            return false;
+        }
+    }
     return true;
 }

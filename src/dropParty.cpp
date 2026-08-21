@@ -29,12 +29,13 @@ DropParty::DropParty(std::filesystem::path parkPath) {
         Json::Value itemJson = itemsJson[itemSpawnIdx];
         Json::Value typeJson = itemsJson[itemSpawnIdx]["type"];
         Json::Value frequencyJson = itemsJson[itemSpawnIdx]["frequency"];
-
+        /*
         m_spawns.emplace_back(
             Eend::jsonVec2(itemsJson[itemSpawnIdx], "position", metadataPath),
             Item::typeFromString(Eend::jsonString(itemsJson[itemSpawnIdx], "type", metadataPath)),
             std::chrono::milliseconds(
                 Eend::jsonInt(itemsJson[itemSpawnIdx], "frequency", metadataPath)));
+        */
     }
 }
 

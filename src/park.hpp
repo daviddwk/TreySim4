@@ -35,7 +35,9 @@ class Park {
         // true if hit the end
         bool nextWave();
 
-        unsigned int numDogsKilled();
+        unsigned int getNumDogsKilled();
+        int getNumDogs();
+        int getWaveIdx();
 
         void setTerrain(std::filesystem::path parkPath);
 

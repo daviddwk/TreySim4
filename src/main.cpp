@@ -231,7 +231,7 @@ static void unpausedUpdate(bool activeCutscene) {
 
         const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 12.5f);
         // const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 50.0f); // DEBUG
-        const float cameraLag = (100.0f * dt);
+        const float cameraLag = (50.0f * dt);
         // const float cameraLag = (10000.0f * dt); // DEBUG
 
         Eend::Point lastCameraPosition = Eend::Cameras::getScene().getPosition();
@@ -244,6 +244,10 @@ static void unpausedUpdate(bool activeCutscene) {
             Eend::Point(treyPosition.x, treyPosition.y, terrainHeight + 3.0f));
     }
 
+    if (Park::get().getNumDogs() == 0 && Park::get().getWaveIdx() == 1) {
+        CutscenePlayer::start(CutsceneType::newKicks);
+        Park::get().nextWave();
+    }
     TextBoxQueue::get().update();
     Eend::Particles::get().update();
 }
