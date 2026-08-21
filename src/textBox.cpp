@@ -57,6 +57,11 @@ void TextBoxQueue::queue(
     m_textBoxQueue.push(TextBoxParams(thumbnail, font, text, seconds, clickToContinue));
 }
 
+bool TextBoxQueue::isEmpty() {
+    if ((m_textBoxQueue.size() == 0) && (!m_textBox)) return true;
+    return false;
+}
+
 void TextBoxQueue::clear() {
     TextBoxQueue::clearTextBox();
     m_textBoxQueue = std::queue<TextBoxParams>();

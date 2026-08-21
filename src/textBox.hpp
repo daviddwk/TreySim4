@@ -15,6 +15,7 @@ class TextBoxQueue {
         void queue(
             std::string thumbnail, Font font, std::string text, float seconds,
             bool clickToContinue);
+        bool isEmpty();
         void clear();
         void update();
 
