@@ -2,6 +2,8 @@
 
 #include "dropParty.hpp"
 
+#include <Eendgine/timer.hpp>
+
 #include <chrono>
 #include <filesystem>
 #include <optional>
@@ -14,12 +16,12 @@ class DropParty {
             public:
                 Spawn(Tile position, Item::Type type, std::chrono::milliseconds frequency)
                     : tile(position), type(type), frequency(frequency), item(std::nullopt),
-                      nextSpawn(std::chrono::steady_clock::now() + frequency) {};
+                      nextSpawn(frequency.count() / 1000.0f) {};
                 const Tile tile;
                 const Item::Type type;
                 const std::chrono::milliseconds frequency;
                 std::optional<Item> item;
-                std::chrono::time_point<std::chrono::steady_clock> nextSpawn;
+                Eend::Timer nextSpawn;
         };
 
     public:

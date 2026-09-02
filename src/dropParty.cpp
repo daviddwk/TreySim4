@@ -3,6 +3,7 @@
 #include "trey.hpp"
 
 #include <Eendgine/fatalError.hpp>
+#include <Eendgine/frameLimiter.hpp>
 #include <Eendgine/jsonUtils.hpp>
 #include <Eendgine/random.hpp>
 
@@ -29,21 +30,20 @@ DropParty::DropParty(std::filesystem::path parkPath) {
         Json::Value itemJson = itemsJson[itemSpawnIdx];
         Json::Value typeJson = itemsJson[itemSpawnIdx]["type"];
         Json::Value frequencyJson = itemsJson[itemSpawnIdx]["frequency"];
-        /*
+
         m_spawns.emplace_back(
             Eend::jsonVec2(itemsJson[itemSpawnIdx], "position", metadataPath),
             Item::typeFromString(Eend::jsonString(itemsJson[itemSpawnIdx], "type", metadataPath)),
             std::chrono::milliseconds(
                 Eend::jsonInt(itemsJson[itemSpawnIdx], "frequency", metadataPath)));
-        */
     }
 }
 
 void DropParty::update() {
-    auto now = std::chrono::steady_clock::now();
     // spawn things
+    float dt = Eend::FrameLimiter::get().deltaTime;
     for (Spawn& spawn : m_spawns) {
-        if (!spawn.item && (now >= spawn.nextSpawn)) {
+        if (!spawn.item && spawn.nextSpawn.update(dt)) {
             Eend::Point2D position2d = Park::get().positionAtTile(spawn.tile);
             Eend::Point position = Eend::Point(
                 position2d.x,
@@ -61,7 +61,6 @@ void DropParty::update() {
             if (distance < treyRadius) {
                 Trey::get().setItem(spawn.item->getType());
                 spawn.item = std::nullopt;
-                spawn.nextSpawn = now + spawn.frequency;
             }
         }
     }
