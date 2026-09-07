@@ -35,9 +35,10 @@
   "Items": [
     {
       "type" : "doubleKick",
-      "frequency" : 3000,
+      "frequency" : 0,
       "position" : [15, 15]
-    }],
+    }
+  ],
 	"Waves": [
 	  {
       "duration" : 10,

@@ -14,19 +14,25 @@
 class DropParty {
         class Spawn {
             public:
-                Spawn(Tile position, Item::Type type, std::chrono::milliseconds frequency)
+                Spawn(
+                    Tile position, Item::Type type,
+                    std::optional<std::chrono::milliseconds> frequency)
                     : tile(position), type(type), frequency(frequency), item(std::nullopt),
-                      nextSpawn(frequency.count() / 1000.0f) {};
+                      nextSpawn(
+                          frequency ? std::optional<Eend::Timer>(frequency->count() / 1000.0f)
+                                    : std::nullopt) {};
                 const Tile tile;
                 const Item::Type type;
-                const std::chrono::milliseconds frequency;
+                // TODO combine frequency and next spawn
+                std::optional<const std::chrono::milliseconds> frequency;
                 std::optional<Item> item;
-                Eend::Timer nextSpawn;
+                std::optional<Eend::Timer> nextSpawn;
         };
 
     public:
         DropParty(std::filesystem::path parkPath);
         void update();
+        void spawn(int idx);
 
     private:
         std::vector<Spawn> m_spawns;

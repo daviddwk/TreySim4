@@ -27,15 +27,19 @@ DropParty::DropParty(std::filesystem::path parkPath) {
         Eend::fatalError("Items exsists but isn't an array"); // TODO it should be okay not to have
     }
     for (int itemSpawnIdx = 0; itemSpawnIdx < itemsJson.size(); ++itemSpawnIdx) {
-        Json::Value itemJson = itemsJson[itemSpawnIdx];
-        Json::Value typeJson = itemsJson[itemSpawnIdx]["type"];
-        Json::Value frequencyJson = itemsJson[itemSpawnIdx]["frequency"];
 
-        m_spawns.emplace_back(
-            Eend::jsonVec2(itemsJson[itemSpawnIdx], "position", metadataPath),
-            Item::typeFromString(Eend::jsonString(itemsJson[itemSpawnIdx], "type", metadataPath)),
-            std::chrono::milliseconds(
-                Eend::jsonInt(itemsJson[itemSpawnIdx], "frequency", metadataPath)));
+        Json::Value itemJson = itemsJson[itemSpawnIdx];
+
+        Tile position = Eend::jsonVec2(itemsJson[itemSpawnIdx], "position", metadataPath);
+
+        Item::Type item =
+            Item::typeFromString(Eend::jsonString(itemsJson[itemSpawnIdx], "type", metadataPath));
+
+        std::optional<std::chrono::milliseconds> frequency = std::chrono::milliseconds(
+            Eend::jsonInt(itemsJson[itemSpawnIdx], "frequency", metadataPath));
+        if (frequency->count() <= 0) frequency = std::nullopt;
+
+        m_spawns.emplace_back(position, item, frequency);
     }
 }
 
@@ -43,13 +47,16 @@ void DropParty::update() {
     // spawn things
     float dt = Eend::FrameLimiter::get().deltaTime;
     for (Spawn& spawn : m_spawns) {
-        if (!spawn.item && spawn.nextSpawn.update(dt)) {
-            Eend::Point2D position2d = Park::get().positionAtTile(spawn.tile);
-            Eend::Point position = Eend::Point(
-                position2d.x,
-                position2d.y,
-                Park::get().elevationAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
-            spawn.item = Item(spawn.type, position);
+        if (spawn.nextSpawn) {                                // if it's an auto spawner
+            if (!spawn.item && spawn.nextSpawn->update(dt)) { // if its empty and it's time
+                spawn.nextSpawn->reset();
+                Eend::Point2D position2d = Park::get().positionAtTile(spawn.tile);
+                Eend::Point position = Eend::Point(
+                    position2d.x,
+                    position2d.y,
+                    Park::get().elevationAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
+                spawn.item = Item(spawn.type, position);
+            }
         }
     }
     // get item
@@ -63,5 +70,18 @@ void DropParty::update() {
                 spawn.item = std::nullopt;
             }
         }
+    }
+}
+
+// TODO make work with tags and a map or somthing
+void DropParty::spawn(int idx) {
+
+    if (!m_spawns[idx].item) { // if its empty and it's time
+        Eend::Point2D position2d = Park::get().positionAtTile(m_spawns[idx].tile);
+        Eend::Point position = Eend::Point(
+            position2d.x,
+            position2d.y,
+            Park::get().elevationAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
+        m_spawns[idx].item = Item(m_spawns[idx].type, position);
     }
 }

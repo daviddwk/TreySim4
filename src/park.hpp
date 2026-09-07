@@ -39,6 +39,8 @@ class Park {
         int getNumDogs();
         int getWaveIdx();
 
+        void spawnItem(int idx);
+
         void setTerrain(std::filesystem::path parkPath);
 
         void playgroundEnable(const std::string& playgroundName);
