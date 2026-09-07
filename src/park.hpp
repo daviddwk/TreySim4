@@ -39,7 +39,7 @@ class Park {
         int getNumDogs();
         int getWaveIdx();
 
-        void spawnItem(int idx);
+        void spawnItem(std::string tag);
 
         void setTerrain(std::filesystem::path parkPath);
 

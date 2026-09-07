@@ -79,7 +79,7 @@ NewKicks::~NewKicks() {
 
 bool NewKicks::update(float dt) {
 
-    Park::get().spawnItem(0);
+    Park::get().spawnItem("test");
     Eend::Point cameraPosition = Eend::Cameras::getScene().getPosition();
     Eend::Cameras::getScene().setPosition(cameraPosition + Eend::Point(dt));
 

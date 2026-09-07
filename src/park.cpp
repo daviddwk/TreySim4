@@ -64,7 +64,7 @@ int Park::getNumDogs() { return m_puppyMill->getNumDogs(); }
 
 int Park::getWaveIdx() { return m_puppyMill->getWaveIdx(); }
 
-void Park::spawnItem(int idx) { m_dropParty->spawn(idx); }
+void Park::spawnItem(std::string tag) { m_dropParty->spawn(tag); }
 
 void Park::setTerrain(std::filesystem::path parkPath) { m_nextParkPath = parkPath; }
 

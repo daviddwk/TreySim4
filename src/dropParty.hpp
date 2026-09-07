@@ -7,6 +7,7 @@
 #include <chrono>
 #include <filesystem>
 #include <optional>
+#include <string>
 
 #include "items.hpp"
 #include "terrain.hpp"
@@ -32,8 +33,9 @@ class DropParty {
     public:
         DropParty(std::filesystem::path parkPath);
         void update();
-        void spawn(int idx);
+        void spawn(std::string tag);
 
     private:
         std::vector<Spawn> m_spawns;
+        std::map<std::string, std::vector<Spawn>::size_type> m_spawnMap;
 };

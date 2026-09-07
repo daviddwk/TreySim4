@@ -7,6 +7,7 @@
 #include <Eendgine/jsonUtils.hpp>
 #include <Eendgine/random.hpp>
 
+#include <assimp/metadata.h>
 #include <chrono>
 #include <glm/glm.hpp>
 #include <json/json.h>
@@ -30,14 +31,20 @@ DropParty::DropParty(std::filesystem::path parkPath) {
 
         Json::Value itemJson = itemsJson[itemSpawnIdx];
 
-        Tile position = Eend::jsonVec2(itemsJson[itemSpawnIdx], "position", metadataPath);
+        Tile position = Eend::jsonVec2(itemJson, "position", metadataPath);
 
-        Item::Type item =
-            Item::typeFromString(Eend::jsonString(itemsJson[itemSpawnIdx], "type", metadataPath));
+        Item::Type item = Item::typeFromString(Eend::jsonString(itemJson, "type", metadataPath));
 
-        std::optional<std::chrono::milliseconds> frequency = std::chrono::milliseconds(
-            Eend::jsonInt(itemsJson[itemSpawnIdx], "frequency", metadataPath));
-        if (frequency->count() <= 0) frequency = std::nullopt;
+        std::optional<std::chrono::milliseconds> frequency = std::nullopt;
+        if (itemJson["frequency"].isNumeric()) {
+            frequency =
+                std::chrono::milliseconds(Eend::jsonInt(itemJson, "frequency", metadataPath));
+        }
+
+        if (itemJson["tag"].isString()) {
+            std::string tag = Eend::jsonString(itemJson, "tag", metadataPath);
+            m_spawnMap[tag] = m_spawns.size();
+        }
 
         m_spawns.emplace_back(position, item, frequency);
     }
@@ -74,14 +81,14 @@ void DropParty::update() {
 }
 
 // TODO make work with tags and a map or somthing
-void DropParty::spawn(int idx) {
-
-    if (!m_spawns[idx].item) { // if its empty and it's time
-        Eend::Point2D position2d = Park::get().positionAtTile(m_spawns[idx].tile);
+void DropParty::spawn(std::string tag) {
+    assert(m_spawnMap.contains(tag));
+    if (!m_spawns[m_spawnMap[tag]].item) {
+        Eend::Point2D position2d = Park::get().positionAtTile(m_spawns[m_spawnMap[tag]].tile);
         Eend::Point position = Eend::Point(
             position2d.x,
             position2d.y,
             Park::get().elevationAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
-        m_spawns[idx].item = Item(m_spawns[idx].type, position);
+        m_spawns[m_spawnMap[tag]].item = Item(m_spawns[m_spawnMap[tag]].type, position);
     }
 }
