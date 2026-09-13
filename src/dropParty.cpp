@@ -24,8 +24,10 @@ DropParty::DropParty(std::filesystem::path parkPath) {
     Json::Value rootJson = Eend::jsonLoadFile(metadataPath);
 
     Json::Value itemsJson = rootJson["Items"];
-    if (!itemsJson.isNull() && !itemsJson.isArray()) {
-        Eend::fatalError("Items exsists but isn't an array"); // TODO it should be okay not to have
+    if (itemsJson.isNull()) {
+        return;
+    } else if (!itemsJson.isArray()) {
+        Eend::fatalError("Items exsists but isn't an array");
     }
     for (int itemSpawnIdx = 0; itemSpawnIdx < itemsJson.size(); ++itemSpawnIdx) {
 
@@ -54,15 +56,9 @@ void DropParty::update() {
     // spawn things
     float dt = Eend::FrameLimiter::get().deltaTime;
     for (Spawn& spawn : m_spawns) {
-        if (spawn.nextSpawn) {                                // if it's an auto spawner
-            if (!spawn.item && spawn.nextSpawn->update(dt)) { // if its empty and it's time
-                spawn.nextSpawn->reset();
-                Eend::Point2D position2d = Park::get().positionAtTile(spawn.tile);
-                Eend::Point position = Eend::Point(
-                    position2d.x,
-                    position2d.y,
-                    Park::get().elevationAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
-                spawn.item = Item(spawn.type, position);
+        if (spawn.timer) {                                // if it's an auto spawner
+            if (!spawn.item && spawn.timer->update(dt)) { // if its empty and it's time
+                spawnItem(spawn);
             }
         }
     }
@@ -80,15 +76,18 @@ void DropParty::update() {
     }
 }
 
-// TODO make work with tags and a map or somthing
 void DropParty::spawn(std::string tag) {
     assert(m_spawnMap.contains(tag));
-    if (!m_spawns[m_spawnMap[tag]].item) {
-        Eend::Point2D position2d = Park::get().positionAtTile(m_spawns[m_spawnMap[tag]].tile);
-        Eend::Point position = Eend::Point(
-            position2d.x,
-            position2d.y,
-            Park::get().elevationAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
-        m_spawns[m_spawnMap[tag]].item = Item(m_spawns[m_spawnMap[tag]].type, position);
-    }
+    Spawn& spawn = m_spawns[m_spawnMap[tag]];
+    if (!spawn.item) spawnItem(m_spawns[m_spawnMap[tag]]);
+}
+
+void DropParty::spawnItem(Spawn& spawn) {
+    if (spawn.timer) spawn.timer->reset();
+    Eend::Point2D position2d = Park::get().positionAtTile(spawn.tile);
+    Eend::Point position = Eend::Point(
+        position2d.x,
+        position2d.y,
+        Park::get().elevationAtPoint(position2d) + ITEM_HEIGHT_OFFSET);
+    spawn.item = Item(spawn.type, position);
 }
