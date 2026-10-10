@@ -1,12 +1,7 @@
 {
   "Scale": [3.0, 3.0, 20.0],
   "Spawn": [20.0, 20.0],
-  "Portals": [
-    {
-      "position": [30, 19],
-      "scale": [1, 1],
-      "path": "grassy2"
-    }],
+  "Portals": [],
   "Playgrounds": {
     "tree1" : {
       "Boards" : [

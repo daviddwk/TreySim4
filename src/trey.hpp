@@ -5,13 +5,15 @@
 #include <Eendgine/types.hpp>
 #include <GL/gl.h>
 
+#include <memory>
 #include <optional>
 
 #include "dog.hpp"
 #include "facing.hpp"
 #include "healthBar.hpp"
 #include "items.hpp"
-#include "terrain.hpp"
+
+#include "treyFeet.hpp"
 
 namespace Eend = Eendgine;
 
@@ -24,7 +26,8 @@ class Trey {
         void setRotation(Eend::Angle rotation);
         void setPosition(Eend::Point position);
         void setAlive(bool alive);
-        void setItem(Item::Type itemType);
+
+        void pickupItem(Item::Type itemType);
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
@@ -83,5 +86,6 @@ class Trey {
         Facing m_facing;
         bool m_moving;
         bool m_alive;
+        std::unique_ptr<Feet::Feet> m_feet;
         std::optional<Item::Type> m_item;
 };

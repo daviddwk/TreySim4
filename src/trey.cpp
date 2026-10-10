@@ -26,7 +26,8 @@ Trey::Trey()
       m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
       m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)),
       m_targetRotation(Eend::Angle(0.0f)), m_bodyTimer(0.075f), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_alive(true), m_item(std::nullopt) {
+      m_upVelocity(0.0f), m_alive(true), m_feet(std::make_unique<Feet::Regular>()),
+      m_item(std::nullopt) {
 
     Eend::Board* const body = Eend::Entities::boards().getRef(m_bodyId);
     Eend::Board* const eye = Eend::Entities::boards().getRef(m_eyeId);
@@ -78,7 +79,15 @@ Trey& Trey::get() {
 
 void Trey::setPosition(Eend::Point position) { m_position = position; }
 void Trey::setAlive(bool alive) { m_alive = alive; }
-void Trey::setItem(Item::Type itemType) { m_item = itemType; }
+void Trey::pickupItem(Item::Type itemType) {
+    // TODO make an item queue kinda situation
+    m_item = itemType;
+    if (m_item) {
+        m_feet = std::make_unique<Feet::Double>();
+    } else {
+        m_feet = std::make_unique<Feet::Regular>();
+    }
+}
 
 Eend::Point Trey::getPosition() { return m_position; };
 Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
@@ -124,26 +133,10 @@ void Trey::kick(float elevationAtPosition) {
     m_kicking = true;
     m_inAir = true;
     m_position.z = elevationAtPosition + 0.1f;
-    if (m_item) {
-        if (*m_item == Item::Type::doubleKick) {
-            doubleKick(m_position, m_facing, m_upVelocity);
-        }
-    } else {
-        regularKick(m_position, m_facing, m_upVelocity);
-    }
+    m_feet->kick(m_position, m_facing, m_upVelocity);
 }
 
-bool Trey::hit(Dog& dog) {
-    bool dies = false;
-    if (m_item) {
-        if (*m_item == Item::Type::doubleKick) {
-            dies = doubleHit(m_position, m_rotation, dog);
-        }
-    } else {
-        dies = regularHit(m_position, m_rotation, dog);
-    }
-    return dies;
-}
+bool Trey::hit(Dog& dog) { return m_feet->hit(m_position, m_rotation, dog); }
 
 void Trey::updateBody(float dt) {
 

@@ -7,10 +7,12 @@
 #include "collision.hpp"
 #include "treyParticles.hpp"
 
+#define VISUAL
+
 static constexpr float KICK_RADIUS = 15.0f;
 static constexpr float KICK_SPREAD = 120.0f;
 
-void regularKick(Eend::Point& position, Facing& facing, float& upVelocity) {
+void Feet::Regular::kick(Eend::Point& position, Facing& facing, float& upVelocity) {
 
     upVelocity = 20.0f;
 
@@ -19,7 +21,7 @@ void regularKick(Eend::Point& position, Facing& facing, float& upVelocity) {
     Eend::Audio::get().playNoise("resources/noises/Quack_Fart_Noise_44k.wav", 100.0f);
 }
 
-void doubleKick(Eend::Point& position, Facing& facing, float& upVelocity) {
+void Feet::Double::kick(Eend::Point& position, Facing& facing, float& upVelocity) {
 
     upVelocity = 20.0f;
 
@@ -29,7 +31,7 @@ void doubleKick(Eend::Point& position, Facing& facing, float& upVelocity) {
     Eend::Audio::get().playNoise("resources/noises/Quack_Fart_Noise_44k.wav", 100.0f);
 }
 
-bool regularHit(Eend::Point position, Eend::Angle rotation, Dog& dog) {
+bool Feet::Regular::hit(Eend::Point position, Eend::Angle rotation, Dog& dog) {
     std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
         dog.getPosition3d(),
         Eend::Sphere(position, KICK_RADIUS),
@@ -42,7 +44,7 @@ bool regularHit(Eend::Point position, Eend::Angle rotation, Dog& dog) {
     return false;
 }
 
-bool doubleHit(Eend::Point position, Eend::Angle rotation, Dog& dog) {
+bool Feet::Double::hit(Eend::Point position, Eend::Angle rotation, Dog& dog) {
     bool dies = false;
     std::optional<Eend::Vector> kick = pointToSphereSliceEdgeRelative(
         dog.getPosition3d(),

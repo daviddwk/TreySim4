@@ -69,7 +69,7 @@ void DropParty::update() {
             const float treyRadius = Trey::get().getRadius();
             const float distance = glm::length(spawn.item->getPosition() - treyPosition);
             if (distance < treyRadius) {
-                Trey::get().setItem(spawn.item->getType());
+                Trey::get().pickupItem(spawn.item->getType());
                 spawn.item = std::nullopt;
             }
         }

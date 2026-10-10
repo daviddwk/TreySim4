@@ -24,6 +24,8 @@
 #include "textBox.hpp"
 #include "trey.hpp"
 
+// #define OVERHEAD
+
 namespace Eend = Eendgine;
 
 static void startFrame();
@@ -180,8 +182,12 @@ static void pauseLatch(bool& paused, bool& dead) {
 
 static void onStart() {
 
-    // using this cutscene to set initial positions i guess
+    Trey::get().setPosition(Park::get().getSpawn());
+    Duck::get().setPosition(Park::get().positionAtTile(Tile(15.0f, 15.0f)));
+
+#ifdef CUTSCENES
     CutscenePlayer::start(CutsceneType::intro);
+#endif
 }
 
 static void onDeath() {
@@ -229,10 +235,13 @@ static void unpausedUpdate(bool activeCutscene) {
         Eend::Point treyPosition = Trey::get().getPosition();
         float terrainHeight = Park::get().elevationAtPoint(treyPosition);
 
+#ifdef OVERHEAD
+        const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 50.0f);
+        const float cameraLag = (10000.0f * dt);
+#else
         const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 12.5f);
-        // const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 50.0f); // DEBUG
         const float cameraLag = (50.0f * dt);
-        // const float cameraLag = (10000.0f * dt); // DEBUG
+#endif
 
         Eend::Point lastCameraPosition = Eend::Cameras::getScene().getPosition();
         Eend::Point approachCameraPosition =
@@ -245,7 +254,9 @@ static void unpausedUpdate(bool activeCutscene) {
     }
 
     if (Park::get().getNumDogs() == 0 && Park::get().getWaveIdx() == 1) {
+#ifdef CUTSCENES
         CutscenePlayer::start(CutsceneType::newKicks);
+#endif
         Park::get().nextWave();
     }
     TextBoxQueue::get().update();
