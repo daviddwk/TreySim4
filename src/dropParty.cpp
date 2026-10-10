@@ -16,6 +16,7 @@
 #include "park.hpp"
 
 constexpr float ITEM_HEIGHT_OFFSET = 5.0f;
+constexpr float ITEM_RADIUS = 5.5f;
 
 DropParty::DropParty(std::filesystem::path parkPath) {
 
@@ -66,9 +67,8 @@ void DropParty::update() {
     for (Spawn& spawn : m_spawns) {
         if (spawn.item) {
             const Eend::Point treyPosition = Trey::get().getPosition();
-            const float treyRadius = Trey::get().getRadius();
             const float distance = glm::length(spawn.item->getPosition() - treyPosition);
-            if (distance < treyRadius) {
+            if (distance < ITEM_RADIUS) {
                 Trey::get().pickupItem(spawn.item->getType());
                 spawn.item = std::nullopt;
             }

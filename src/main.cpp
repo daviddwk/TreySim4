@@ -24,7 +24,7 @@
 #include "textBox.hpp"
 #include "trey.hpp"
 
-// #define OVERHEAD
+#define OVERHEAD
 
 namespace Eend = Eendgine;
 
