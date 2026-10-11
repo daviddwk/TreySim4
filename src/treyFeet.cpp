@@ -12,11 +12,18 @@
 static constexpr float KICK_RADIUS = 15.0f;
 static constexpr float KICK_SPREAD = 120.0f;
 
+static Eend::Angle KICK_SPREAD_REGULAR = Eend::Angle(120.0f);
+
 void Feet::Regular::kick(Eend::Point& position, Facing& facing, float& upVelocity) {
 
     upVelocity = 20.0f;
 
-    Eend::Particles::get().create(position, 2, getKickParticleProperties(facing.getDirection()));
+    Eend::Particles::get().create(
+        position,
+        30,
+        getVisualParticleProperties(facing.getDirection(), KICK_SPREAD_REGULAR));
+
+    // Eend::Particles::get().create(position, 2, getKickParticleProperties(facing.getDirection()));
     Eend::Particles::get().create(position, 5, getJumpParticleProperties());
     Eend::Audio::get().playNoise("resources/noises/Quack_Fart_Noise_44k.wav", 100.0f);
 }
@@ -36,7 +43,7 @@ bool Feet::Regular::hit(Eend::Point position, Eend::Angle rotation, Dog& dog) {
         dog.getPosition3d(),
         Eend::Sphere(position, KICK_RADIUS),
         rotation,
-        KICK_SPREAD);
+        KICK_SPREAD_REGULAR);
     if (kick) {
         dog.kick(*kick);
         return dog.giveDamage(1);

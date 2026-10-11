@@ -1,5 +1,70 @@
+#include "Eendgine/particles.hpp"
 #include "Eendgine/types.hpp"
 #include "treyParticles.hpp"
+
+Eend::Vector2D vectorFromDirection(Direction direction);
+
+Eend::Particles::Properties getVisualParticleProperties(Direction direction, Eend::Angle spread) {
+
+    const std::filesystem::path boardPath("resources/Trey/particles/visual");
+
+    Eend::Vector2D directionVector = vectorFromDirection(direction);
+
+    const Eend::Particles::Behavior behavior =
+        [directionVector, spread](
+            int seed,
+            std::chrono::milliseconds time) mutable -> std::optional<Eend::Particles::State> {
+        constexpr int LIFETIME_BASE = 250;
+        constexpr int LIFETIME_SPREAD = 100;
+
+        constexpr float SCALE_BASE = 3.0f;
+        constexpr float SCALE_SPREAD = 2.0f;
+
+        constexpr float DISTANCE_BASE = 10.0f;
+
+        constexpr float HEIGHT_BASE = 5.0f;
+
+        const int lifetimeMs = LIFETIME_BASE + (seed % LIFETIME_SPREAD);
+
+        if (time.count() < lifetimeMs) {
+
+            const float elapsedMs = static_cast<float>(time.count());
+            const float lifetimeRatio = elapsedMs / lifetimeMs;
+
+            const float maxU8 = static_cast<float>(std::pow(2, 8));
+            auto extractU8 = [](int seed, unsigned int idx) { return (seed >> (8 * idx)) & 0xFF; };
+
+            float spreadScale = static_cast<float>(extractU8(seed, 0)) / maxU8;
+            bool posOrNeg = (seed % 2) ? true : false;
+            Eend::Angle angle = (spread * spreadScale) * 0.5f;
+            std::print(
+                "spreadScale {} posOrNeg {} angle {}\n",
+                spreadScale,
+                posOrNeg,
+                angle.getDegrees());
+            Eend::Vector2D angleVector =
+                glm::rotate(directionVector, posOrNeg ? angle.getRadians() : -angle.getRadians());
+
+            const float x = (angleVector.x) * DISTANCE_BASE * lifetimeRatio;
+
+            const float y = (angleVector.y) * DISTANCE_BASE * lifetimeRatio;
+
+            const float z = (HEIGHT_BASE + HEIGHT_BASE) * lifetimeRatio;
+
+            const Eend::Point position = Eend::Point(x, y, z);
+
+            const Eend::Scale2D scale = Eend::Scale2D(SCALE_BASE);
+
+            const unsigned int frame =
+                lifetimeRatio < 0.333f ? 0 : (lifetimeRatio < 0.666f ? 1 : 2);
+
+            return std::make_optional(Eend::Particles::State(position, scale, frame));
+        }
+        return std::nullopt;
+    };
+
+    return Eend::Particles::Properties(boardPath, behavior);
+}
 
 Eend::Particles::Properties getJumpParticleProperties() {
     Eend::Particles::Behavior behavior =
@@ -54,34 +119,7 @@ Eend::Particles::Properties getKickParticleProperties(Direction direction) {
     const std::filesystem::path boardPath("resources/Trey/particles/kick");
 
     // clang-format off
-    Eend::Vector2D directionVector = Eend::Vector2D(0.0f);
-    switch (direction) {
-    case Direction::up:
-        directionVector = Eend::Vector2D(                0.0f,                1.0f);
-        break;
-    case Direction::upRight:
-        directionVector = Eend::Vector2D(  Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
-        break;
-    case Direction::right:
-        directionVector = Eend::Vector2D(                1.0f,                0.0f);
-        break;
-    case Direction::downRight:
-        directionVector = Eend::Vector2D(  Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
-        break;
-    case Direction::down:
-        directionVector = Eend::Vector2D(                0.0f,               -1.0f);
-        break;
-    case Direction::downLeft:
-        directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
-        break;
-    case Direction::left:
-        directionVector = Eend::Vector2D(               -1.0f,                0.0f);
-        break;
-    case Direction::upLeft:
-        directionVector = Eend::Vector2D( -Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
-        break;
-    }
-    // clang-format on
+    Eend::Vector2D directionVector = vectorFromDirection(direction);
 
     const Eend::Particles::Behavior behavior =
         [directionVector](
@@ -136,4 +174,27 @@ Eend::Particles::Properties getKickParticleProperties(Direction direction) {
     };
 
     return Eend::Particles::Properties(boardPath, behavior);
+}
+
+Eend::Vector2D vectorFromDirection(Direction direction) {
+    // clang-format off
+    switch (direction) {
+    case Direction::up:
+        return Eend::Vector2D(                0.0f,                1.0f);
+    case Direction::upRight:
+        return Eend::Vector2D(  Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
+    case Direction::right:
+        return Eend::Vector2D(                1.0f,                0.0f);
+    case Direction::downRight:
+        return Eend::Vector2D(  Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
+    case Direction::down:
+        return Eend::Vector2D(                0.0f,               -1.0f);
+    case Direction::downLeft:
+        return Eend::Vector2D( -Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
+    case Direction::left:
+        return Eend::Vector2D(               -1.0f,                0.0f);
+    case Direction::upLeft:
+        return Eend::Vector2D( -Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
+    }
+    // clang-format on
 }
