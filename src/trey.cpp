@@ -136,7 +136,7 @@ void Trey::kick(float elevationAtPosition) {
     m_feet->kick(m_position, m_facing, m_upVelocity);
 }
 
-bool Trey::hit(Dog& dog) { return m_feet->hit(m_position, m_rotation, dog); }
+bool Trey::hit(Dog& dog) { return m_feet->hit(m_position, m_facing.getDirection(), dog); }
 
 void Trey::updateBody(float dt) {
 

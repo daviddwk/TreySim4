@@ -6,6 +6,8 @@ enum class Direction { up, upRight, right, downRight, down, downLeft, left, upLe
 
 namespace Eend = Eendgine;
 
+Eend::Vector2D vectorFromDirection(Direction direction);
+
 class Facing {
     public:
         Facing();

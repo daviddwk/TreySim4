@@ -10,9 +10,12 @@ bool pointOnRectangle(Eend::Point2D point, Eend::Rectangle rectangle) {
     float behindRight = rectangle.lowerRight.x - point.x;
     float behindBottom = rectangle.lowerRight.y - point.y;
 
-    if (behindLeft > 0 && behindTop > 0 && behindRight > 0 && behindBottom > 0)
-        return true;
+    if (behindLeft > 0 && behindTop > 0 && behindRight > 0 && behindBottom > 0) return true;
     return false;
+}
+
+bool pointOnSphere(Eend::Point point, Eend::Sphere sphere) {
+    return glm::length(point - sphere.position) <= sphere.radius;
 }
 
 std::optional<Eend::Vector> pointToSphereEdgeRelative(Eend::Point point, Eend::Sphere sphere) {

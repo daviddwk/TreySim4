@@ -82,3 +82,26 @@ Eend::Angle Facing::getAngle() {
         return Eend::Angle(45.0f) * 7.0f;
     }
 }
+
+Eend::Vector2D vectorFromDirection(Direction direction) {
+    // clang-format off
+    switch (direction) {
+    case Direction::up:
+        return Eend::Vector2D(                0.0f,                1.0f);
+    case Direction::upRight:
+        return Eend::Vector2D(  Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
+    case Direction::right:
+        return Eend::Vector2D(                1.0f,                0.0f);
+    case Direction::downRight:
+        return Eend::Vector2D(  Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
+    case Direction::down:
+        return Eend::Vector2D(                0.0f,               -1.0f);
+    case Direction::downLeft:
+        return Eend::Vector2D( -Eend::INV_SQRT_TWO, -Eend::INV_SQRT_TWO);
+    case Direction::left:
+        return Eend::Vector2D(               -1.0f,                0.0f);
+    case Direction::upLeft:
+        return Eend::Vector2D( -Eend::INV_SQRT_TWO,  Eend::INV_SQRT_TWO);
+    }
+    // clang-format on
+}

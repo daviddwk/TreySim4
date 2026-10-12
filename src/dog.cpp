@@ -102,8 +102,7 @@ unsigned int Dog::getHealth() { return m_health; }
 bool Dog::shouldDelete() { return m_delete; }
 
 void Dog::kick(Eend::Point kick) {
-    // make kick power scale exponentially
-    float kickFactor = glm::pow(glm::length(kick), 2.0f);
+    float kickFactor = glm::length(kick);
     kickFactor = ((M_KNOCKBACK_MAX - M_KNOCKBACK_MIN) * kickFactor) + (M_KNOCKBACK_MIN);
     m_knockback = glm::normalize(kick) * kickFactor;
 }
