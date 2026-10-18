@@ -125,6 +125,9 @@ void Trey::update(bool activeCutscene) {
         Trey::handleCollision(oldTreyPosition);
     }
     Trey::updateBody(dt);
+
+    boot_circle.update(
+        Eend::Point(m_position.x, m_position.y, Park::get().elevationAtPoint(m_position)));
 }
 
 void Trey::cutsceneUpdate() { Trey::updateBody(Eend::FrameLimiter::get().deltaTime); }

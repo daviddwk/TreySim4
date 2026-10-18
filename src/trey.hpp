@@ -13,6 +13,7 @@
 #include "healthBar.hpp"
 #include "items.hpp"
 
+#include "bootCircle.hpp"
 #include "treyFeet.hpp"
 
 namespace Eend = Eendgine;
@@ -68,6 +69,8 @@ class Trey {
         void kick(float elevationAtPosition);
 
         Direction oppositeDirection(Direction direction);
+
+        BootCircle boot_circle;
 
         Eend::StatueId m_headId;
         Eend::StatueId m_hairId;
