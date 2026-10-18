@@ -1,10 +1,15 @@
 #include <queue>
 
+constexpr float DEFAULT_BOOT_RADIUS = 1.0f;
+constexpr float DEFAULT_CIRCLE_RADIUS = 1.0f;
+constexpr float DEFAULT_SPEED = 1.0f;
+
 struct bootCircleTraits {
     public:
-        float bootRadius;
-        float circleRadius;
-        float speed;
+        bootCircleTraits(float bootRadius, float circleRadius, float speed)
+            : bootRadius(bootRadius), circleRadius(circleRadius), speed(speed) {
+
+              };
         bootCircleTraits& operator+=(const bootCircleTraits& rhs) {
             bootRadius += rhs.bootRadius;
             circleRadius += rhs.circleRadius;
@@ -17,6 +22,11 @@ struct bootCircleTraits {
             speed -= rhs.speed;
             return *this;
         }
+
+    private:
+        float bootRadius;
+        float circleRadius;
+        float speed;
 };
 
 class BootCircleItem { // TODO also inherit from item?
@@ -26,12 +36,7 @@ class BootCircleItem { // TODO also inherit from item?
 
 class bootCircle {
     public:
-        bootCircle() {
-            traits.bootRadius = 1.0f; // default values go here
-            traits.circleRadius = 1.0f;
-            traits.speed = 1.0f;
-        };
-
+        bootCircle() : traits(DEFAULT_BOOT_RADIUS, DEFAULT_CIRCLE_RADIUS, DEFAULT_SPEED) {};
         bool enabled() { return !items.empty(); }
 
         void addItem(BootCircleItem item) {
