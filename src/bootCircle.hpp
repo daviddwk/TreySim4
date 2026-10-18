@@ -7,13 +7,14 @@
 #include "dog.hpp"
 #include "items.hpp"
 
-constexpr float DEFAULT_BOOT_RADIUS = 3.0f;
+constexpr float DEFAULT_BOOT_RADIUS = 2.5f;
 constexpr float DEFAULT_CIRCLE_RADIUS = 15.0f;
 constexpr float DEFAULT_SPEED = 10.0f;
 
-constexpr float BOOT_UP_OFFSET = 0.0f;
+constexpr float BOOT_SPRITE_OFFSET = 2.5f;
+constexpr float BOOT_COLLISION_OFFSET = 0.0f;
 
-const std::filesystem::path BOOT_SPRITE_PATH = std::filesystem::path("resources/duck/statues/body");
+const std::filesystem::path BOOT_SPRITE_PATH = std::filesystem::path("resources/boot");
 
 class BootCircleTraits {
     public:
@@ -68,7 +69,7 @@ class BootCircle { // TODO particle system that follows boot!
             boot_rotation = glm::rotate(boot_rotation, dt * traits.speed);
             const Eend::Vector boot_position_relative =
                 traits.circle_radius * Eend::Vector(boot_rotation.x, boot_rotation.y, 0.0f);
-            boot_position = trey_position + boot_position_relative + BOOT_UP_OFFSET;
+            boot_position = trey_position + boot_position_relative + BOOT_COLLISION_OFFSET;
             // TODO add a bit of lag behind trey's position?
 
             // handle sprite
@@ -79,7 +80,7 @@ class BootCircle { // TODO particle system that follows boot!
             }
             if (BootCircle::boot_sprite) {
                 Eend::Board* board_ref = Eend::Entities::boards().getRef(*BootCircle::boot_sprite);
-                board_ref->setPosition(boot_position);
+                board_ref->setPosition(boot_position + BOOT_SPRITE_OFFSET);
                 board_ref->setScale(Eend::Scale2D(traits.boot_radius * 2));
             }
         };
