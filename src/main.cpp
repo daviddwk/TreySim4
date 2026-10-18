@@ -239,7 +239,7 @@ static void unpausedUpdate(bool activeCutscene) {
         const Eend::Point cameraOffset = Eend::Point(0.0f, -1.0f, 50.0f);
         const float cameraLag = (10000.0f * dt);
 #else
-        const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 12.5f);
+        const Eend::Point cameraOffset = Eend::Point(0.0f, -25.0f, 20.0f);
         const float cameraLag = (50.0f * dt);
 #endif
 

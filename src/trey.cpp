@@ -18,22 +18,21 @@
 //
 
 Trey::Trey()
-    : m_headId(Eend::Entities::statues().insert(std::filesystem::path("resources/Trey/head"))),
-      m_hairId(Eend::Entities::statues().insert(std::filesystem::path("resources/Trey/hair"))),
-      m_hairOutterId(
+    : head_id(Eend::Entities::statues().insert(std::filesystem::path("resources/Trey/head"))),
+      hair_id(Eend::Entities::statues().insert(std::filesystem::path("resources/Trey/hair"))),
+      hair_outter_id(
           Eend::Entities::statues().insert(std::filesystem::path("resources/Trey/hair"))),
-      m_bodyId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/body"))),
-      m_eyeId(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
-      m_position(Eend::Point(0.0f)), m_rotation(Eend::Angle(0.0f)),
-      m_targetRotation(Eend::Angle(0.0f)), m_bodyTimer(0.075f), m_kicking(true), m_inAir(false),
-      m_upVelocity(0.0f), m_alive(true), m_feet(std::make_unique<Feet::Regular>()),
-      m_item(std::nullopt) {
+      body_id(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/body"))),
+      eye_id(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
+      position(Eend::Point(0.0f)), rotation(Eend::Angle(0.0f)), target_rotation(Eend::Angle(0.0f)),
+      body_timer(0.075f), kicking(true), in_air(false), up_velocity(0.0f), alive(true),
+      feet(std::make_unique<Feet::Regular>()), item(std::nullopt) {
 
-    Eend::Board* const body = Eend::Entities::boards().getRef(m_bodyId);
-    Eend::Board* const eye = Eend::Entities::boards().getRef(m_eyeId);
+    Eend::Board* const body = Eend::Entities::boards().getRef(body_id);
+    Eend::Board* const eye = Eend::Entities::boards().getRef(eye_id);
     // Eend::Statue* const head = Eend::Entities::statues().getRef(m_headId);
-    Eend::Statue* const hair = Eend::Entities::statues().getRef(m_hairId);
-    Eend::Statue* const hairOutter = Eend::Entities::statues().getRef(m_hairOutterId);
+    Eend::Statue* const hair = Eend::Entities::statues().getRef(hair_id);
+    Eend::Statue* const hairOutter = Eend::Entities::statues().getRef(hair_outter_id);
 
     // TODO  make convenience function for setting to size of texture
     const float bodyHeight = static_cast<float>(body->getTexture().height);
@@ -54,11 +53,11 @@ Trey::Trey()
 }
 
 Trey::~Trey() {
-    Eend::Entities::statues().erase(m_headId);
-    Eend::Entities::statues().erase(m_hairId);
-    Eend::Entities::statues().erase(m_hairOutterId);
-    Eend::Entities::boards().erase(m_bodyId);
-    Eend::Entities::boards().erase(m_eyeId);
+    Eend::Entities::statues().erase(head_id);
+    Eend::Entities::statues().erase(hair_id);
+    Eend::Entities::statues().erase(hair_outter_id);
+    Eend::Entities::boards().erase(body_id);
+    Eend::Entities::boards().erase(eye_id);
 }
 
 void Trey::construct() {
@@ -77,20 +76,20 @@ Trey& Trey::get() {
     return *m_instance;
 }
 
-void Trey::setPosition(Eend::Point position) { m_position = position; }
-void Trey::setAlive(bool alive) { m_alive = alive; }
+void Trey::setPosition(Eend::Point position) { Trey::position = position; }
+void Trey::setAlive(bool alive) { Trey::alive = alive; }
 void Trey::pickupItem(Item::Type itemType) {
     // TODO make an item queue kinda situation
-    m_item = itemType;
-    if (m_item) {
-        m_feet = std::make_unique<Feet::Double>();
+    item = itemType;
+    if (item) {
+        feet = std::make_unique<Feet::Double>();
     } else {
-        m_feet = std::make_unique<Feet::Regular>();
+        feet = std::make_unique<Feet::Regular>();
     }
 }
 
-Eend::Point Trey::getPosition() { return m_position; };
-Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(m_position.x, m_position.y); };
+Eend::Point Trey::getPosition() { return position; };
+Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(position.x, position.y); };
 float Trey::getRadius() { return M_TREY_RADIUS; }
 
 void Trey::update(bool activeCutscene) {
@@ -99,26 +98,26 @@ void Trey::update(bool activeCutscene) {
     if (!activeCutscene) {
         Eend::Point oldTreyPosition = getPosition();
 
-        if (m_alive) {
+        if (alive) {
             Trey::updateDirection();
-            if (m_moving) {
+            if (moving) {
                 Trey::updatePosition(dt);
             }
 
-            m_kicking = false;
-            float elevationAtPosition = Park::get().elevationAtPoint(m_position);
+            kicking = false;
+            float elevationAtPosition = Park::get().elevationAtPoint(position);
 
-            if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !m_inAir) {
+            if (Eend::InputManager::get().isKeyPressed(SDL_SCANCODE_SPACE) && !in_air) {
                 Trey::kick(elevationAtPosition);
-            } else if (m_inAir) {
-                m_upVelocity += M_GRAVITY;
-                m_position.z += (m_upVelocity * dt);
-                if (m_position.z < elevationAtPosition) {
-                    m_inAir = false;
-                    m_position.z = elevationAtPosition;
+            } else if (in_air) {
+                up_velocity += M_GRAVITY;
+                position.z += (up_velocity * dt);
+                if (position.z < elevationAtPosition) {
+                    in_air = false;
+                    position.z = elevationAtPosition;
                 }
             } else {
-                m_position.z = elevationAtPosition;
+                position.z = elevationAtPosition;
             }
         }
 
@@ -126,36 +125,40 @@ void Trey::update(bool activeCutscene) {
     }
     Trey::updateBody(dt);
 
-    boot_circle.update(
-        Eend::Point(m_position.x, m_position.y, Park::get().elevationAtPoint(m_position)));
+    boot_circle.update(Eend::Point(position.x, position.y, Park::get().elevationAtPoint(position)));
 }
 
 void Trey::cutsceneUpdate() { Trey::updateBody(Eend::FrameLimiter::get().deltaTime); }
 
 void Trey::kick(float elevationAtPosition) {
-    m_kicking = true;
-    m_inAir = true;
-    m_position.z = elevationAtPosition + 0.1f;
-    m_feet->kick(m_position, m_facing, m_upVelocity);
+    kicking = true;
+    in_air = true;
+    position.z = elevationAtPosition + 0.1f;
+    feet->kick(position, facing, up_velocity);
 }
 
-bool Trey::hit(Dog& dog) { return m_feet->hit(m_position, m_facing.getDirection(), dog); }
+void Trey::hit(Dog& dog) {
+    if (Trey::isKicking()) {
+        feet->hit(position, facing.getDirection(), dog);
+    }
+    boot_circle.hit(position, dog);
+}
 
 void Trey::updateBody(float dt) {
 
-    Eend::Statue* head = Eend::Entities::statues().getRef(m_headId);
-    Eend::Statue* hair = Eend::Entities::statues().getRef(m_hairId);
-    Eend::Statue* hairOutter = Eend::Entities::statues().getRef(m_hairOutterId);
-    Eend::Board* body = Eend::Entities::boards().getRef(m_bodyId);
-    Eend::Board* eye = Eend::Entities::boards().getRef(m_eyeId);
+    Eend::Statue* head = Eend::Entities::statues().getRef(head_id);
+    Eend::Statue* hair = Eend::Entities::statues().getRef(hair_id);
+    Eend::Statue* hairOutter = Eend::Entities::statues().getRef(hair_outter_id);
+    Eend::Board* body = Eend::Entities::boards().getRef(body_id);
+    Eend::Board* eye = Eend::Entities::boards().getRef(eye_id);
 
-    Direction direction = m_facing.getDirection();
+    Direction direction = facing.getDirection();
     std::string prefix;
 
     // update strip
-    if (m_inAir) {
+    if (in_air) {
         prefix = "kick";
-    } else if (m_moving) {
+    } else if (moving) {
         prefix = "walk";
     } else {
         prefix = "stand";
@@ -168,7 +171,7 @@ void Trey::updateBody(float dt) {
         body->setStrip(prefix + "SideBackward");
         body->setStripFlip(false);
     } else if (direction == Direction::right) {
-        if (m_facing.getUpOrDown() == Direction::up) {
+        if (facing.getUpOrDown() == Direction::up) {
             body->setStrip(prefix + "SideBackward");
         } else {
             body->setStrip(prefix + "SideForward");
@@ -184,7 +187,7 @@ void Trey::updateBody(float dt) {
         body->setStrip(prefix + "SideForward");
         body->setStripFlip(true);
     } else if (direction == Direction::left) {
-        if (m_facing.getUpOrDown() == Direction::up) {
+        if (facing.getUpOrDown() == Direction::up) {
             body->setStrip(prefix + "SideBackward");
         } else {
             body->setStrip(prefix + "SideForward");
@@ -195,29 +198,29 @@ void Trey::updateBody(float dt) {
         body->setStripFlip(true);
     }
 
-    if (m_bodyTimer.update(dt)) {
-        m_bodyTimer.reset();
+    if (body_timer.update(dt)) {
+        body_timer.reset();
         body->nextStripIdx();
     }
 
     // set head rotation
-    m_rotation = m_facing.getAngle();
-    head->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
-    hair->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
-    hairOutter->setRotation(Eend::Rotation(0.0f, 0.0f, m_rotation.getDegrees() + 180.0f));
+    rotation = facing.getAngle();
+    head->setRotation(Eend::Rotation(0.0f, 0.0f, rotation.getDegrees() + 180.0f));
+    hair->setRotation(Eend::Rotation(0.0f, 0.0f, rotation.getDegrees() + 180.0f));
+    hairOutter->setRotation(Eend::Rotation(0.0f, 0.0f, rotation.getDegrees() + 180.0f));
 
     // set eye rotation
     eye->setRotation(eye->getRotation() + (1.0f * dt));
-    eye->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
+    eye->setPosition(Eend::Point(position.x, position.y, position.z + 4.1f));
 
     // set position
-    body->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 3.0f));
-    head->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
-    hair->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
-    hairOutter->setPosition(Eend::Point(m_position.x, m_position.y, m_position.z + 4.1f));
+    body->setPosition(Eend::Point(position.x, position.y, position.z + 3.0f));
+    head->setPosition(Eend::Point(position.x, position.y, position.z + 4.1f));
+    hair->setPosition(Eend::Point(position.x, position.y, position.z + 4.1f));
+    hairOutter->setPosition(Eend::Point(position.x, position.y, position.z + 4.1f));
 }
 
-bool Trey::isKicking() { return m_kicking; }
+bool Trey::isKicking() { return kicking; }
 
 bool Trey::updateDirection() {
 
@@ -252,59 +255,59 @@ bool Trey::updateDirection() {
     }
 
     if (direction) {
-        if (m_facing.getDirection() == *direction) newDirection = true;
-        m_facing.setDirection(*direction);
-        m_moving = true;
+        if (facing.getDirection() == *direction) newDirection = true;
+        facing.setDirection(*direction);
+        moving = true;
     } else {
-        m_moving = false;
+        moving = false;
     }
     return newDirection;
 }
 
 void Trey::updatePosition(float dt) {
 
-    switch (m_facing.getDirection()) {
+    switch (facing.getDirection()) {
     case Direction::up:
-        m_position.y += M_MOVE_SPEED * dt;
+        position.y += M_MOVE_SPEED * dt;
         break;
     case Direction::upRight:
-        m_position.y += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
-        m_position.x += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
+        position.y += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
+        position.x += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         break;
     case Direction::right:
-        m_position.x += M_MOVE_SPEED * dt;
+        position.x += M_MOVE_SPEED * dt;
         break;
     case Direction::downRight:
-        m_position.y -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
-        m_position.x += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
+        position.y -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
+        position.x += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         break;
     case Direction::down:
-        m_position.y -= M_MOVE_SPEED * dt;
+        position.y -= M_MOVE_SPEED * dt;
         break;
     case Direction::downLeft:
-        m_position.y -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
-        m_position.x -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
+        position.y -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
+        position.x -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         break;
     case Direction::left:
-        m_position.x -= M_MOVE_SPEED * dt;
+        position.x -= M_MOVE_SPEED * dt;
         break;
     case Direction::upLeft:
-        m_position.y += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
-        m_position.x -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
+        position.y += M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
+        position.x -= M_MOVE_SPEED * Eend::INV_SQRT_TWO * dt;
         break;
     }
 }
 
 void Trey::handleCollision(Eend::Point& oldPosition) {
-    if (!Park::get().colliding(Eend::Point2D(m_position.x, m_position.y))) {
-    } else if (!Park::get().colliding(Eend::Point2D(oldPosition.x, m_position.y))) {
-        m_position.x = oldPosition.x;
-    } else if (!Park::get().colliding(Eend::Point2D(m_position.x, oldPosition.y))) {
-        m_position.y = oldPosition.y;
+    if (!Park::get().colliding(Eend::Point2D(position.x, position.y))) {
+    } else if (!Park::get().colliding(Eend::Point2D(oldPosition.x, position.y))) {
+        position.x = oldPosition.x;
+    } else if (!Park::get().colliding(Eend::Point2D(position.x, oldPosition.y))) {
+        position.y = oldPosition.y;
     } else {
-        m_position.x = oldPosition.x;
-        m_position.y = oldPosition.y;
+        position.x = oldPosition.x;
+        position.y = oldPosition.y;
     }
 }
 
-Eend::Angle Trey::getAngle() { return m_facing.getAngle(); }
+Eend::Angle Trey::getAngle() { return facing.getAngle(); }

@@ -37,7 +37,7 @@ class Trey {
 
         bool isKicking();
         // return true if dog dies
-        bool hit(Dog& dog);
+        void hit(Dog& dog);
 
         void update(bool activeCutscene);
         void cutsceneUpdate();
@@ -72,23 +72,23 @@ class Trey {
 
         BootCircle boot_circle;
 
-        Eend::StatueId m_headId;
-        Eend::StatueId m_hairId;
-        Eend::StatueId m_hairOutterId;
-        Eend::BoardId m_bodyId;
-        Eend::BoardId m_eyeId;
-        Eend::Point m_position;
-        Eend::Angle m_rotation;
-        Eend::Angle m_targetRotation;
+        Eend::StatueId head_id;
+        Eend::StatueId hair_id;
+        Eend::StatueId hair_outter_id;
+        Eend::BoardId body_id;
+        Eend::BoardId eye_id;
+        Eend::Point position;
+        Eend::Angle rotation;
+        Eend::Angle target_rotation;
 
-        Eend::Timer m_bodyTimer;
+        Eend::Timer body_timer;
 
-        bool m_kicking;
-        bool m_inAir;
-        float m_upVelocity;
-        Facing m_facing;
-        bool m_moving;
-        bool m_alive;
-        std::unique_ptr<Feet::Feet> m_feet;
-        std::optional<Item::Type> m_item;
+        bool kicking;
+        bool in_air;
+        float up_velocity;
+        Facing facing;
+        bool moving;
+        bool alive;
+        std::unique_ptr<Feet::Feet> feet;
+        std::optional<Item::Type> item;
 };

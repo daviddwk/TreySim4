@@ -108,16 +108,13 @@ void PuppyMill::damage() {
             }
         }
     }
-
-    if (Trey::get().isKicking()) {
-        for (Dog& dog : m_dogs) {
-            bool dogDies = Trey::get().hit(dog);
-            if (dogDies) m_numKilled++;
-        }
+    for (Dog& dog : m_dogs) {
+        Trey::get().hit(dog);
     }
     for (std::vector<Dog>::size_type dogIdx = m_dogs.size() - 1; dogIdx < m_dogs.size(); --dogIdx) {
         if (m_dogs[dogIdx].shouldDelete()) {
             m_dogs.erase(m_dogs.begin() + dogIdx);
+            m_numKilled++;
             break;
         }
     }
