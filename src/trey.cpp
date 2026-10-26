@@ -125,7 +125,10 @@ void Trey::update(bool activeCutscene) {
     }
     Trey::updateBody(dt);
 
-    boot_circle.update(Eend::Point(position.x, position.y, Park::get().elevationAtPoint(position)));
+    Eend::Point standing_position =
+        Eend::Point(position.x, position.y, Park::get().elevationAtPoint(position));
+    boot_circle.update(standing_position);
+    boot_throw.update(standing_position, vectorFromDirection(facing.getDirection()));
 }
 
 void Trey::cutsceneUpdate() { Trey::updateBody(Eend::FrameLimiter::get().deltaTime); }

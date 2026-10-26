@@ -14,6 +14,7 @@
 #include "items.hpp"
 
 #include "bootCircle.hpp"
+#include "bootThrow.hpp"
 #include "treyFeet.hpp"
 
 namespace Eend = Eendgine;
@@ -71,6 +72,7 @@ class Trey {
         Direction oppositeDirection(Direction direction);
 
         BootCircle boot_circle;
+        BootThrow boot_throw;
 
         Eend::StatueId head_id;
         Eend::StatueId hair_id;
