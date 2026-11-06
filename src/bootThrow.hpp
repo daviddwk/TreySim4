@@ -10,10 +10,9 @@
 
 const float THROW_DEFAULT_BOOT_RADIUS = 2.5f;
 const float THROW_DEFAULT_THROW_DISTANCE = 25.0f;
-const float THROW_DEFAULT_FREQUENCY = 4.0f;
+const float THROW_DEFAULT_FREQUENCY = 1.0f;
 const float THROW_DEFAULT_SPEED = 1.0f;
-
-const Eend::Point BOOT_THROW_SPRITE_OFFSET = Eend::Point(0.0f, 0.0f, 0.0f);
+const Eend::Point BOOT_THROW_SPRITE_OFFSET = Eend::Point(0.0f, 0.0f, 5.0f);
 const std::filesystem::path BOOT_THROW_SPRITE_PATH = std::filesystem::path("resources/boot");
 
 class BootThrowTraits {
@@ -94,14 +93,19 @@ class BootThrow {
                         boot_sprite = std::nullopt;
                     }
                 }
-
-                // end throw
-                //}
             }
         };
         void hit(Eend::Point trey_position, Dog& dog) {
             if (enabled()) {
-                // TODO collision
+                Eend::Sphere bootSphere(boot_position, traits.boot_radius);
+                bool kicked = pointOnSphere(dog.getPosition3d(), bootSphere);
+                if (kicked) {
+                    Eend::Vector kick_vector = boot_position - trey_position;
+                    if (glm::length(kick_vector) != 0.0f) {
+                        dog.kick(glm::normalize(boot_position - trey_position));
+                    }
+                    dog.giveDamage(1);
+                }
             }
         };
 

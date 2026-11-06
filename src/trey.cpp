@@ -145,6 +145,7 @@ void Trey::hit(Dog& dog) {
         feet->hit(position, facing.getDirection(), dog);
     }
     boot_circle.hit(position, dog);
+    boot_throw.hit(position, dog);
 }
 
 void Trey::updateBody(float dt) {

@@ -24,7 +24,7 @@ class Terrain {
 
     public:
         // would like this to be one path with scale build into the format
-        Terrain(std::filesystem::path pngHeightMap);
+        Terrain(std::filesystem::path png_height_map);
         ~Terrain();
 
         Terrain(const Terrain& other) = delete;
@@ -40,43 +40,43 @@ class Terrain {
         float getWidth() { return static_cast<float>(m_width) * m_scale.y; }
         Eend::Point getSpawn() { return positionAtTile(m_spawn); }
 
-        void playgroundEnable(const std::string& playgroundName);
-        void playgroundDisable(const std::string& playgroundName);
-        bool playgroundIsEnabled(const std::string& playgroundName);
-        void playgroundToggle(const std::string& playgroundName);
+        void playgroundEnable(const std::string& playground_name);
+        void playgroundDisable(const std::string& playground_name);
+        bool playgroundIsEnabled(const std::string& playground_name);
+        void playgroundToggle(const std::string& playground_name);
 
         float elevationAtPoint(Eend::Point2D point);
         Eend::Point positionAtTile(Tile tile);
-        Eend::Point positionAtTile(Tile tile, float heightOffset);
+        Eend::Point positionAtTile(Tile tile, float height_offset);
 
     private:
-        std::tuple<Eend::BoardId, float> boardFromJson(Json::Value boardJson);
-        Eend::StatueId statueFromJson(Json::Value statueJson);
-        std::tuple<Eend::DollId, float> dollFromJson(Json::Value dollJson);
-        Portal portalFromJson(Json::Value portalJson);
+        std::tuple<Eend::BoardId, float> boardFromJson(Json::Value board_json);
+        Eend::StatueId statueFromJson(Json::Value statue_json);
+        std::tuple<Eend::DollId, float> dollFromJson(Json::Value doll_json);
+        Portal portalFromJson(Json::Value portal_json);
         void
-        collisionFromJson(Json::Value collisionJson, std::vector<Eend::Rectangle>& collisionVec);
+        collisionFromJson(Json::Value collision_json, std::vector<Eend::Rectangle>& collision_vec);
 
         void collisionFromMap(
-            std::filesystem::path collisionMap, std::vector<Eend::Rectangle>& collisionVec);
+            std::filesystem::path collision_map, std::vector<Eend::Rectangle>& collision_vec);
 
         void loadEntities(
-            Json::Value rootJson, std::vector<std::tuple<Eend::BoardId, float>>& boards,
+            Json::Value root_json, std::vector<std::tuple<Eend::BoardId, float>>& boards,
             std::vector<Eend::StatueId>& statues,
             std::vector<std::tuple<Eend::DollId, float>> dolls,
-            std::vector<std::vector<float>> heightMap);
-        void loadHeightMap(std::vector<std::vector<float>>& heightMap);
+            std::vector<std::vector<float>> height_map);
+        void loadHeightMap(std::vector<std::vector<float>>& height_map);
 
-        void createTerrainObj(const std::vector<std::vector<float>>& heightMap);
+        void createTerrainObj(const std::vector<std::vector<float>>& height_map);
 
         const std::filesystem::path m_path;
-        const std::filesystem::path m_metadataPath;
+        const std::filesystem::path m_metadata_path;
         int m_height;
         int m_width;
-        float m_animationSpeed;
-        std::vector<std::vector<float>> m_heightMap;
-        Eend::StatueId m_statueId;
-        std::vector<Eend::Rectangle> m_collisionRectangles;
+        float m_animation_speed;
+        std::vector<std::vector<float>> m_height_map;
+        Eend::StatueId m_statue_id;
+        std::vector<Eend::Rectangle> m_collision_rectangles;
         std::vector<std::tuple<Eend::BoardId, float>> m_boards;
         std::vector<Eend::StatueId> m_statues;
         std::vector<std::tuple<Eend::DollId, float>> m_dolls;

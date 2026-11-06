@@ -25,47 +25,47 @@ namespace Eend = Eendgine;
 
 Json::Value jsonLoadFile(std::filesystem::path filePath);
 
-const std::filesystem::path metadataSubPath("generate/metadata.json");
-const std::filesystem::path heightMapSubPath("generate/heightMap.png");
-const std::filesystem::path collisionMapSubPath("generate/collisionMap.png");
+const std::filesystem::path metadata_subpath("generate/metadata.json");
+const std::filesystem::path heightmap_subpath("generate/heightMap.png");
+const std::filesystem::path collisionmap_subpath("generate/collisionMap.png");
 
 Terrain::Terrain(const std::filesystem::path path)
-    : m_path(path), m_height(0), m_width(0), m_animationSpeed(0), m_statueId(0), m_spawn(0.0f) {
+    : m_path(path), m_height(0), m_width(0), m_animation_speed(0), m_statue_id(0), m_spawn(0.0f) {
     // TODO this is possibly the worst code in this whole project
 
-    std::filesystem::path metadataPath = path / metadataSubPath;
-    Json::Value rootJson = Eend::jsonLoadFile(metadataPath);
+    std::filesystem::path metadata_path = path / metadata_subpath;
+    Json::Value root_json = Eend::jsonLoadFile(metadata_path);
 
-    m_scale = Eend::jsonVec3(rootJson, "Scale", metadataPath);
-    m_spawn = Eend::jsonVec2(rootJson, "Spawn", metadataPath);
+    m_scale = Eend::jsonVec3(root_json, "Scale", metadata_path);
+    m_spawn = Eend::jsonVec2(root_json, "Spawn", metadata_path);
 
     // optional
-    if (rootJson["Pace"].isNumeric()) {
-        m_animationSpeed = Eend::jsonFloat(rootJson, "Pace", metadataPath);
+    if (root_json["Pace"].isNumeric()) {
+        m_animation_speed = Eend::jsonFloat(root_json, "Pace", metadata_path);
     }
 
     // optional
-    if (rootJson["Portals"].isArray()) {
-        for (unsigned int portalIdx = 0; portalIdx < rootJson["Portals"].size(); ++portalIdx) {
-            m_portals.push_back(Terrain::portalFromJson(rootJson["Portals"][portalIdx]));
+    if (root_json["Portals"].isArray()) {
+        for (unsigned int portal_idx = 0; portal_idx < root_json["Portals"].size(); ++portal_idx) {
+            m_portals.push_back(Terrain::portalFromJson(root_json["Portals"][portal_idx]));
         }
     }
 
-    Terrain::loadHeightMap(m_heightMap);
+    Terrain::loadHeightMap(m_height_map);
 
     // TODO i want to encapsulate this and make it clear that it's using the height map
-    const std::filesystem::path collisionMapPath = m_path / collisionMapSubPath;
-    Terrain::collisionFromMap(collisionMapPath, m_collisionRectangles);
+    const std::filesystem::path collisionmap_path = m_path / collisionmap_subpath;
+    Terrain::collisionFromMap(collisionmap_path, m_collision_rectangles);
 
-    Terrain::loadEntities(rootJson, m_boards, m_statues, m_dolls, m_heightMap);
+    Terrain::loadEntities(root_json, m_boards, m_statues, m_dolls, m_height_map);
 
     // TODO make this conditional or a seperate util
-    Terrain::createTerrainObj(m_heightMap);
-    m_statueId = Eend::Entities::statues().insert(m_path);
+    Terrain::createTerrainObj(m_height_map);
+    m_statue_id = Eend::Entities::statues().insert(m_path);
 }
 
 Terrain::~Terrain() {
-    Eend::Entities::statues().erase(m_statueId);
+    Eend::Entities::statues().erase(m_statue_id);
     for (auto& board : m_boards)
         Eend::Entities::boards().erase(std::get<Eend::BoardId>(board));
     for (Eend::StatueId& statue : m_statues)
@@ -78,15 +78,16 @@ void Terrain::update() {
     static float cumulative = 0.0f;
     cumulative += Eend::FrameLimiter::get().deltaTime;
 
-    auto animateBoards = [](std::vector<std::tuple<Eend::BoardId, float>>& pacedBoards) {
-        for (auto& board : pacedBoards) {
-            Eend::Board* boardRef = Eend::Entities::boards().getRef(std::get<Eend::BoardId>(board));
+    auto animate_boards = [](std::vector<std::tuple<Eend::BoardId, float>>& paced_boards) {
+        for (auto& board : paced_boards) {
+            Eend::Board* board_ref =
+                Eend::Entities::boards().getRef(std::get<Eend::BoardId>(board));
             if (std::get<float>(board) != 0) {
-                boardRef->setStripIdx((size_t)(cumulative / std::get<float>(board)));
+                board_ref->setStripIdx((size_t)(cumulative / std::get<float>(board)));
             }
         }
     };
-    auto animateDolls = [](std::vector<std::tuple<Eend::DollId, float>>& pacedDolls) {
+    auto animate_dolls = [](std::vector<std::tuple<Eend::DollId, float>>& pacedDolls) {
         for (auto& doll : pacedDolls) {
             Eend::Doll* dollRef = Eend::Entities::dolls().getRef(std::get<Eend::DollId>(doll));
             float animScale = dollRef->getAnim();
@@ -95,35 +96,35 @@ void Terrain::update() {
         }
     };
 
-    animateBoards(m_boards);
+    animate_boards(m_boards);
     for (auto& [key, playground] : m_playgrounds) {
-        animateBoards(playground.boards);
+        animate_boards(playground.boards);
     }
-    animateDolls(m_dolls);
+    animate_dolls(m_dolls);
     for (auto& [key, playground] : m_playgrounds) {
-        animateDolls(playground.dolls);
+        animate_dolls(playground.dolls);
     }
 
-    if (m_animationSpeed != 0.0f) {
-        Eend::Entities::statues().getRef(m_statueId)->setStripIdx(cumulative / m_animationSpeed);
+    if (m_animation_speed != 0.0f) {
+        Eend::Entities::statues().getRef(m_statue_id)->setStripIdx(cumulative / m_animation_speed);
     }
 }
 
 bool Terrain::colliding(const Eend::Point2D point) {
 
-    auto handlePortals = [point](std::vector<Portal>& portals) {
+    auto handle_portals = [point](std::vector<Portal>& portals) {
         for (auto& portal : portals) {
             if (pointOnRectangle(point, portal.collision)) {
                 Park::get().setTerrain(portal.terrainPath);
             }
         }
     };
-    handlePortals(m_portals);
+    handle_portals(m_portals);
     for (auto& [key, playground] : m_playgrounds) {
-        handlePortals(playground.portals);
+        handle_portals(playground.portals);
     }
 
-    for (auto& rectangle : m_collisionRectangles) {
+    for (auto& rectangle : m_collision_rectangles) {
         if (pointOnRectangle(point, rectangle)) return true;
     }
     for (auto& [key, playground] : m_playgrounds) {
@@ -134,66 +135,65 @@ bool Terrain::colliding(const Eend::Point2D point) {
     return false;
 }
 
-void Terrain::playgroundEnable(const std::string& playgroundName) {
-    assert(m_playgrounds.count(playgroundName) == 0); // TODO idk but handle better
+void Terrain::playgroundEnable(const std::string& playground_name) {
+    assert(m_playgrounds.count(playground_name) == 0); // TODO idk but handle better
 
-    std::filesystem::path metadataPath = m_path / metadataSubPath;
-    Json::Value rootJson = Eend::jsonLoadFile(metadataPath);
+    std::filesystem::path metadata_path = m_path / metadata_subpath;
+    Json::Value root_json = Eend::jsonLoadFile(metadata_path);
 
-    m_playgrounds[playgroundName];
+    m_playgrounds[playground_name];
 
-    if (rootJson["Playgrounds"].isObject()) {
-        Json::Value pgJson = rootJson["Playgrounds"][playgroundName];
-        assert(pgJson.isObject());
+    if (root_json["Playgrounds"].isObject()) {
+        Json::Value pg_json = root_json["Playgrounds"][playground_name];
+        assert(pg_json.isObject());
         Terrain::loadEntities(
-            pgJson,
-            m_playgrounds[playgroundName].boards,
-            m_playgrounds[playgroundName].statues,
-            m_playgrounds[playgroundName].dolls,
-            m_heightMap);
-        if (pgJson["Portals"].isArray()) {
-            for (unsigned int portalIdx = 0; portalIdx < pgJson["Portals"].size(); ++portalIdx) {
-                m_playgrounds[playgroundName].portals.push_back(
-                    portalFromJson(pgJson["Portals"][portalIdx]));
+            pg_json,
+            m_playgrounds[playground_name].boards,
+            m_playgrounds[playground_name].statues,
+            m_playgrounds[playground_name].dolls,
+            m_height_map);
+        if (pg_json["Portals"].isArray()) {
+            for (unsigned int portalIdx = 0; portalIdx < pg_json["Portals"].size(); ++portalIdx) {
+                m_playgrounds[playground_name].portals.push_back(
+                    portalFromJson(pg_json["Portals"][portalIdx]));
             }
         }
-        if (pgJson["Collision"].isArray()) {
-            for (unsigned int portalIdx = 0; portalIdx < pgJson["Collision"].size(); ++portalIdx) {
+        if (pg_json["Collision"].isArray()) {
+            for (unsigned int portalIdx = 0; portalIdx < pg_json["Collision"].size(); ++portalIdx) {
                 collisionFromJson(
-                    pgJson["Collision"][portalIdx],
-                    m_playgrounds[playgroundName].collision);
+                    pg_json["Collision"][portalIdx],
+                    m_playgrounds[playground_name].collision);
             }
         }
     }
 }
 
-void Terrain::playgroundDisable(const std::string& playgroundName) {
-    m_playgrounds.erase(playgroundName);
+void Terrain::playgroundDisable(const std::string& playground_name) {
+    m_playgrounds.erase(playground_name);
 }
 
-bool Terrain::playgroundIsEnabled(const std::string& playgroundName) {
-    return m_playgrounds.count(playgroundName) > 0;
+bool Terrain::playgroundIsEnabled(const std::string& playground_name) {
+    return m_playgrounds.count(playground_name) > 0;
 }
 
-void Terrain::playgroundToggle(const std::string& playgroundName) {
-    if (playgroundIsEnabled(playgroundName)) {
-        playgroundDisable(playgroundName);
+void Terrain::playgroundToggle(const std::string& playground_name) {
+    if (playgroundIsEnabled(playground_name)) {
+        playgroundDisable(playground_name);
     } else {
-        playgroundEnable(playgroundName);
+        playgroundEnable(playground_name);
     }
 }
 
 Eend::Point Terrain::positionAtTile(const Tile tile) { return positionAtTile(tile, 0.0f); }
 
-Eend::Point Terrain::positionAtTile(const Tile tile, const float heightOffset) {
+Eend::Point Terrain::positionAtTile(const Tile tile, const float height_offset) {
     return Eend::Point(
         (tile.x * m_scale.x) + (m_scale.x / 2.0),
         (tile.y * -m_scale.y) + (-m_scale.y / 2.0),
-        heightOffset + elevationAtPoint(Eend::Point2D(tile.x * m_scale.x, tile.y * -m_scale.y)));
+        height_offset + elevationAtPoint(Eend::Point2D(tile.x * m_scale.x, tile.y * -m_scale.y)));
 }
 
 float Terrain::elevationAtPoint(Eend::Point2D point) {
-
     // TODO I'm flipping the y around randomly here
     // be more explicit about pixel coords vs 3d coords
 
@@ -207,59 +207,59 @@ float Terrain::elevationAtPoint(Eend::Point2D point) {
     //             |      \|
     // bottom left +-------+ bottom right
 
-    const float scaledX = point.x / m_scale.x;
-    const float scaledY = point.y / m_scale.y;
+    const float scaled_x = point.x / m_scale.x;
+    const float scaled_y = point.y / m_scale.y;
 
-    const bool outsideTerrain = scaledX < 0 || scaledY > 0 ||
-                                scaledX >= ((float)m_heightMap[0].size() - 1.0f) ||
-                                scaledY <= (-(float)m_heightMap.size() + 1.0f);
+    const bool outside_terrain = scaled_x < 0 || scaled_y > 0 ||
+                                 scaled_x >= static_cast<float>(m_height_map[0].size() - 1) ||
+                                 scaled_y <= static_cast<float>((-(float)m_height_map.size() + 1));
     // could make this an optional
-    if (outsideTerrain) {
+    if (outside_terrain) {
         return 0.0f;
     }
 
     Eend::Triangle triangle(Eend::Point(0.0f), Eend::Point(0.0f), Eend::Point(0.0f));
 
-    const float relativeX = scaledX - (float)floor(scaledX);
-    const float relativeY = -scaledY - (float)floor(-scaledY);
+    const float relativeX = scaled_x - (float)floor(scaled_x);
+    const float relativeY = -scaled_y - (float)floor(-scaled_y);
     const bool upperTri = (relativeX - relativeY) > 0;
 
-    const size_t topLeftXIdx = (size_t)floor(scaledX);
-    const size_t topLeftYIdx = (size_t)floor(-scaledY);
+    const int topLeftXIdx = floor(scaled_x);
+    const int topLeftYIdx = floor(-scaled_y);
 
-    const size_t bottomRightXIdx = (size_t)floor(scaledX + 1);
-    const size_t bottomRightYIdx = (size_t)floor(-scaledY + 1);
+    const int bottomRightXIdx = floor(scaled_x + 1);
+    const int bottomRightYIdx = floor(-scaled_y + 1);
 
     const Eend::Point topLeftPoint = Eend::Point(
-        (float)topLeftXIdx * m_scale.x,
-        (float)topLeftYIdx * -m_scale.y,
-        m_heightMap[topLeftYIdx][topLeftXIdx]);
+        static_cast<float>(topLeftXIdx) * m_scale.x,
+        static_cast<float>(topLeftYIdx) * -m_scale.y,
+        m_height_map[topLeftYIdx][topLeftXIdx]);
 
     const Eend::Point bottomRightPoint = Eend::Point(
-        (float)bottomRightXIdx * m_scale.x,
-        (float)bottomRightYIdx * -m_scale.y,
-        m_heightMap[bottomRightYIdx][bottomRightXIdx]);
+        static_cast<float>(bottomRightXIdx) * m_scale.x,
+        static_cast<float>(bottomRightYIdx) * -m_scale.y,
+        m_height_map[bottomRightYIdx][bottomRightXIdx]);
 
     if (upperTri) {
 
-        const size_t topRightXIdx = (size_t)floor(scaledX + 1);
-        const size_t topRightYIdx = (size_t)floor(-scaledY);
+        const int topRightXIdx = floor(scaled_x + 1);
+        const int topRightYIdx = floor(-scaled_y);
 
         const Eend::Point topRightPoint = Eend::Point(
-            (float)topRightXIdx * m_scale.x,
-            (float)topRightYIdx * -m_scale.y,
-            m_heightMap[topRightYIdx][topRightXIdx]);
+            static_cast<float>(topRightXIdx * m_scale.x),
+            static_cast<float>(topRightYIdx * -m_scale.y),
+            m_height_map[topRightYIdx][topRightXIdx]);
 
         triangle = Eend::Triangle(topLeftPoint, topRightPoint, bottomRightPoint);
 
     } else {
 
-        const size_t bottomLeftXIdx = (size_t)floor(scaledX);
-        const size_t bottomLeftYIdx = (size_t)floor(-scaledY + 1);
+        const int bottomLeftXIdx = floor(scaled_x);
+        const int bottomLeftYIdx = floor(-scaled_y + 1);
         const Eend::Point bottomLeftPoint = Eend::Point(
-            (float)bottomLeftXIdx * m_scale.x,
-            (float)bottomLeftYIdx * -m_scale.y,
-            m_heightMap[bottomLeftYIdx][bottomLeftXIdx]);
+            static_cast<float>(bottomLeftXIdx * m_scale.x),
+            static_cast<float>(bottomLeftYIdx * -m_scale.y),
+            m_height_map[bottomLeftYIdx][bottomLeftXIdx]);
 
         triangle = Eend::Triangle(topLeftPoint, bottomLeftPoint, bottomRightPoint);
     }
@@ -268,7 +268,7 @@ float Terrain::elevationAtPoint(Eend::Point2D point) {
 
 void Terrain::loadHeightMap(std::vector<std::vector<float>>& heightMap) {
     // create height map
-    const std::filesystem::path heightMapPath = m_path / heightMapSubPath;
+    const std::filesystem::path heightMapPath = m_path / heightmap_subpath;
     int channels = 0;
     unsigned char* imageData = stbi_load(heightMapPath.c_str(), &m_width, &m_height, &channels, 0);
     constexpr float IMAGE_DATA_MAX_VALUE = 256.0f;
@@ -387,7 +387,7 @@ void Terrain::loadEntities(
 }
 
 void Terrain::createTerrainObj(const std::vector<std::vector<float>>& heightMap) {
-    std::filesystem::path heightMapPath = m_path / heightMapSubPath;
+    std::filesystem::path heightMapPath = m_path / heightmap_subpath;
     std::string fileName = heightMapPath.stem().string();
 
     std::filesystem::path objPath = m_path / m_path.filename().string().append(".obj");
@@ -446,7 +446,7 @@ void Terrain::createTerrainObj(const std::vector<std::vector<float>>& heightMap)
 }
 
 std::tuple<Eend::BoardId, float> Terrain::boardFromJson(Json::Value boardJson) {
-    std::filesystem::path metadataPath = m_path / metadataSubPath;
+    std::filesystem::path metadataPath = m_path / metadata_subpath;
     std::filesystem::path boardPath = m_path / Eend::jsonString(boardJson, "path", metadataPath);
     Eend::BoardId id = Eend::Entities::boards().insert(boardPath);
     Eend::Board* boardRef = Eend::Entities::boards().getRef(id);
@@ -461,7 +461,7 @@ std::tuple<Eend::BoardId, float> Terrain::boardFromJson(Json::Value boardJson) {
 }
 
 Eend::StatueId Terrain::statueFromJson(Json::Value statueJson) {
-    std::filesystem::path metadataPath = m_path / metadataSubPath;
+    std::filesystem::path metadataPath = m_path / metadata_subpath;
     std::filesystem::path statuePath = m_path / Eend::jsonString(statueJson, "path", metadataPath);
     Eend::StatueId id = Eend::Entities::statues().insert(statuePath);
     Eend::Statue* statueRef = Eend::Entities::statues().getRef(id);
@@ -474,7 +474,7 @@ Eend::StatueId Terrain::statueFromJson(Json::Value statueJson) {
 }
 
 std::tuple<Eend::DollId, float> Terrain::dollFromJson(Json::Value dollJson) {
-    std::filesystem::path metadataPath = m_path / metadataSubPath;
+    std::filesystem::path metadataPath = m_path / metadata_subpath;
     std::filesystem::path dollPath = m_path / Eend::jsonString(dollJson, "path", metadataPath);
     Eend::DollId id = Eend::Entities::dolls().insert(dollPath);
     Eend::Doll* dollRef = Eend::Entities::dolls().getRef(id);
@@ -491,7 +491,7 @@ std::tuple<Eend::DollId, float> Terrain::dollFromJson(Json::Value dollJson) {
 }
 
 Portal Terrain::portalFromJson(Json::Value portalJson) {
-    std::filesystem::path metadataPath = m_path / metadataSubPath;
+    std::filesystem::path metadataPath = m_path / metadata_subpath;
     Tile tilePosition = Eend::jsonVec2(portalJson, "position", metadataPath);
     TileScale tileScale = Eend::jsonVec2(portalJson, "scale", metadataPath);
 
@@ -505,7 +505,7 @@ Portal Terrain::portalFromJson(Json::Value portalJson) {
 
 void Terrain::collisionFromJson(
     Json::Value collisionJson, std::vector<Eend::Rectangle>& collisionVec) {
-    std::filesystem::path metadataPath = m_path / metadataSubPath;
+    std::filesystem::path metadataPath = m_path / metadata_subpath;
     std::filesystem::path collisionMap;
 
     if (collisionJson.isMember("map")) {
