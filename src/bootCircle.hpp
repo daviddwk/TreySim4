@@ -3,46 +3,25 @@
 
 #include <Eendgine/frameLimiter.hpp>
 
-#include "collision.hpp"
 #include "dog.hpp"
-#include "items.hpp"
 
-constexpr float DEFAULT_BOOT_RADIUS = 2.5f;
-constexpr float DEFAULT_CIRCLE_RADIUS = 15.0f;
-constexpr float DEFAULT_SPEED = 10.0f;
-
-constexpr float BOOT_SPRITE_OFFSET = 2.5f;
-constexpr float BOOT_COLLISION_OFFSET = 0.0f;
-
-const std::filesystem::path BOOT_SPRITE_PATH = std::filesystem::path("resources/boot");
+namespace Eend = Eendgine;
 
 class BootCircleTraits {
     public:
-        BootCircleTraits(float bootRadius, float circleRadius, float speed)
-            : boot_radius(bootRadius), circle_radius(circleRadius), speed(speed) {};
+        BootCircleTraits(float bootRadius, float circleRadius, float speed);
 
-        BootCircleTraits& operator+=(const BootCircleTraits& rhs) {
-            BootCircleTraits::boot_radius += rhs.boot_radius;
-            BootCircleTraits::circle_radius += rhs.circle_radius;
-            BootCircleTraits::speed += rhs.speed;
-            return *this;
-        }
-        BootCircleTraits& operator-=(const BootCircleTraits& rhs) {
-            BootCircleTraits::boot_radius -= rhs.boot_radius;
-            BootCircleTraits::circle_radius -= rhs.circle_radius;
-            BootCircleTraits::speed -= rhs.speed;
-            return *this;
-        }
+        BootCircleTraits& operator+=(const BootCircleTraits& rhs);
+        BootCircleTraits& operator-=(const BootCircleTraits& rhs);
 
-        float boot_radius; // TODO make everything snakecase lol
+        float boot_radius;
         float circle_radius;
         float speed;
 };
 
 class BootCircleItem {
     public:
-        BootCircleItem(float boot_radius, float circle_radius, float speed)
-            : traits(boot_radius, circle_radius, speed) {};
+        BootCircleItem(float boot_radius, float circle_radius, float speed);
         const BootCircleTraits traits;
 
     private:
@@ -51,62 +30,15 @@ class BootCircleItem {
 
 class BootCircle { // TODO particle system that follows boot!
     public:
-        BootCircle()
-            : boot_rotation(1.0f, 0.0f),
-              traits(DEFAULT_BOOT_RADIUS, DEFAULT_CIRCLE_RADIUS, DEFAULT_SPEED) {
+        BootCircle();
+        ~BootCircle();
 
-            itemTraits.emplace(0.0f, 0.0f, 0.0f);
-        };
-        ~BootCircle() {
-            if (BootCircle::boot_sprite) Eend::Entities::boards().erase(*BootCircle::boot_sprite);
-        }
+        void update(Eend::Point trey_position);
+        void hit(Eend::Point trey_position, Dog& dog);
+        bool enabled();
 
-        void update(Eend::Point trey_position) {
-
-            float dt = Eend::FrameLimiter::get().deltaTime;
-
-            // unconditionally update boot position
-            boot_rotation = glm::rotate(boot_rotation, dt * traits.speed);
-            const Eend::Vector boot_position_relative =
-                traits.circle_radius * Eend::Vector(boot_rotation.x, boot_rotation.y, 0.0f);
-            boot_position = trey_position + boot_position_relative + BOOT_COLLISION_OFFSET;
-            // TODO add a bit of lag behind trey's position?
-
-            // handle sprite
-            if (BootCircle::boot_sprite && !enabled()) {
-                Eend::Entities::boards().erase(*BootCircle::boot_sprite);
-            } else if (!BootCircle::boot_sprite && enabled()) {
-                BootCircle::boot_sprite = Eend::Entities::boards().insert(BOOT_SPRITE_PATH);
-            }
-            if (BootCircle::boot_sprite) {
-                Eend::Board* board_ref = Eend::Entities::boards().getRef(*BootCircle::boot_sprite);
-                board_ref->setPosition(boot_position + BOOT_SPRITE_OFFSET);
-                board_ref->setScale(Eend::Scale2D(traits.boot_radius * 2));
-            }
-        };
-        void hit(Eend::Point trey_position, Dog& dog) {
-            if (enabled()) {
-                Eend::Sphere bootSphere(boot_position, traits.boot_radius);
-                bool kicked = pointOnSphere(dog.getPosition3d(), bootSphere);
-                if (kicked) {
-                    dog.kick(glm::normalize(boot_position - trey_position));
-                    dog.giveDamage(1);
-                }
-            }
-        };
-        bool enabled() { return !itemTraits.empty(); }
-
-        void addTraits(BootCircleTraits newTraits) {
-            traits += newTraits;
-            itemTraits.push(newTraits);
-        };
-        void removeTraits() {
-            if (enabled()) {
-                BootCircleTraits oldTraits = itemTraits.front();
-                traits -= oldTraits;
-                itemTraits.pop();
-            }
-        };
+        void addTraits(BootCircleTraits newTraits);
+        void removeTraits();
 
     private:
         std::optional<Eend::BoardId> boot_sprite;
@@ -114,5 +46,5 @@ class BootCircle { // TODO particle system that follows boot!
         Eend::Vector2D boot_rotation;
 
         BootCircleTraits traits;
-        std::queue<BootCircleTraits> itemTraits;
+        std::queue<BootCircleTraits> item_traits;
 };

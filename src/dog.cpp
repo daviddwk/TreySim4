@@ -11,38 +11,58 @@
 #include <print>
 namespace Eend = Eendgine;
 
+constexpr float SPEED = 15.0f;
+
+constexpr unsigned int DAMAGE = 2;
+constexpr unsigned int HEALTH = 3;
+
+constexpr float KNOCKBACK_MAX = SPEED * 4.0f;
+constexpr float KNOCKBACK_MIN = SPEED;
+constexpr float KNOCKBACK_DECAY_FACTOR = 1.0f;
+constexpr float KNOCKBACK_STOP = 5.0;
+constexpr float KNOCKBACK_DEAD_MULTIPLIER = 1.5f;
+
+constexpr float ANIM_INCREMENT_TIME = 0.25f;
+constexpr float QUICK_INCREMENT_TIME = 0.125f;
+
+constexpr float UP_OFFSET = 2.0f;
+constexpr float STOP_DISTANCE = 3.0f;
+
+constexpr float BLINK_AFTER_DEATH_TIME = 3.0f;
+constexpr float DELETE_AFTER_DEATH_TIME = 5.0f;
+
 Dog::Dog(Eend::Point2D position, Eend::Scale2D scale, float speed, Dog::Type type)
-    : m_type(type), m_bodyId(Eend::Entities::boards().insert(getDogPath(type) / "boards")),
-      m_position(position), m_speed(speed), m_knockback(Eend::Point2D(0.0f)), m_animTime(0.0f),
-      m_health(M_HEALTH), m_deadTime(0.0f), m_delete(false) {
-    Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
+    : type(type), body_id(Eend::Entities::boards().insert(getDogPath(type) / "boards")),
+      position(position), speed(speed), knockback(Eend::Point2D(0.0f)), anim_time(0.0f),
+      health(HEALTH), dead_time(0.0f), to_delete(false) {
+    Eend::Board* boardRef = Eend::Entities::boards().getRef(body_id);
     boardRef->setStrip("walk");
     boardRef->setScale(scale);
     boardRef->setPosition(
         Eend::Point(position.x, Park::get().elevationAtPoint(position), position.y));
 }
-Dog::~Dog() { Eend::Entities::boards().erase(m_bodyId); }
+Dog::~Dog() { Eend::Entities::boards().erase(body_id); }
 
 Dog::Dog(const Dog& other) noexcept
-    : m_bodyId(Eend::Entities::boards().clone(other.m_bodyId)), m_position(other.m_position),
-      m_speed(other.m_speed), m_knockback(other.m_knockback), m_animTime(other.m_animTime),
-      m_health(other.m_health), m_deadTime(other.m_deadTime), m_delete(other.m_delete) {}
+    : body_id(Eend::Entities::boards().clone(other.body_id)), position(other.position),
+      speed(other.speed), knockback(other.knockback), anim_time(other.anim_time),
+      health(other.health), dead_time(other.dead_time), to_delete(other.to_delete) {}
 
 Dog& Dog::operator=(const Dog& other) noexcept {
     // Self-assignment detection
     if (&other == this) return *this;
 
-    Eend::Entities::boards().erase(m_bodyId);
+    Eend::Entities::boards().erase(body_id);
 
     // transfer ownership
-    m_bodyId = Eend::Entities::boards().clone(other.m_bodyId);
-    m_position = other.m_position;
-    m_speed = other.m_speed;
-    m_knockback = other.m_knockback;
-    m_animTime = other.m_animTime;
-    m_health = other.m_health;
-    m_deadTime = other.m_deadTime;
-    m_delete = other.m_delete;
+    body_id = Eend::Entities::boards().clone(other.body_id);
+    position = other.position;
+    speed = other.speed;
+    knockback = other.knockback;
+    anim_time = other.anim_time;
+    health = other.health;
+    dead_time = other.dead_time;
+    to_delete = other.to_delete;
 
     return *this;
 }
@@ -50,8 +70,10 @@ Dog& Dog::operator=(const Dog& other) noexcept {
 /*
 Dog::Dog(Dog&& other) noexcept
     : m_bodyId(Eend::Entities::boards().clone(other.m_bodyId)), m_position(other.m_position),
-      m_speed(other.m_speed), m_knockback(other.m_knockback), m_animTime(other.m_animTime),
-      m_health(other.m_health), m_deadTime(other.m_deadTime), m_delete(other.m_delete) {}
+      m_speed(other.m_speed), m_knockback(other.m_knockback), m_anim_time(other.m_anim_time),
+      m_health(other.m_health), m_dead_time
+      (other.m_dead_time
+      ), m_delete(other.m_delete) {}
 
 Dog& Dog::operator=(Dog&& other) noexcept {
     // Self-assignment detection
@@ -64,98 +86,102 @@ Dog& Dog::operator=(Dog&& other) noexcept {
     m_position = other.m_position;
     m_speed = other.m_speed;
     m_knockback = other.m_knockback;
-    m_animTime = other.m_animTime;
+    m_anim_time = other.m_anim_time;
     m_health = other.m_health;
-    m_deadTime = other.m_deadTime;
+    m_dead_time
+     = other.m_dead_time
+    ;
     m_delete = other.m_delete;
 
     return *this;
 }
 */
 
-void Dog::setSpeed(float speed) { m_speed = speed; }
+void Dog::setSpeed(float speed) { Dog::speed = speed; }
 
-Eend::Point2D Dog::getPosition() { return m_position; }
+Eend::Point2D Dog::getPosition() { return Dog::position; }
 
 Eend::Point Dog::getPosition3d() {
-    return Eend::Point(m_position.x, m_position.y, Park::get().elevationAtPoint(m_position));
+    return Eend::Point(position.x, position.y, Park::get().elevationAtPoint(position));
 }
 
-unsigned int Dog::getDamage() { return M_DAMAGE; }
+unsigned int Dog::getDamage() { return DAMAGE; }
 
 bool Dog::giveDamage(unsigned int damage) {
-    if (damage >= m_health) {
-        m_health = 0;
-        Eendgine::Board* board = Eend::Entities::boards().getRef(m_bodyId);
+    if (damage >= health) {
+        health = 0;
+        Eendgine::Board* board = Eend::Entities::boards().getRef(body_id);
         board->setStrip("dead");
         board->setStripIdx(0);
-        m_knockback *= M_KNOCKBACK_DEAD_MULTIPLIER;
+        knockback *= KNOCKBACK_DEAD_MULTIPLIER;
         return true;
     } else {
-        m_health -= damage;
+        health -= damage;
         return false;
     }
 }
 
-unsigned int Dog::getHealth() { return m_health; }
+unsigned int Dog::getHealth() { return Dog::health; }
 
-bool Dog::shouldDelete() { return m_delete; }
+bool Dog::shouldDelete() { return Dog::to_delete; }
 
 void Dog::kick(Eend::Vector kick) {
-    float kickFactor = glm::length(kick);
-    kickFactor = ((M_KNOCKBACK_MAX - M_KNOCKBACK_MIN) * kickFactor) + (M_KNOCKBACK_MIN);
-    m_knockback = glm::normalize(kick) * kickFactor;
+
+    const float kick_length = glm::length(kick);
+
+    if (kick_length == 0.0f) return;
+
+    const float kickFactor = ((KNOCKBACK_MAX - KNOCKBACK_MIN) * kick_length) + (KNOCKBACK_MIN);
+
+    knockback = glm::normalize(kick) * kickFactor;
 }
 
 void Dog::update() {
 
-    Eend::Board* boardRef = Eend::Entities::boards().getRef(m_bodyId);
+    Eend::Board* board_ref = Eend::Entities::boards().getRef(body_id);
     float dt = Eend::FrameLimiter::get().deltaTime;
 
-    m_animTime += dt;
-    if (m_health == 0) {
-        m_deadTime += dt;
+    anim_time += dt;
+    if (health == 0) {
+        dead_time += dt;
     }
-    if (m_health > 0) {
-        if (m_animTime > M_ANIM_INCREMENT_TIME) {
-            m_animTime = 0;
-            boardRef->nextStripIdx();
+    if (health > 0) {
+        if (anim_time > ANIM_INCREMENT_TIME) {
+            anim_time = 0;
+            board_ref->nextStripIdx();
         }
     } else {
-        if ((m_deadTime > M_BLINK_AFTER_DEATH_TIME) && (m_animTime > M_ANIM_INCREMENT_TIME)) {
-            m_animTime = 0;
-            boardRef->nextStripIdx();
+        if ((dead_time > BLINK_AFTER_DEATH_TIME) && (anim_time > ANIM_INCREMENT_TIME)) {
+            anim_time = 0;
+            board_ref->nextStripIdx();
         }
     }
 
-    m_position += m_knockback * dt;
+    position += knockback * dt;
 
     Eend::Point2D approachPoint = Trey::get().getPosition();
 
-    if (m_health != 0) {
-        const glm::vec2 difference = approachPoint - m_position;
-        boardRef->setStripFlip(difference.x < 0.0f);
-        if (glm::length(difference) > M_STOP_DISTANCE) {
-            m_position += glm::normalize(approachPoint - m_position) * M_SPEED * dt;
+    if (health != 0) {
+        const glm::vec2 difference = approachPoint - position;
+        board_ref->setStripFlip(difference.x < 0.0f);
+        if (glm::length(difference) > STOP_DISTANCE) {
+            position += glm::normalize(approachPoint - position) * SPEED * dt;
         }
     }
 
-    m_knockback = m_knockback / (1 + (dt * M_KNOCKBACK_DECAY_FACTOR));
+    knockback = knockback / (1 + (dt * KNOCKBACK_DECAY_FACTOR));
 
-    if (m_health == 0 && (glm::length(m_knockback) < M_KNOCKBACK_STOP)) {
-        m_knockback = Eend::Vector2D(0.0f);
+    if (health == 0 && (glm::length(knockback) < KNOCKBACK_STOP)) {
+        knockback = Eend::Vector2D(0.0f);
     }
 
-    if (m_deadTime > M_DELETE_AFTER_DEATH_TIME) {
-        m_delete = true;
+    if (dead_time > DELETE_AFTER_DEATH_TIME) {
+        to_delete = true;
     }
 
     // add some offsets for the dog visually here
-    boardRef->setPosition(
-        Eend::Point(
-            m_position.x,
-            m_position.y,
-            Park::get().elevationAtPoint(m_position) + M_UP_OFFSET));
+    board_ref->setPosition(
+        Eend::Point(position.x, position.y, Park::get().elevationAtPoint(position) + UP_OFFSET));
 }
 
 Dog::Type Dog::stringToType(std::string string) {
@@ -164,20 +190,20 @@ Dog::Type Dog::stringToType(std::string string) {
     if (string == "classic") return Dog::Type::Classic;
     if (string == "snow") return Dog::Type::Snow;
 
-    return Dog::Type::Classic;
+    return Type::Classic;
 }
 
 std::filesystem::path Dog::getDogPath(Type type) {
-    std::filesystem::path dogPath;
+    std::filesystem::path dog_path;
     switch (type) {
-    case Type::Classic:
-        dogPath = "dog";
+    case Dog::Type::Classic:
+        dog_path = "dog";
         break;
-    case Type::Snow:
-        dogPath = "dog2";
+    case Dog::Type::Snow:
+        dog_path = "dog2";
         break;
     default:
-        dogPath = "dog";
+        dog_path = "dog";
     }
-    return "resources" / dogPath;
+    return "resources" / dog_path;
 }
