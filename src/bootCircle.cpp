@@ -8,6 +8,7 @@ constexpr float DEFAULT_SPEED = 10.0f;
 
 constexpr float BOOT_SPRITE_OFFSET = 2.5f;
 constexpr float BOOT_COLLISION_OFFSET = 0.0f;
+
 const std::filesystem::path BOOT_SPRITE_PATH = std::filesystem::path("resources/boot");
 
 // traits

@@ -1,3 +1,4 @@
+#include "Eendgine/types.hpp"
 #include "bootThrow.hpp"
 
 namespace Eend = Eendgine;
@@ -6,7 +7,9 @@ constexpr float THROW_DEFAULT_BOOT_RADIUS = 2.5f;
 constexpr float THROW_DEFAULT_THROW_DISTANCE = 25.0f;
 constexpr float THROW_DEFAULT_FREQUENCY = 1.0f;
 constexpr float THROW_DEFAULT_SPEED = 1.0f;
+
 const Eend::Point BOOT_THROW_SPRITE_OFFSET = Eend::Point(0.0f, 0.0f, 5.0f);
+
 const std::filesystem::path BOOT_THROW_SPRITE_PATH = std::filesystem::path("resources/boot");
 
 // traits
@@ -44,7 +47,9 @@ BootThrow::BootThrow()
     BootThrow::item_traits.emplace(0.0f, 0.0f, 0.0f, 0.0f); // DEBUG
 }
 
-BootThrow::~BootThrow() {}
+BootThrow::~BootThrow() {
+    if (boot_sprite) Eend::Entities::boards().erase(*boot_sprite);
+}
 
 void BootThrow::update(Eend::Point trey_position, Eend::Vector2D trey_direction) {
     if (enabled()) {
@@ -74,7 +79,7 @@ void BootThrow::update(Eend::Point trey_position, Eend::Vector2D trey_direction)
                 .getRef(*boot_sprite)
                 ->setPosition(boot_position + BOOT_THROW_SPRITE_OFFSET);
 
-            const bool throw_distance = glm::length(trey_position - boot_position);
+            const float throw_distance = glm::length(trey_position - boot_position);
             if (throw_distance > traits.throw_distance) {
 
                 Eend::Entities::boards().erase(*boot_sprite);
