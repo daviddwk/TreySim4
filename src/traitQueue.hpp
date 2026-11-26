@@ -26,16 +26,16 @@ template <typename T, float F> class TraitQueue {
         void update() {
             last_remove += Eend::FrameLimiter::get().deltaTime; // TODO didn't I make timers
 
-            if (enabled() && (last_remove > 5.0f)) {
+            if (!isEmpty() && (last_remove > 5.0f)) {
                 last_remove = 0.0f;
                 popTrait();
             }
         }
 
-        bool enabled() { return !items.empty(); }
+        bool isEmpty() const { return items.empty(); }
 
         void addTrait(T newTraits, std::filesystem::path texture) {
-            if (!enabled()) {
+            if (isEmpty()) {
                 last_remove = 0.0f;
             }
             Eend::PanelId newPanelId = Eend::Entities::panels().insert(texture);
@@ -45,7 +45,7 @@ template <typename T, float F> class TraitQueue {
         }
 
         void popTrait() { // TODO should total traits be passed or internal?
-            if (enabled()) {
+            if (!isEmpty()) {
                 auto& item = items.front();
                 T oldTraits = std::get<T>(item);
                 traits_total -= oldTraits;

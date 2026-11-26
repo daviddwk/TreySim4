@@ -39,6 +39,8 @@ BootKick::BootKick()
 
 BootKick::~BootKick() {}
 
+void BootKick::update() { trait_queue.update(); }
+
 void BootKick::kick(Eend::Point position, Direction direction, float& upVelocity) const {
     upVelocity = 20.0f;
 

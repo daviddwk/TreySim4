@@ -52,7 +52,7 @@ BootThrow::~BootThrow() {
 }
 
 void BootThrow::update(Eend::Point trey_position, Eend::Vector2D trey_direction) {
-    if (trait_queue.enabled()) {
+    if (!trait_queue.isEmpty()) {
         float dt = Eend::FrameLimiter::get().deltaTime;
         const BootThrowTraits traits_total = trait_queue.getTraitsTotal();
 
@@ -88,10 +88,11 @@ void BootThrow::update(Eend::Point trey_position, Eend::Vector2D trey_direction)
             }
         }
     }
+    trait_queue.update();
 };
 
-void BootThrow::hit(Eend::Point trey_position, Dog& dog) {
-    if (trait_queue.enabled()) {
+void BootThrow::hit(Eend::Point trey_position, Dog& dog) const {
+    if (!trait_queue.isEmpty()) {
         const BootThrowTraits traits_total = trait_queue.getTraitsTotal();
 
         Eend::Sphere bootSphere(boot_position, traits_total.boot_radius);

@@ -126,6 +126,8 @@ void Trey::update(bool activeCutscene) {
 
     Eend::Point standing_position =
         Eend::Point(position.x, position.y, Park::get().elevationAtPoint(position));
+
+    boot_kick.update();
     boot_circle.update(standing_position);
     boot_throw.update(standing_position, vectorFromDirection(facing.getDirection()));
 }

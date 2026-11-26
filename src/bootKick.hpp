@@ -38,6 +38,8 @@ class BootKick { // TODO particle system that follows boot!
         BootKick(const BootKick&) = delete;
         BootKick& operator=(const BootKick&) = delete;
 
+        void update();
+
         void kick(Eend::Point position, Direction direction, float& upVelocity) const;
         void hit(Eend::Point trey_position, Direction direction, Dog& dog) const;
 

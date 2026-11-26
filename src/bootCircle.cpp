@@ -62,11 +62,11 @@ void BootCircle::update(Eend::Point trey_position) {
     // TODO add a bit of lag behind trey's position?
 
     // handle sprite
-    if (boot_sprite && !trait_queue.enabled()) {
+    if (boot_sprite && trait_queue.isEmpty()) {
         std::print("erase boot sprite\n");
         Eend::Entities::boards().erase(*boot_sprite);
         boot_sprite = std::nullopt;
-    } else if (!boot_sprite && trait_queue.enabled()) {
+    } else if (!boot_sprite && !trait_queue.isEmpty()) {
         boot_sprite = Eend::Entities::boards().insert(BOOT_SPRITE_PATH);
     }
     if (boot_sprite) {
@@ -77,7 +77,7 @@ void BootCircle::update(Eend::Point trey_position) {
 }
 
 void BootCircle::hit(Eend::Point trey_position, Dog& dog) {
-    if (trait_queue.enabled()) {
+    if (!trait_queue.isEmpty()) {
         const BootCircleTraits traits_total = trait_queue.getTraitsTotal();
         Eend::Sphere bootSphere(boot_position, traits_total.boot_radius);
         bool kicked = pointOnSphere(dog.getPosition3d(), bootSphere);

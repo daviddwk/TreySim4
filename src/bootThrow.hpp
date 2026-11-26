@@ -41,7 +41,7 @@ class BootThrow {
         BootThrow& operator=(const BootThrow&) = delete;
 
         void update(Eend::Point trey_position, Eend::Vector2D trey_direction);
-        void hit(Eend::Point trey_position, Dog& dog);
+        void hit(Eend::Point trey_position, Dog& dog) const;
 
         void addTrait(BootThrowTraits new_traits, std::filesystem::path texture);
         void popTrait();
