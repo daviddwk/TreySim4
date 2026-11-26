@@ -29,7 +29,8 @@ class Trey {
         void setPosition(Eend::Point position);
         void setAlive(bool alive);
 
-        void pickupItem(Item::Type itemType);
+        void pickupItem(BootCircleTraits);
+        void pickupItem(BootThrowTraits);
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();

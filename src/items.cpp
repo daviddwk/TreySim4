@@ -6,49 +6,47 @@
 constexpr float HEIGHT_OFFSET = 5.0f;
 constexpr Eend::Scale2D SCALE = Eend::Scale2D(5.0f);
 
-Item::Item(Item::Type type, Eend::Point position)
-    : m_type(type), m_position(position),
-      m_sprite(Eend::Entities::boards().insert(Item::spritePath(type))) {
-    Eend::Board* spriteRef = Eend::Entities::boards().getRef(m_sprite);
+// maybe could template but probably not really worth
+Item::Item(Eend::Point position, std::filesystem::path texture, BootCircleTraits traits)
+    : position(position), sprite(Eend::Entities::boards().insert(texture)), texture(texture),
+      traits(traits) {
+    construct();
+}
+
+Item::Item(Eend::Point position, std::filesystem::path texture, BootThrowTraits traits)
+    : position(position), sprite(Eend::Entities::boards().insert(texture)), texture(texture),
+      traits(traits) {
+
+    construct();
+}
+
+void Item::construct() {
+    Eend::Board* spriteRef = Eend::Entities::boards().getRef(sprite);
     spriteRef->setScale(Eend::Scale2D(SCALE));
     spriteRef->setPosition(position);
 }
 
-Item::~Item() { Eend::Entities::boards().erase(m_sprite); }
+Item::~Item() { Eend::Entities::boards().erase(sprite); }
 
 Item::Item(const Item& other) noexcept
-    : m_type(other.m_type), m_position(other.m_position),
-      m_sprite(Eend::Entities::boards().clone(other.m_sprite)) {}
+    : position(other.position), sprite(Eend::Entities::boards().clone(other.sprite)),
+      texture(other.texture), traits(other.traits) {}
 
 Item& Item::operator=(const Item& other) noexcept {
 
     if (&other == this) return *this;
 
-    Eend::Entities::boards().erase(m_sprite);
+    Eend::Entities::boards().erase(sprite);
 
-    m_type = other.m_type;
-    m_position = other.m_position;
-    m_sprite = Eend::Entities::boards().clone(other.m_sprite);
+    position = other.position;
+    sprite = Eend::Entities::boards().clone(other.sprite);
+    texture = other.texture;
+    traits = other.traits;
 
     return *this;
 }
 
-Eend::Point Item::getPosition() { return m_position; }
+Eend::Point Item::getPosition() { return position; }
 
-Item::Type Item::getType() { return m_type; }
-
-std::filesystem::path Item::spritePath(Item::Type type) {
-    switch (type) {
-    case Item::Type::doubleKick:
-        return std::filesystem::path("resources/duck/statues/body");
-        break;
-    }
-}
-
-Item::Type Item::typeFromString(std::string typeString) {
-    if (typeString == "doubleKick") {
-        return Item::Type::doubleKick;
-    } else {
-        Eend::fatalError("item type " + typeString + " does not exsist");
-    }
-}
+BootCircleTraits Item::getBootCircleTraits() { return traits.boot_circle; }
+BootThrowTraits Item::getBootThrowTraits() { return traits.boot_throw; }

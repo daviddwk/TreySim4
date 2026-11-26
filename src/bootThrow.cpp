@@ -44,7 +44,7 @@ BootThrow::BootThrow()
           THROW_DEFAULT_BOOT_RADIUS, THROW_DEFAULT_THROW_DISTANCE, THROW_DEFAULT_FREQUENCY,
           THROW_DEFAULT_SPEED),
       last_throw(0.0f) {
-    BootThrow::item_traits.emplace(0.0f, 0.0f, 0.0f, 0.0f); // DEBUG
+    // BootThrow::item_traits.emplace(0.0f, 0.0f, 0.0f, 0.0f); // DEBUG
 }
 
 BootThrow::~BootThrow() {
@@ -114,10 +114,12 @@ void BootThrow::addTraits(BootThrowTraits new_traits) {
     item_traits.push(new_traits);
 };
 
-void BootThrow::removeTraits() {
+void BootThrow::popTraits() {
     if (enabled()) {
         BootThrowTraits oldTraits = item_traits.front();
         traits -= oldTraits;
         item_traits.pop();
     }
 };
+
+void BootThrow::emptyTraits() { item_traits = std::queue<BootThrowTraits>(); }

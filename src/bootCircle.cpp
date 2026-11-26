@@ -37,7 +37,7 @@ BootCircleItem::BootCircleItem(float boot_radius, float circle_radius, float spe
 BootCircle::BootCircle()
     : boot_rotation(1.0f, 0.0f), traits(DEFAULT_BOOT_RADIUS, DEFAULT_CIRCLE_RADIUS, DEFAULT_SPEED) {
 
-    item_traits.emplace(0.0f, 0.0f, 0.0f);
+    // item_traits.emplace(0.0f, 0.0f, 0.0f); // DEBUG
 }
 
 BootCircle::~BootCircle() {
@@ -93,3 +93,5 @@ void BootCircle::removeTraits() {
         item_traits.pop();
     }
 }
+
+void BootCircle::emptyTraits() { item_traits = std::queue<BootCircleTraits>(); }

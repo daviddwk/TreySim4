@@ -29,14 +29,31 @@
   },
   "Items": [
     {
-      "tag" : "test",
-      "type" : "doubleKick",
-      "position" : [15, 15]
+      "tag" : "testCircle",
+      "texture" : "resources/boot",
+      "position" : [15, 15],
+      "frequency" : 3000,
+      "type" : "circle",
+      "traits" :
+      {
+        "boot_radius" : 0.0,
+        "circle_radius" : 0.0,
+        "speed" : 0.0
+      }
     },
     {
-      "type" : "doubleKick",
-      "position" : [20, 20],
-      "frequency" : 3000
+      "tag" : "testThrow",
+      "texture": "resources/boot",
+      "position" : [18, 18],
+      "frequency" : 5000,
+      "type" : "throw",
+      "traits" :
+      {
+        "boot_radius" : 0.0,
+        "throw_distance" : 0.0,
+        "throw_frequency" : 0.0,
+        "throw_speed" : 0.0
+      }
     }
   ],
 	"Waves": [

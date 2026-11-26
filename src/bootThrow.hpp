@@ -6,10 +6,10 @@
 
 #include "collision.hpp"
 #include "dog.hpp"
-#include "items.hpp"
 
 class BootThrowTraits {
     public:
+        BootThrowTraits() = default;
         BootThrowTraits(
             float boot_radius, float throw_distance, float throw_frequency, float throw_speed);
 
@@ -44,7 +44,8 @@ class BootThrow {
 
         bool enabled();
         void addTraits(BootThrowTraits new_traits);
-        void removeTraits();
+        void popTraits();
+        void emptyTraits();
 
     private:
         std::optional<Eend::BoardId> boot_sprite = std::nullopt;

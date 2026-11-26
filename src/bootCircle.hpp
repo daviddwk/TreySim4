@@ -1,3 +1,5 @@
+#pragma once
+
 #include <glm/ext/quaternion_transform.hpp>
 #include <queue>
 
@@ -9,6 +11,7 @@ namespace Eend = Eendgine;
 
 class BootCircleTraits {
     public:
+        BootCircleTraits() = default;
         BootCircleTraits(float bootRadius, float circleRadius, float speed);
 
         BootCircleTraits& operator+=(const BootCircleTraits& rhs);
@@ -25,7 +28,6 @@ class BootCircleItem {
         const BootCircleTraits traits;
 
     private:
-        // Item item;
 };
 
 class BootCircle { // TODO particle system that follows boot!
@@ -39,9 +41,11 @@ class BootCircle { // TODO particle system that follows boot!
 
         void addTraits(BootCircleTraits newTraits);
         void removeTraits();
+        void emptyTraits();
 
     private:
         std::optional<Eend::BoardId> boot_sprite;
+
         Eend::Point boot_position;
         Eend::Vector2D boot_rotation;
 

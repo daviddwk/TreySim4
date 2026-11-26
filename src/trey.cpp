@@ -78,15 +78,9 @@ Trey& Trey::get() {
 
 void Trey::setPosition(Eend::Point position) { Trey::position = position; }
 void Trey::setAlive(bool alive) { Trey::alive = alive; }
-void Trey::pickupItem(Item::Type itemType) {
-    // TODO make an item queue kinda situation
-    item = itemType;
-    if (item) {
-        feet = std::make_unique<Feet::Double>();
-    } else {
-        feet = std::make_unique<Feet::Regular>();
-    }
-}
+
+void Trey::pickupItem(BootCircleTraits traits) { boot_circle.addTraits(traits); }
+void Trey::pickupItem(BootThrowTraits traits) { boot_throw.addTraits(traits); }
 
 Eend::Point Trey::getPosition() { return position; };
 Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(position.x, position.y); };
