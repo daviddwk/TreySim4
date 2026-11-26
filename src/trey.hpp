@@ -14,8 +14,8 @@
 #include "items.hpp"
 
 #include "bootCircle.hpp"
+#include "bootKick.hpp"
 #include "bootThrow.hpp"
-#include "treyFeet.hpp"
 
 namespace Eend = Eendgine;
 
@@ -31,6 +31,7 @@ class Trey {
 
         void pickupItem(BootCircleTraits);
         void pickupItem(BootThrowTraits);
+        void pickupItem(BootKickTraits traits);
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();
@@ -74,6 +75,7 @@ class Trey {
 
         BootCircle boot_circle;
         BootThrow boot_throw;
+        BootKick boot_kick;
 
         Eend::StatueId head_id;
         Eend::StatueId hair_id;
@@ -92,6 +94,5 @@ class Trey {
         Facing facing;
         bool moving;
         bool alive;
-        std::unique_ptr<Feet::Feet> feet;
         std::optional<Item::Type> item;
 };

@@ -29,7 +29,20 @@
   },
   "Items": [
     {
-      "tag" : "testCircle",
+      "tag" : "testCircle1",
+      "texture" : "resources/boot",
+      "position" : [13, 15],
+      "frequency" : 3000,
+      "type" : "circle",
+      "traits" :
+      {
+        "boot_radius" : 0.0,
+        "circle_radius" : 0.0,
+        "speed" : 10.0
+      }
+    },
+    {
+      "tag" : "testCircle2",
       "texture" : "resources/boot",
       "position" : [15, 15],
       "frequency" : 3000,
@@ -38,11 +51,11 @@
       {
         "boot_radius" : 0.0,
         "circle_radius" : 0.0,
-        "speed" : 0.0
+        "speed" : 10.0
       }
     },
     {
-      "tag" : "testThrow",
+      "tag" : "testThrow1",
       "texture": "resources/boot",
       "position" : [18, 18],
       "frequency" : 5000,
@@ -53,6 +66,18 @@
         "throw_distance" : 0.0,
         "throw_frequency" : 0.0,
         "throw_speed" : 0.0
+      }
+    },
+    {
+      "tag" : "testKick1",
+      "texture": "resources/boot",
+      "position" : [23, 23],
+      "frequency" : 500,
+      "type" : "kick",
+      "traits" :
+      {
+        "kick_radius" : 20.0,
+        "kick_offset": 0.0
       }
     }
   ],

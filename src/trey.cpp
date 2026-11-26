@@ -5,10 +5,8 @@
 #include <optional>
 #include <print>
 
-#include "collision.hpp"
 #include "park.hpp"
 
-#include "treyFeet.hpp"
 #include "treyParticles.hpp"
 
 #include "trey.hpp"
@@ -26,7 +24,7 @@ Trey::Trey()
       eye_id(Eend::Entities::boards().insert(std::filesystem::path("resources/Trey/eye"))),
       position(Eend::Point(0.0f)), rotation(Eend::Angle(0.0f)), target_rotation(Eend::Angle(0.0f)),
       body_timer(0.075f), kicking(true), in_air(false), up_velocity(0.0f), alive(true),
-      feet(std::make_unique<Feet::Regular>()), item(std::nullopt) {
+      item(std::nullopt) {
 
     Eend::Board* const body = Eend::Entities::boards().getRef(body_id);
     Eend::Board* const eye = Eend::Entities::boards().getRef(eye_id);
@@ -81,6 +79,7 @@ void Trey::setAlive(bool alive) { Trey::alive = alive; }
 
 void Trey::pickupItem(BootCircleTraits traits) { boot_circle.addTraits(traits); }
 void Trey::pickupItem(BootThrowTraits traits) { boot_throw.addTraits(traits); }
+void Trey::pickupItem(BootKickTraits traits) { boot_kick.addTraits(traits); }
 
 Eend::Point Trey::getPosition() { return position; };
 Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(position.x, position.y); };
@@ -131,12 +130,12 @@ void Trey::kick(float elevationAtPosition) {
     kicking = true;
     in_air = true;
     position.z = elevationAtPosition + 0.1f;
-    feet->kick(position, facing, up_velocity);
+    boot_kick.kick(position, facing.getDirection(), up_velocity);
 }
 
 void Trey::hit(Dog& dog) {
     if (Trey::isKicking()) {
-        feet->hit(position, facing.getDirection(), dog);
+        boot_kick.hit(position, facing.getDirection(), dog);
     }
     boot_circle.hit(position, dog);
     boot_throw.hit(position, dog);

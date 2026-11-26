@@ -4,6 +4,8 @@
 
 enum class Direction { up, upRight, right, downRight, down, downLeft, left, upLeft };
 
+Direction oppositeDirection(Direction direction);
+
 namespace Eend = Eendgine;
 
 Eend::Vector2D vectorFromDirection(Direction direction);

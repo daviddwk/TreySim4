@@ -20,6 +20,13 @@ Item::Item(Eend::Point position, std::filesystem::path texture, BootThrowTraits 
     construct();
 }
 
+Item::Item(Eend::Point position, std::filesystem::path texture, BootKickTraits traits)
+    : position(position), sprite(Eend::Entities::boards().insert(texture)), texture(texture),
+      traits(traits) {
+
+    construct();
+}
+
 void Item::construct() {
     Eend::Board* spriteRef = Eend::Entities::boards().getRef(sprite);
     spriteRef->setScale(Eend::Scale2D(SCALE));
@@ -50,3 +57,4 @@ Eend::Point Item::getPosition() { return position; }
 
 BootCircleTraits Item::getBootCircleTraits() { return traits.boot_circle; }
 BootThrowTraits Item::getBootThrowTraits() { return traits.boot_throw; }
+BootKickTraits Item::getBootKickTraits() { return traits.boot_kick; }

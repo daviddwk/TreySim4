@@ -86,6 +86,8 @@ DropParty::DropParty(std::filesystem::path parkPath) {
                 Eend::jsonFloat(traitsJson, "throw_speed", metadataPath);
             break;
         case Item::Type::Kick:
+            traits.boot_kick.kick_offset = Eend::jsonFloat(traitsJson, "kick_offset", metadataPath);
+            traits.boot_kick.kick_radius = Eend::jsonFloat(traitsJson, "kick_radius", metadataPath);
             break;
         }
 
@@ -116,6 +118,9 @@ void DropParty::update() {
                 case Item::Type::Throw:
                     Trey::get().pickupItem(spawn.item->getBootThrowTraits());
                     break;
+                case Item::Type::Kick:
+                    Trey::get().pickupItem(spawn.item->getBootKickTraits());
+                    break;
                 default:
                     Eend::fatalError("item type not handled");
                     break;
@@ -145,6 +150,9 @@ void DropParty::spawnItem(Spawn& spawn) {
         break;
     case Item::Type::Throw:
         spawn.item = Item(position, spawn.texture, spawn.traits.boot_throw);
+        break;
+    case Item::Type::Kick:
+        spawn.item = Item(position, spawn.texture, spawn.traits.boot_kick);
         break;
     default:
         Eend::fatalError("item type not handled");

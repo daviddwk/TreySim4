@@ -1,5 +1,26 @@
 #include "facing.hpp"
 
+Direction oppositeDirection(Direction direction) {
+    switch (direction) {
+    case Direction::up:
+        return Direction::down;
+    case Direction::upRight:
+        return Direction::downLeft;
+    case Direction::right:
+        return Direction::left;
+    case Direction::downRight:
+        return Direction::upLeft;
+    case Direction::down:
+        return Direction::up;
+    case Direction::downLeft:
+        return Direction::upRight;
+    case Direction::left:
+        return Direction::right;
+    case Direction::upLeft:
+        return Direction::downRight;
+    }
+};
+
 Facing::Facing() : m_direction(Direction::down), m_lastUp(true), m_lastRight(true) {}
 
 void Facing::setDirection(Direction direction) {
@@ -38,26 +59,7 @@ void Facing::setDirection(Direction direction) {
 
 Direction Facing::getDirection() { return m_direction; }
 
-Direction Facing::getOpposite() {
-    switch (m_direction) {
-    case Direction::up:
-        return Direction::down;
-    case Direction::upRight:
-        return Direction::downLeft;
-    case Direction::right:
-        return Direction::left;
-    case Direction::downRight:
-        return Direction::upLeft;
-    case Direction::down:
-        return Direction::up;
-    case Direction::downLeft:
-        return Direction::upRight;
-    case Direction::left:
-        return Direction::right;
-    case Direction::upLeft:
-        return Direction::downRight;
-    }
-}
+Direction Facing::getOpposite() { return oppositeDirection(m_direction); }
 
 Direction Facing::getUpOrDown() { return m_lastUp ? Direction::up : Direction::down; }
 Direction Facing::getLeftOrRight() { return m_lastRight ? Direction::right : Direction::left; }
