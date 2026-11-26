@@ -67,7 +67,6 @@ void BootCircle::update(Eend::Point trey_position) {
         Eend::Entities::boards().erase(*boot_sprite);
         boot_sprite = std::nullopt;
     } else if (!boot_sprite && trait_queue.enabled()) {
-        std::print("create boot sprite\n");
         boot_sprite = Eend::Entities::boards().insert(BOOT_SPRITE_PATH);
     }
     if (boot_sprite) {

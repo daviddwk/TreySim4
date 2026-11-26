@@ -22,7 +22,7 @@ template <typename T, float F> class TraitQueue {
         TraitQueue& operator=(const TraitQueue&) = delete;
         TraitQueue& operator=(TraitQueue&&) = delete;
 
-        T getTraitsTotal() { return traits_total; }
+        T getTraitsTotal() const { return traits_total; }
 
         void update() {
             last_remove += Eend::FrameLimiter::get().deltaTime; // TODO didn't I make timers

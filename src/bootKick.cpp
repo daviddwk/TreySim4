@@ -30,7 +30,9 @@ BootKickItem::BootKickItem(float kick_offset, float kick_radius)
     : traits(kick_offset, kick_radius) {};
 
 // circle
-BootKick::BootKick() : boot_rotation(1.0f, 0.0f), traits(KICK_DEFAULT_OFFSET, KICK_DEFAULT_RADIUS) {
+BootKick::BootKick()
+    : boot_rotation(1.0f, 0.0f),
+      trait_queue(BootKickTraits(KICK_DEFAULT_OFFSET, KICK_DEFAULT_RADIUS)) {
 
     // item_traits.emplace(0.0f, 0.0f, 0.0f); // DEBUG
 }
@@ -50,11 +52,11 @@ void BootKick::kick(Eend::Point position, Direction direction, float& upVelocity
 }
 
 void BootKick::hit(Eend::Point trey_position, Direction direction, Dog& dog) const {
-
+    const BootKickTraits traits_total = trait_queue.getTraitsTotal();
     Eend::Vector2D offsetVector =
-        vectorFromDirection(direction) * traits.kick_offset; // TODO use traits
+        vectorFromDirection(direction) * traits_total.kick_offset; // TODO use traits
     Eend::Point kickSphereOffset = Eend::Vector(offsetVector.x, offsetVector.y, 0.0f);
-    Eend::Sphere kickSphere(trey_position + kickSphereOffset, traits.kick_radius);
+    Eend::Sphere kickSphere(trey_position + kickSphereOffset, traits_total.kick_radius);
 
     bool kicked = pointOnSphere(dog.getPosition3d(), kickSphere);
     // TODO mechanism for excluding behind Trey
@@ -65,19 +67,10 @@ void BootKick::hit(Eend::Point trey_position, Direction direction, Dog& dog) con
     }
 }
 
-bool BootKick::enabled() { return !item_traits.empty(); }
-
-void BootKick::addTraits(BootKickTraits newTraits) {
-    traits += newTraits;
-    item_traits.push(newTraits);
+void BootKick::addTraits(BootKickTraits newTraits, std::filesystem::path texture) {
+    trait_queue.addTraits(newTraits, texture);
 }
 
-void BootKick::removeTraits() {
-    if (enabled()) {
-        BootKickTraits oldTraits = item_traits.front();
-        traits -= oldTraits;
-        item_traits.pop();
-    }
-}
+void BootKick::removeTraits() { trait_queue.removeTraits(); }
 
-void BootKick::emptyTraits() { item_traits = std::queue<BootKickTraits>(); }
+void BootKick::emptyTraits() { trait_queue.emptyTraits(); }

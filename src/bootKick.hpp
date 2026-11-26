@@ -7,6 +7,7 @@
 
 #include "dog.hpp"
 #include "facing.hpp"
+#include "traitQueue.hpp"
 
 namespace Eend = Eendgine;
 
@@ -37,9 +38,8 @@ class BootKick { // TODO particle system that follows boot!
 
         void kick(Eend::Point position, Direction direction, float& upVelocity) const;
         void hit(Eend::Point trey_position, Direction direction, Dog& dog) const;
-        bool enabled();
 
-        void addTraits(BootKickTraits newTraits);
+        void addTraits(BootKickTraits newTraits, std::filesystem::path texture);
         void removeTraits();
         void emptyTraits();
 
@@ -47,6 +47,5 @@ class BootKick { // TODO particle system that follows boot!
         Eend::Point boot_position;
         Eend::Vector2D boot_rotation;
 
-        BootKickTraits traits;
-        std::queue<BootKickTraits> item_traits;
+        TraitQueue<BootKickTraits, 220.0f> trait_queue;
 };

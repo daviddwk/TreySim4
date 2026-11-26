@@ -84,7 +84,7 @@ void Trey::pickupItem(BootThrowTraits traits, std::filesystem::path texture) {
     boot_throw.addTraits(traits, texture);
 }
 void Trey::pickupItem(BootKickTraits traits, std::filesystem::path texture) {
-    boot_kick.addTraits(traits);
+    boot_kick.addTraits(traits, texture);
 }
 
 Eend::Point Trey::getPosition() { return position; };
