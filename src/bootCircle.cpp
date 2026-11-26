@@ -88,11 +88,11 @@ void BootCircle::hit(Eend::Point trey_position, Dog& dog) {
     }
 }
 
-void BootCircle::addTraits(BootCircleTraits newTraits, std::filesystem::path texture) {
-    trait_queue.addTraits(newTraits, texture);
+void BootCircle::addTrait(BootCircleTraits newTraits, std::filesystem::path texture) {
+    trait_queue.addTrait(newTraits, texture);
 }
 
-void BootCircle::removeTraits() { trait_queue.removeTraits(); }
+void BootCircle::popTrait() { trait_queue.popTrait(); }
 
 void BootCircle::emptyTraits() { trait_queue.emptyTraits(); }
 

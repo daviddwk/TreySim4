@@ -3,7 +3,6 @@
 #include <Eendgine/entityBatches.hpp>
 #include <Eendgine/frameLimiter.hpp>
 
-#include <chrono>
 #include <filesystem>
 
 namespace Eend = Eendgine;
@@ -29,13 +28,13 @@ template <typename T, float F> class TraitQueue {
 
             if (enabled() && (last_remove > 5.0f)) {
                 last_remove = 0.0f;
-                removeTraits();
+                popTrait();
             }
         }
 
         bool enabled() { return !items.empty(); }
 
-        void addTraits(T newTraits, std::filesystem::path texture) {
+        void addTrait(T newTraits, std::filesystem::path texture) {
             if (!enabled()) {
                 last_remove = 0.0f;
             }
@@ -45,7 +44,7 @@ template <typename T, float F> class TraitQueue {
             positionIcons();
         }
 
-        void removeTraits() { // TODO should total traits be passed or internal?
+        void popTrait() { // TODO should total traits be passed or internal?
             if (enabled()) {
                 auto& item = items.front();
                 T oldTraits = std::get<T>(item);

@@ -35,12 +35,14 @@ class BootKick { // TODO particle system that follows boot!
     public:
         BootKick();
         ~BootKick();
+        BootKick(const BootKick&) = delete;
+        BootKick& operator=(const BootKick&) = delete;
 
         void kick(Eend::Point position, Direction direction, float& upVelocity) const;
         void hit(Eend::Point trey_position, Direction direction, Dog& dog) const;
 
         void addTraits(BootKickTraits newTraits, std::filesystem::path texture);
-        void removeTraits();
+        void popTraits();
         void emptyTraits();
 
     private:

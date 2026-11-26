@@ -78,10 +78,10 @@ void Trey::setPosition(Eend::Point position) { Trey::position = position; }
 void Trey::setAlive(bool alive) { Trey::alive = alive; }
 
 void Trey::pickupItem(BootCircleTraits traits, std::filesystem::path texture) {
-    boot_circle.addTraits(traits, texture);
+    boot_circle.addTrait(traits, texture);
 }
 void Trey::pickupItem(BootThrowTraits traits, std::filesystem::path texture) {
-    boot_throw.addTraits(traits, texture);
+    boot_throw.addTrait(traits, texture);
 }
 void Trey::pickupItem(BootKickTraits traits, std::filesystem::path texture) {
     boot_kick.addTraits(traits, texture);

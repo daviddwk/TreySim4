@@ -109,10 +109,10 @@ void BootThrow::hit(Eend::Point trey_position, Dog& dog) {
     }
 };
 
-void BootThrow::addTraits(BootThrowTraits new_traits, std::filesystem::path texture) {
-    trait_queue.addTraits(new_traits, texture);
+void BootThrow::addTrait(BootThrowTraits new_traits, std::filesystem::path texture) {
+    trait_queue.addTrait(new_traits, texture);
 };
 
-void BootThrow::popTraits() { trait_queue.removeTraits(); };
+void BootThrow::popTrait() { trait_queue.popTrait(); };
 
-void BootThrow::emptyTraits() { trait_queue.removeTraits(); }
+void BootThrow::emptyTraits() { trait_queue.popTrait(); }

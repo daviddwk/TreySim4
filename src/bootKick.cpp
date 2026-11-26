@@ -68,9 +68,9 @@ void BootKick::hit(Eend::Point trey_position, Direction direction, Dog& dog) con
 }
 
 void BootKick::addTraits(BootKickTraits newTraits, std::filesystem::path texture) {
-    trait_queue.addTraits(newTraits, texture);
+    trait_queue.addTrait(newTraits, texture);
 }
 
-void BootKick::removeTraits() { trait_queue.removeTraits(); }
+void BootKick::popTraits() { trait_queue.popTrait(); }
 
 void BootKick::emptyTraits() { trait_queue.emptyTraits(); }
