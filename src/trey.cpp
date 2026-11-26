@@ -77,9 +77,15 @@ Trey& Trey::get() {
 void Trey::setPosition(Eend::Point position) { Trey::position = position; }
 void Trey::setAlive(bool alive) { Trey::alive = alive; }
 
-void Trey::pickupItem(BootCircleTraits traits) { boot_circle.addTraits(traits); }
-void Trey::pickupItem(BootThrowTraits traits) { boot_throw.addTraits(traits); }
-void Trey::pickupItem(BootKickTraits traits) { boot_kick.addTraits(traits); }
+void Trey::pickupItem(BootCircleTraits traits, std::filesystem::path texture) {
+    boot_circle.addTraits(traits, texture);
+}
+void Trey::pickupItem(BootThrowTraits traits, std::filesystem::path texture) {
+    boot_throw.addTraits(traits, texture);
+}
+void Trey::pickupItem(BootKickTraits traits, std::filesystem::path texture) {
+    boot_kick.addTraits(traits);
+}
 
 Eend::Point Trey::getPosition() { return position; };
 Eend::Point2D Trey::getPosition2D() { return Eend::Point2D(position.x, position.y); };

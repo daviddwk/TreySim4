@@ -113,13 +113,13 @@ void DropParty::update() {
             if (distance < ITEM_RADIUS) {
                 switch (spawn.type) {
                 case Item::Type::Circle:
-                    Trey::get().pickupItem(spawn.item->getBootCircleTraits());
+                    Trey::get().pickupItem(spawn.item->getBootCircleTraits(), spawn.texture);
                     break;
                 case Item::Type::Throw:
-                    Trey::get().pickupItem(spawn.item->getBootThrowTraits());
+                    Trey::get().pickupItem(spawn.item->getBootThrowTraits(), spawn.texture);
                     break;
                 case Item::Type::Kick:
-                    Trey::get().pickupItem(spawn.item->getBootKickTraits());
+                    Trey::get().pickupItem(spawn.item->getBootKickTraits(), spawn.texture);
                     break;
                 default:
                     Eend::fatalError("item type not handled");

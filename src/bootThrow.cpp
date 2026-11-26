@@ -40,9 +40,9 @@ BootThrowItem::BootThrowItem(
 
 // throw
 BootThrow::BootThrow()
-    : traits(
+    : trait_queue(BootThrowTraits(
           THROW_DEFAULT_BOOT_RADIUS, THROW_DEFAULT_THROW_DISTANCE, THROW_DEFAULT_FREQUENCY,
-          THROW_DEFAULT_SPEED),
+          THROW_DEFAULT_SPEED)),
       last_throw(0.0f) {
     // BootThrow::item_traits.emplace(0.0f, 0.0f, 0.0f, 0.0f); // DEBUG
 }
@@ -52,13 +52,14 @@ BootThrow::~BootThrow() {
 }
 
 void BootThrow::update(Eend::Point trey_position, Eend::Vector2D trey_direction) {
-    if (enabled()) {
+    if (trait_queue.enabled()) {
         float dt = Eend::FrameLimiter::get().deltaTime;
+        const BootThrowTraits traits_total = trait_queue.getTraitsTotal();
 
         last_throw += dt;
 
         const bool throwing = boot_sprite.has_value();
-        const bool new_throw = last_throw >= traits.throw_frequency;
+        const bool new_throw = last_throw >= traits_total.throw_frequency;
         if (!throwing && new_throw) {
 
             last_throw = 0.0f;
@@ -80,7 +81,7 @@ void BootThrow::update(Eend::Point trey_position, Eend::Vector2D trey_direction)
                 ->setPosition(boot_position + BOOT_THROW_SPRITE_OFFSET);
 
             const float throw_distance = glm::length(trey_position - boot_position);
-            if (throw_distance > traits.throw_distance) {
+            if (throw_distance > traits_total.throw_distance) {
 
                 Eend::Entities::boards().erase(*boot_sprite);
                 boot_sprite = std::nullopt;
@@ -90,9 +91,10 @@ void BootThrow::update(Eend::Point trey_position, Eend::Vector2D trey_direction)
 };
 
 void BootThrow::hit(Eend::Point trey_position, Dog& dog) {
-    if (enabled()) {
+    if (trait_queue.enabled()) {
+        const BootThrowTraits traits_total = trait_queue.getTraitsTotal();
 
-        Eend::Sphere bootSphere(boot_position, traits.boot_radius);
+        Eend::Sphere bootSphere(boot_position, traits_total.boot_radius);
 
         const bool kicked = pointOnSphere(dog.getPosition3d(), bootSphere);
         if (kicked) {
@@ -107,19 +109,10 @@ void BootThrow::hit(Eend::Point trey_position, Dog& dog) {
     }
 };
 
-bool BootThrow::enabled() { return !BootThrow::item_traits.empty(); };
-
-void BootThrow::addTraits(BootThrowTraits new_traits) {
-    BootThrow::traits += new_traits;
-    item_traits.push(new_traits);
+void BootThrow::addTraits(BootThrowTraits new_traits, std::filesystem::path texture) {
+    trait_queue.addTraits(new_traits, texture);
 };
 
-void BootThrow::popTraits() {
-    if (enabled()) {
-        BootThrowTraits oldTraits = item_traits.front();
-        traits -= oldTraits;
-        item_traits.pop();
-    }
-};
+void BootThrow::popTraits() { trait_queue.removeTraits(); };
 
-void BootThrow::emptyTraits() { item_traits = std::queue<BootThrowTraits>(); }
+void BootThrow::emptyTraits() { trait_queue.removeTraits(); }

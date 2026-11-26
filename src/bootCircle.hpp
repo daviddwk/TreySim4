@@ -1,11 +1,11 @@
 #pragma once
 
 #include <glm/ext/quaternion_transform.hpp>
-#include <queue>
 
 #include <Eendgine/frameLimiter.hpp>
 
 #include "dog.hpp"
+#include "traitQueue.hpp"
 
 namespace Eend = Eendgine;
 
@@ -37,18 +37,18 @@ class BootCircle { // TODO particle system that follows boot!
 
         void update(Eend::Point trey_position);
         void hit(Eend::Point trey_position, Dog& dog);
-        bool enabled();
 
-        void addTraits(BootCircleTraits newTraits);
+        void addTraits(BootCircleTraits newTraits, std::filesystem::path texture);
         void removeTraits();
         void emptyTraits();
 
     private:
+        void positionIcons();
+
         std::optional<Eend::BoardId> boot_sprite;
 
         Eend::Point boot_position;
         Eend::Vector2D boot_rotation;
 
-        BootCircleTraits traits;
-        std::queue<BootCircleTraits> item_traits;
+        TraitQueue<BootCircleTraits, 0.0f> trait_queue;
 };

@@ -29,9 +29,9 @@ class Trey {
         void setPosition(Eend::Point position);
         void setAlive(bool alive);
 
-        void pickupItem(BootCircleTraits);
-        void pickupItem(BootThrowTraits);
-        void pickupItem(BootKickTraits traits);
+        void pickupItem(BootCircleTraits traits, std::filesystem::path texture);
+        void pickupItem(BootThrowTraits traits, std::filesystem::path texture);
+        void pickupItem(BootKickTraits traits, std::filesystem::path texture);
 
         Eend::Point getPosition();
         Eend::Point2D getPosition2D();

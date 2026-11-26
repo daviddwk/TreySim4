@@ -6,6 +6,7 @@
 
 #include "collision.hpp"
 #include "dog.hpp"
+#include "traitQueue.hpp"
 
 class BootThrowTraits {
     public:
@@ -42,8 +43,7 @@ class BootThrow {
         void update(Eend::Point trey_position, Eend::Vector2D trey_direction);
         void hit(Eend::Point trey_position, Dog& dog);
 
-        bool enabled();
-        void addTraits(BootThrowTraits new_traits);
+        void addTraits(BootThrowTraits new_traits, std::filesystem::path texture);
         void popTraits();
         void emptyTraits();
 
@@ -53,8 +53,7 @@ class BootThrow {
 
         Eend::Vector throw_vector;
 
-        BootThrowTraits traits;
-        std::queue<BootThrowTraits> item_traits;
+        TraitQueue<BootThrowTraits, 110.0f> trait_queue;
 
         float last_throw;
 };
